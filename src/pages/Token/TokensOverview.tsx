@@ -25,6 +25,8 @@ export default function TokensOverview() {
   const [savedTokens] = useSavedTokens()
   const watchListTokens = useTokenDatas(savedTokens)
 
+  console.log('formattedTokens', formattedTokens)
+
   return (
     <PageWrapper>
       <AutoColumn gap="lg">

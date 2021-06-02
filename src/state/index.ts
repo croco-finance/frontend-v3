@@ -9,6 +9,7 @@ import multicall from './multicall/reducer'
 import protocol from './protocol/reducer'
 import tokens from './tokens/reducer'
 import pools from './pools/reducer'
+import simulator from './simulator/reducer'
 
 const PERSISTED_KEYS: string[] = ['user', 'lists']
 
@@ -21,6 +22,7 @@ const store = configureStore({
     protocol,
     tokens,
     pools,
+    simulator,
   },
   middleware: [...getDefaultMiddleware({ thunk: false, immutableCheck: false }), save({ states: PERSISTED_KEYS })],
   preloadedState: load({ states: PERSISTED_KEYS }),

@@ -49,6 +49,7 @@ export interface Colors {
   yellow3: Color
   blue1: Color
   blue2: Color
+  black1: Color
 }
 
 export interface Grids {
@@ -57,9 +58,28 @@ export interface Grids {
   lg: number
 }
 
+export interface FontWeights {
+  light: number
+  regular: number
+  medium: number
+  demiBold: number
+  bold: number
+}
+
+export interface FontSizes {
+  tiny: string
+  small: string
+  normal: string
+  h1: string
+  h2: string
+  h3: string
+}
+
 declare module 'styled-components' {
   export interface DefaultTheme extends Colors {
     grids: Grids
+    fontWeight: FontWeights
+    fontSize: FontSizes
 
     // shadows
     shadow1: string

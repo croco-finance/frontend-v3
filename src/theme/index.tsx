@@ -18,6 +18,23 @@ export const MEDIA_WIDTHS = {
   upToLarge: 1280,
 }
 
+export const FONT_WEIGHTS = {
+  light: 300,
+  regular: 400,
+  medium: 500,
+  demiBold: 600,
+  bold: 700,
+} as const
+
+export const FONT_SIZES = {
+  tiny: '12px',
+  small: '14px',
+  normal: '16px',
+  h1: '24px',
+  h2: '20px',
+  h3: '18px',
+} as const
+
 const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } = Object.keys(MEDIA_WIDTHS).reduce(
   (accumulator, size) => {
     ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
@@ -84,6 +101,7 @@ export function colors(darkMode: boolean): Colors {
     yellow3: '#F3B71E',
     blue1: '#2172E5',
     blue2: '#5199FF',
+    black1: '#121417',
 
     // dont wanna forget these blue yet
     // blue4: darkMode ? '#153d6f70' : '#C4D9F8',
@@ -100,6 +118,9 @@ export function theme(darkMode: boolean): DefaultTheme {
       md: 12,
       lg: 24,
     },
+
+    fontWeight: FONT_WEIGHTS,
+    fontSize: FONT_SIZES,
 
     //shadows
     shadow1: darkMode ? '#000' : '#2F80ED',

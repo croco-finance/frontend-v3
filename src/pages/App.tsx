@@ -11,6 +11,7 @@ import Protocol from './Protocol'
 import PoolsOverview from './Pool/PoolsOverview'
 import TokensOverview from './Token/TokensOverview'
 import TopBar from 'components/Header/TopBar'
+import Simulator from './Simulator'
 import { RedirectInvalidToken } from './Token/redirects'
 import { LocalLoader } from 'components/Loader'
 import PoolPage from './Pool/PoolPage'
@@ -109,6 +110,8 @@ export default function App() {
               <Route exact strict path="/tokens" component={TokensOverview} />
               <Route exact strict path="/tokens/:address" component={RedirectInvalidToken} />
               <Route exact strict path="/pools/:address" component={PoolPage} />
+              <Route exact strict path="/simulator" component={Simulator} />
+              <Route exact strict path="/simulator/:address" component={Simulator} />
             </Switch>
             <Marginer />
           </BodyWrapper>
