@@ -174,14 +174,6 @@ export default function PositionOverview({
   const positionValueCurrentPrices = getTokenArrayValue(realTokenReservesCurrentPrice, currentTokenPricesUsd)
   const positionValueSimulatedPrices = getTokenArrayValue(realTokenReservesSimulatedPrice, simulatedTokenPricesUsd)
 
-  console.log('currentTokenPricesUsd', currentTokenPricesUsd)
-  console.log('simulatedTokenPricesUsd', simulatedTokenPricesUsd)
-  console.log('realTokenReservesCurrentPrice', realTokenReservesCurrentPrice)
-  console.log('realTokenReservesSimulatedPrice', realTokenReservesSimulatedPrice)
-  console.log('tokenBalancesDiff', tokenBalancesDiff)
-  console.log('positionValueSimulatedPrices', positionValueSimulatedPrices)
-  console.log('positionValueCurrentPrices', positionValueCurrentPrices)
-
   // TODO this shows different values when I switch price ratio order
   // maybe it's right, but is confusing
   // TODO show somewhere in the interface current token0/token1 price ratio so it's obvious.
@@ -271,17 +263,20 @@ export default function PositionOverview({
           <AddTitle>Capital efficiency coefficient</AddTitle>
           <div>{capitalEfficiencyCoefficient.toFixed(2)}</div>
         </AddRow>
-        <AddRow>
+        {/* <AddRow>
           <AddTitle>Simulated price</AddTitle>
           <div>{roundToNDecimals(simulatedTokenPricesUsd[0] / simulatedTokenPricesUsd[1], 5)}</div>
-        </AddRow>
+        </AddRow> */}
         <AddRow>
           <AddTitle>Impermanent loss:</AddTitle>
           <IlValuesWrapper>
             <IlRelative>
               {!ilAbsolute ? '0%' : formatPercentageValue(Math.abs(ilRelative) < 0.00001 ? 0 : ilRelative)}
             </IlRelative>
-            <IlAbsolute>{formatDollarAmount(-ilAbsolute)}</IlAbsolute>
+            <IlAbsolute>
+              {ilAbsolute > 0 ? '-' : ''}
+              {formatDollarAmount(ilAbsolute)}
+            </IlAbsolute>
           </IlValuesWrapper>
         </AddRow>
         <AddRow>

@@ -34,7 +34,7 @@ class SimulatedDensityChart extends PureComponent<Props, State> {
 
     return (
       <div>
-        <Title>Current liquidity distribution</Title>
+        <Title>Liquidity distribution</Title>
         <ResponsiveContainer width="100%" height={350}>
           <AreaChart
             width={800}
@@ -106,11 +106,11 @@ class SimulatedDensityChart extends PureComponent<Props, State> {
               x={currentPrice}
               strokeDasharray="3 3"
               isFront
-              stroke={theme.blue1}
+              stroke={theme.pink1}
               label={{
                 position: 'top',
                 value: 'Current price',
-                fill: theme.blue2,
+                fill: theme.pink1,
                 fontSize: 14,
               }}
             />

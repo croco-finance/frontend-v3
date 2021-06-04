@@ -1,7 +1,6 @@
 import numbro from 'numbro'
 
 export function getNumberSign(value: number) {
-  console.log('getNumberSign value: ', value)
   if (Number.isNaN(value)) {
     throw new Error('Value is not a number')
   }
@@ -17,7 +16,7 @@ export function getNumberSign(value: number) {
 export const formatDollarAmount = (num: number | undefined, digits = 2, round = true, signed = false) => {
   if (num === 0) return '$0.00'
   if (!num) return '-'
-  if (num < 0.001 && digits <= 3) {
+  if (num < 0.001 && digits <= 3 && !signed) {
     return '<$0.001'
   }
 

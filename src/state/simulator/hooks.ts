@@ -9,7 +9,6 @@ export function useAllSimulatorData(): SimulatorState {
 }
 
 export function useSwitchPriceRatioOrder() {
-  console.log('useSwitchPriceRatioOrder')
   const dispatch = useDispatch<AppDispatch>()
   return useCallback(() => dispatch(switchPriceRatioOrder()), [dispatch])
 }

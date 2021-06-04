@@ -163,7 +163,6 @@ export const getInvestmentIncreaseCoefficient = (currentTokenPrices: number[], p
 
   // compute constant product
   const k = virtualTokenReservesCurrentPrice[0] * virtualTokenReservesCurrentPrice[1]
-  console.log('k', k)
 
   // reserves at limit prices
   const { realTokenReservesAtLimitPriceMin, realTokenReservesAtLimitPriceMax } = getRealReservesAtLimitPrices(
@@ -192,7 +191,6 @@ export const getInvestmentIncreaseCoefficient = (currentTokenPrices: number[], p
   // investment increase coefficient (independent on simulated price)
   const tokenXVirtualValue = fakeInvestment / currentTokenPrices[0]
   const tokenXRealValue = realTokenReservesCurrentPrice[0] + realTokenReservesCurrentPrice[1] / currentPriceRatio
-
   return tokenXVirtualValue / tokenXRealValue
 }
 

@@ -48,8 +48,8 @@ export interface SimulatorState {
 const initialPosition: Position = {
   investmentUsd: 0,
   priceMin: 0,
-  priceMax: 0,
-  infiniteRangeSelected: true,
+  priceMax: Infinity,
+  infiniteRangeSelected: false,
 }
 
 const initialState: SimulatorState = {
@@ -66,10 +66,10 @@ const initialState: SimulatorState = {
   swapFee: 0,
   currentTokenPricesUsd: [],
   // simulation data
-  simulatedPriceCoefficients: [],
-  defaultSliderPriceCoefficients: [],
+  simulatedPriceCoefficients: [1, 1],
+  defaultSliderPriceCoefficients: [1, 1],
   // initiate the state with one position on infinite price range
-  positions: [initialPosition],
+  positions: [],
   priceRatioOrder: 'default',
 }
 
@@ -96,7 +96,7 @@ const fakeInitialState: SimulatorState = {
       investmentUsd: 1000000,
       priceMin: 1 / 2250,
       priceMax: 1 / 1000,
-      infiniteRangeSelected: true,
+      infiniteRangeSelected: false,
     },
     // {
     //     investmentUsd: 500000,
@@ -108,7 +108,10 @@ const fakeInitialState: SimulatorState = {
   priceRatioOrder: 'default',
 }
 
-export default createReducer(fakeInitialState, (builder) =>
+const MAX_PRICE_MULTIPLIER = 1.5
+const MIN_PRICE_MULTIPLIER = 0.5
+
+export default createReducer(initialState, (builder) =>
   builder
     .addCase(setNewSimulationPoolData, (state, action) => {
       const {
@@ -120,6 +123,7 @@ export default createReducer(fakeInitialState, (builder) =>
         poolTokenReserves,
         volume24Usd,
         swapFee,
+        positions,
       } = action.payload
       state.poolId = poolId
       state.tokenSymbols = tokenSymbols
@@ -129,6 +133,7 @@ export default createReducer(fakeInitialState, (builder) =>
       state.poolTokenReserves = poolTokenReserves
       state.volume24Usd = volume24Usd
       state.swapFee = swapFee
+      state.positions = positions
     })
     .addCase(resetSimulationCoefficients, (state, action) => {
       const tokenCount = state.simulatedPriceCoefficients.length
@@ -157,9 +162,10 @@ export default createReducer(fakeInitialState, (builder) =>
       state.positions[positionIndex].priceMax = price
     })
     .addCase(switchPriceRatioOrder, (state) => {
-      const currentOrder = state.priceRatioOrder
-      if (currentOrder === 'default') state.priceRatioOrder = 'reversed'
-      if (currentOrder === 'reversed') state.priceRatioOrder = 'default'
+      const { priceRatioOrder, currentTokenPricesUsd } = state
+
+      if (priceRatioOrder === 'default') state.priceRatioOrder = 'reversed'
+      if (priceRatioOrder === 'reversed') state.priceRatioOrder = 'default'
       // change the order of all token-related arrays
       state.tokenSymbols.reverse()
       state.tokenAddresses.reverse()
@@ -168,7 +174,6 @@ export default createReducer(fakeInitialState, (builder) =>
       state.poolTokenReserves?.reverse()
       state.simulatedPriceCoefficients.reverse()
       state.defaultSliderPriceCoefficients.reverse()
-
       // go through all positions and change bottom/top prices according to the new price reference
       state.positions.forEach((position) => {
         let newTop
@@ -176,7 +181,7 @@ export default createReducer(fakeInitialState, (builder) =>
 
         // make sure you don't divide by 0
         if (position.priceMin === 0) {
-          newTop = 0
+          newTop = MAX_PRICE_MULTIPLIER * (currentTokenPricesUsd[0] / currentTokenPricesUsd[1])
         } else {
           newTop = 1 / position.priceMin
         }
@@ -204,7 +209,12 @@ export default createReducer(fakeInitialState, (builder) =>
       state.positions[positionIndex].investmentUsd = value
     })
     .addCase(addPosition, (state) => {
-      state.positions.push({ ...initialPosition })
+      // get current price
+      const { currentTokenPricesUsd } = state
+      // compute intial maxPrice value
+      const priceMax = MAX_PRICE_MULTIPLIER * (currentTokenPricesUsd[0] / currentTokenPricesUsd[1])
+      const priceMin = MIN_PRICE_MULTIPLIER * (currentTokenPricesUsd[0] / currentTokenPricesUsd[1])
+      state.positions.push({ investmentUsd: 0, priceMin: priceMin, priceMax, infiniteRangeSelected: false })
     })
     .addCase(removePosition, (state, action) => {
       const { positionIndex } = action.payload

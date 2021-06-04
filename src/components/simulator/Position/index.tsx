@@ -30,9 +30,12 @@ const PositionDataWrapper = styled.div`
 const PositionSelectorWrapper = styled.div`
   border-bottom: none;
   padding: 20px;
+  border-right: 1px solid ${({ theme }) => theme.text5};
+  border-bottom: none;
   min-width: 44%;
   ${({ theme }) => theme.mediaWidth.upToMedium`
   border-right: none;
+  border-bottom: 1px solid ${({ theme }) => theme.text5};
   padding-right: 0;
   padding-bottom: 20px;
   margin-right: 0;

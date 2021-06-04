@@ -33,11 +33,12 @@ export default function PriceRangeSelector({ type = 'absolute', positionIndex, d
     <Wrapper>
       {/* TODO add second selector of the same type for reversed order */}
       {type === 'absolute' && (
-        <AbsoluteSelector
-          disabled={disabled}
-          positionIndex={positionIndex}
-          onPriceLimitChange={(value, limit) => handlePriceLimitChange(value, limit)}
-        />
+        // <AbsoluteSelector
+        //   disabled={disabled}
+        //   positionIndex={positionIndex}
+        //   onPriceLimitChange={(value, limit) => handlePriceLimitChange(value, limit)}
+        // />
+        <div></div>
       )}
       {type === 'relative' && (
         <RelativeSelector

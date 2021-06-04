@@ -6,11 +6,13 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: center;
+  // justify-content: flex-end;
 `
 
 const Title = styled.div`
   margin-right: 10px;
+  font-weight: ${({ theme }) => theme.fontWeight.light};
+  font-size: ${({ theme }) => theme.fontSize.small};
 `
 
 const Button = styled.button<{ selected: boolean }>`
@@ -34,7 +36,7 @@ interface Props {
 export default function RangeTypeSelect({ typeSelected, onTypeChange }: Props) {
   return (
     <Wrapper>
-      <Title>Range type:</Title>
+      {/* <Title>Selector type:</Title> */}
       <Button
         selected={typeSelected === 'absolute'}
         onClick={() => {

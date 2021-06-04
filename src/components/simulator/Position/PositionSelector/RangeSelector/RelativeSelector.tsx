@@ -11,6 +11,7 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100%;
   justify-content: center;
+  // margin-bottom: 10px;
 `
 
 const InputWrapper = styled.div`
@@ -35,6 +36,7 @@ const PercentageLabel = styled.div`
 const AbsValueWrapper = styled.div`
   margin-top: 6px;
   padding-right: 16px;
+  font-size: ${({ theme }) => theme.fontSize.small};
 `
 
 const InputLabel = styled.div`
@@ -42,10 +44,10 @@ const InputLabel = styled.div`
   color: ${({ theme }) => theme.text2};
   margin-bottom: 6px;
   padding-right: 16px;
+  font-size: ${({ theme }) => theme.fontSize.small};
 `
 
 const SliderWrapper = styled.div`
-  padding-top: 20px;
   margin-left: 20px;
   margin-right: 20px;
 `
@@ -64,18 +66,12 @@ interface Props {
 
 // eslint-disable-next-line no-empty-pattern
 export default function RelativeRangeSelector({
-  initialMinRatio = -100,
-  initialMaxRatio = 100,
-  positionIndex,
+  initialMinRatio = -50,
+  initialMaxRatio = 50,
   onPriceLimitChange,
   disabled,
-}: // positionIndex,
-// priceMin,
-// priceMax,
-// infiniteRangeSelected,
-Props) {
-  // const dispatch = useDispatch();
-  const { tokenSymbols, currentTokenPricesUsd } = useAllSimulatorData()
+}: Props) {
+  const { currentTokenPricesUsd } = useAllSimulatorData()
   const [sliderValues, setSliderValues] = useState([initialMinRatio, initialMaxRatio])
 
   const currentPriceRatio = currentTokenPricesUsd[0] / currentTokenPricesUsd[1]
@@ -102,8 +98,13 @@ Props) {
     setSliderValues(newValue)
     // call function that saves changes to redux
     // newValue is percentage difference which the user selected. Compute price from that and save that value to redux.
-    onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[0]), 'min')
-    onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[1]), 'max')
+    if (newValue[0]) {
+      onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[0]), 'min')
+    }
+
+    if (newValue[1]) {
+      onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[1]), 'max')
+    }
   }
 
   // TODO if mark out of range, do not show
@@ -131,7 +132,9 @@ Props) {
           />
           <PercentageLabel>%</PercentageLabel>
         </InputWrapper2>
-        <AbsValueWrapper>{getAbsolutePriceRatio(currentPriceRatio, sliderValues[0])}</AbsValueWrapper>
+        <AbsValueWrapper>
+          {sliderValues[0] ? getAbsolutePriceRatio(currentPriceRatio, sliderValues[0]) : '-'}
+        </AbsValueWrapper>
       </InputWrapper>
 
       <SliderWrapper>
@@ -161,7 +164,9 @@ Props) {
           />
           <PercentageLabel>%</PercentageLabel>
         </InputWrapper2>
-        <AbsValueWrapper>{getAbsolutePriceRatio(currentPriceRatio, sliderValues[1])}</AbsValueWrapper>
+        <AbsValueWrapper>
+          {sliderValues[1] ? getAbsolutePriceRatio(currentPriceRatio, sliderValues[1]) : '-'}
+        </AbsValueWrapper>
       </InputWrapper>
     </Wrapper>
   )

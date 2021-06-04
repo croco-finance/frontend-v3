@@ -5,14 +5,18 @@ import PriceSimulationBox from 'components/simulator/PriceSimulationBox'
 import useTheme from 'hooks/useTheme'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { addPosition, setDefaultSliderPriceCoefficient, setSimulatedPriceCoefficients } from 'state/simulator/actions'
+import {
+  addPosition,
+  setDefaultSliderPriceCoefficient,
+  setSimulatedPriceCoefficients,
+  setNewSimulationPoolData,
+} from 'state/simulator/actions'
 import { useAllSimulatorData } from 'state/simulator/hooks'
 import styled from 'styled-components'
 import SearchSmall from 'components/Search'
 import { usePoolDatas } from 'state/pools/hooks'
 import { RouteComponentProps } from 'react-router-dom'
 import PoolSelect from 'components/simulator/PoolSelect'
-import { setNewSimulationPoolData } from 'state/simulator/actions'
 import { useTokenPriceData, useAllTokenData } from 'state/tokens/hooks'
 import { ThemedBackground, PageWrapper } from 'pages/styled'
 import { useColor } from 'hooks/useColor'
@@ -20,6 +24,7 @@ import BarChart from 'components/BarChart'
 import SimulatedDensityChart from 'components/SimulatedDensityChart'
 import { multiplyArraysElementWise } from 'utils/math'
 import { getDataForSimulatedDensityChart } from 'utils/simulator'
+import Loader from 'components/Loader'
 
 const Wrapper = styled.div`
   padding-bottom: 40px;
@@ -93,8 +98,10 @@ const SimulationBoxWrapper = styled(ContentWrapper)`
 `
 
 const ChartWrapper = styled.div`
+  padding: 20px;
   width: 620px;
   margin-left: 50px;
+  background-color: ${({ theme }) => theme.bg0};
 `
 
 const Simulator = ({
@@ -104,7 +111,6 @@ const Simulator = ({
 }: RouteComponentProps<{ address: string }>) => {
   useEffect(() => {
     window.scrollTo(0, 0)
-    console.log('1. Calling simulator useEffect()')
   }, [])
 
   // theming
@@ -122,11 +128,10 @@ const Simulator = ({
 
   const poolData = usePoolDatas([address])[0]
   const allTokens = useAllTokenData()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    console.log('2. Calling simulator useEffect()')
-    console.log('poolData', poolData)
-    console.log('allTokens', allTokens)
+    setLoading(true)
 
     if (poolData && allTokens && Object.keys(poolData).length !== 0 && Object.keys(allTokens).length !== 0) {
       const token0Address = poolData.token0.address
@@ -146,10 +151,13 @@ const Simulator = ({
             poolTokenReserves: [poolData.tvlToken0, poolData.tvlToken1],
             swapFee: poolData.feeTier,
             volume24Usd: poolData.volumeUSD,
+            positions: [], // clear all positions
           })
         )
+        dispatch(addPosition())
       }
     }
+    setLoading(false)
 
     // check if pool address in url
     // if not address in url, allow user to set pool via search
@@ -168,7 +176,8 @@ const Simulator = ({
         <PoolSelectTitle>Choose pool: </PoolSelectTitle>
         <PoolSelect />
       </PoolSelectWrapper>
-      {address && poolData && allTokens && (
+      {loading && <Loader />}
+      {!loading && address && poolData && allTokens && (
         <>
           <PositionsHeadline>
             <PositionsTitle>Define your positions</PositionsTitle>
@@ -178,8 +187,7 @@ const Simulator = ({
             {/* TODO change the way how you render this. "positions" array will get re-render every time you change something in any of the positions */}
             {/* Consider using something like React.memo */}
             {positions.map((position, i) => (
-              // eslint-disable-next-line react/jsx-key
-              <PositionWrapper>
+              <PositionWrapper key={`${i}`}>
                 <Position
                   positionIndex={i}
                   investmentUsd={position.investmentUsd}

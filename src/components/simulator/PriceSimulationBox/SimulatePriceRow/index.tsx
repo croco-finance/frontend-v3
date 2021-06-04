@@ -88,9 +88,12 @@ const SimulatePriceRow = ({
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const typedValueFloat = parseFloat(event.target.value)
-    handleSliderMoveChange(typedValueFloat)
-    setSliderMidValue(typedValueFloat)
-    onNewDefaultSliderValue(typedValueFloat)
+    setSliderValue(typedValueFloat)
+    if (typedValueFloat) {
+      handleSliderMoveChange(typedValueFloat)
+      setSliderMidValue(typedValueFloat)
+      onNewDefaultSliderValue(typedValueFloat)
+    }
   }
 
   return (
