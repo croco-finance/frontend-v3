@@ -1,9 +1,9 @@
-import RangeSelector from 'components/RangeSelector'
 import Input from 'components/Input'
+import RangeSelector from 'components/RangeSelector'
+import React, { useEffect, useState } from 'react'
 import { useAllSimulatorData } from 'state/simulator/hooks'
-import React, { useState } from 'react'
 import styled from 'styled-components'
-import { roundToNDecimals, toTwoNonZeroDecimals } from 'utils/numbers'
+import { toTwoNonZeroDecimals } from 'utils/numbers'
 
 const Wrapper = styled.div`
   color: ${({ theme }) => theme.text2};
@@ -16,8 +16,7 @@ const Wrapper = styled.div`
 
 const InputWrapper = styled.div`
   width: 110px;
-  margin: 0 12px;
-  // padding-top: 32px;
+  margin: 0 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -37,6 +36,7 @@ const AbsValueWrapper = styled.div`
   margin-top: 6px;
   padding-right: 16px;
   font-size: ${({ theme }) => theme.fontSize.small};
+  color: ${({ theme }) => theme.text3};
 `
 
 const InputLabel = styled.div`
@@ -59,9 +59,6 @@ interface Props {
   positionIndex: number
   onPriceLimitChange: (value: number, limit: 'min' | 'max') => void
   disabled: boolean
-  // priceMin: Position['priceMin'];
-  // priceMax: Position['priceMax'];
-  // infiniteRangeSelected: Position['infiniteRangeSelected'];
 }
 
 // eslint-disable-next-line no-empty-pattern
@@ -79,20 +76,27 @@ export default function RelativeRangeSelector({
   // TODO there is some bug. The input values do not change when I change the priceRatioOrder
   const [sliderMinPrice, setSliderMinPrice] = useState(initialMinRatio.toString())
   const [sliderMaxPrice, setSliderMaxPrice] = useState(initialMaxRatio.toString())
+
+  const getAbsolutePriceRatio = (currentPriceRatio: number, percentageDifference: number) =>
+    toTwoNonZeroDecimals(currentPriceRatio + (percentageDifference / 100) * currentPriceRatio)
+
   const handleSliderLimitPriceChange = (value: string, price: 'min' | 'max') => {
     const typedValueFloat = parseFloat(value)
     if (price === 'min') {
       setSliderMinPrice(value)
       setSliderValues([value, sliderValues[1]])
+      if (typedValueFloat && typedValueFloat < parseFloat(sliderValues[1])) {
+        onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, typedValueFloat), 'min')
+      }
     }
     if (price === 'max') {
       setSliderMaxPrice(value)
       setSliderValues([sliderValues[0], value])
+      if (typedValueFloat && parseFloat(sliderValues[0]) < typedValueFloat) {
+        onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, typedValueFloat), 'max')
+      }
     }
   }
-
-  const getAbsolutePriceRatio = (currentPriceRatio: number, percentageDifference: number) =>
-    toTwoNonZeroDecimals(currentPriceRatio + (percentageDifference / 100) * currentPriceRatio)
 
   const handleSliderMoveChange = (newValue: number[]) => {
     setSliderValues([newValue[0].toString(), newValue[1].toString()])
@@ -102,7 +106,7 @@ export default function RelativeRangeSelector({
       onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[0]), 'min')
     }
 
-    if (newValue[1]) {
+    if (newValue[1] && newValue[0] < newValue[1]) {
       onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[1]), 'max')
     }
   }
@@ -114,6 +118,11 @@ export default function RelativeRangeSelector({
       label: '',
     },
   ]
+
+  useEffect(() => {
+    onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, initialMinRatio), 'min')
+    onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, initialMaxRatio), 'max')
+  }, [])
 
   return (
     <Wrapper>
@@ -143,7 +152,7 @@ export default function RelativeRangeSelector({
           min={parseFloat(sliderMinPrice)}
           max={parseFloat(sliderMaxPrice)}
           step={0.01}
-          width={240}
+          width={220}
           marks={marks}
           value={[parseFloat(sliderValues[0]), parseFloat(sliderValues[1])]}
           onChange={(_: any, newValue: number[]) => handleSliderMoveChange(newValue)}

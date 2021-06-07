@@ -1,6 +1,6 @@
 import Input from 'components/Input'
 import RangeSelector from 'components/RangeSelector'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAllSimulatorData } from 'state/simulator/hooks'
 import { Position } from 'state/simulator/reducer'
 import styled from 'styled-components'
@@ -16,8 +16,8 @@ const Wrapper = styled.div`
 `
 
 const InputWrapper = styled.div`
-  width: 110px;
-  margin: 0 12px;
+  width: 120px;
+  margin: 0 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -46,16 +46,7 @@ interface Props {
 }
 
 // eslint-disable-next-line no-empty-pattern
-export default function PriceRangeSelector({
-  onPriceLimitChange,
-  disabled,
-  priceMin,
-  priceMax,
-}: // positionIndex,
-// investmentUsd,
-
-// infiniteRangeSelected,
-Props) {
+export default function PriceRangeSelector({ onPriceLimitChange, disabled, priceMin, priceMax }: Props) {
   // const dispatch = useDispatch();
   const { currentTokenPricesUsd } = useAllSimulatorData()
   const [sliderValues, setSliderValues] = useState([
@@ -75,7 +66,7 @@ Props) {
       setSliderMinPrice(value)
       setSliderValues([value, sliderValues[1]])
       // call function that saves changes to redux
-      if (typedValueFloat) {
+      if (typedValueFloat && typedValueFloat < parseFloat(sliderValues[1])) {
         onPriceLimitChange(typedValueFloat, price)
       }
     }
@@ -83,7 +74,7 @@ Props) {
       setSliderMaxPrice(value)
       setSliderValues([sliderValues[0], value])
       // call function that saves changes to redux && make sure you don't save 0 as max price (avoid division error)
-      if (typedValueFloat && typedValueFloat > 0) {
+      if (typedValueFloat && typedValueFloat > 0 && parseFloat(sliderValues[0]) < typedValueFloat) {
         onPriceLimitChange(typedValueFloat, price)
       }
     }
@@ -119,6 +110,11 @@ Props) {
     },
   ]
 
+  useEffect(() => {
+    onPriceLimitChange(parseFloat(formatNumber(priceMin)), 'min')
+    onPriceLimitChange(parseFloat(formatNumber(priceMax)), 'max')
+  }, [])
+
   return (
     <Wrapper>
       <InputWrapper>
@@ -141,7 +137,7 @@ Props) {
           min={parseFloat(sliderMinPrice)}
           max={parseFloat(sliderMaxPrice)}
           step={(parseFloat(sliderMaxPrice) - parseFloat(sliderMinPrice)) / 100}
-          width={240}
+          width={220}
           marks={marks}
           value={[parseFloat(sliderValues[0]), parseFloat(sliderValues[1])]}
           onChange={(_: any, newValue: number[]) => handleSliderMoveChange(newValue)}
