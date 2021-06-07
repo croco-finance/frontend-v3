@@ -1,13 +1,30 @@
 /* eslint-disable max-classes-per-file */
 import React, { PureComponent } from 'react'
-import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, XAxis, YAxis, Label } from 'recharts'
+import { Area, AreaChart, CartesianGrid, Label, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import styled, { DefaultTheme } from 'styled-components'
+import { formatDollarAmount, formatNumber } from 'utils/numbers'
 
 const Title = styled.div`
-  color: ${({ theme }) => theme.text2};
+  color: ${({ theme }) => theme.text3};
+  font-size: ${({ theme }) => theme.fontSize.small}
   text-align: center;
   width: 100%;
+  padding-left: 75px;
 `
+
+const ReferenceLabelWrapper = styled.text`
+  color: red;
+`
+export function ReferenceLabel(props: any) {
+  const { fill, value, textAnchor, fontSize, viewBox, dy, dx } = props
+  const x = viewBox.width + viewBox.x - 52
+  const y = viewBox.y - 22
+  return (
+    <ReferenceLabelWrapper x={x} y={y} dy={dy} dx={dx} fill={fill} fontSize={fontSize} textAnchor={textAnchor}>
+      {value}
+    </ReferenceLabelWrapper>
+  )
+}
 
 interface ChartDataItem {
   price: number
@@ -34,8 +51,8 @@ class SimulatedDensityChart extends PureComponent<Props, State> {
 
     return (
       <div>
-        <Title>Liquidity distribution</Title>
-        <ResponsiveContainer width="100%" height={350}>
+        {/* <Title>Liquidity distribution</Title> */}
+        <ResponsiveContainer width="100%" height={320}>
           <AreaChart
             width={800}
             height={320}
@@ -44,10 +61,10 @@ class SimulatedDensityChart extends PureComponent<Props, State> {
               top: 40,
               right: 10,
               bottom: 40,
-              left: 70,
+              left: 20,
             }}
           >
-            <CartesianGrid strokeDasharray="2 2" />
+            <CartesianGrid strokeDasharray="2 2" stroke={theme.text4} />
             {/* consider adding reference area for the liquidity amount 
                         https://gaurav5430.medium.com/exploring-recharts-reference-area-2fd68bb33ca5 */}
             {data.map((_data, i) => {
@@ -71,8 +88,12 @@ class SimulatedDensityChart extends PureComponent<Props, State> {
               dataKey="price"
               tick={{
                 fontSize: theme.fontSize.small,
+                transform: 'translate(0, 6)',
               }}
               domain={['dataMin', 'dataMax']}
+              tickFormatter={formatNumber}
+              tickCount={10}
+              // interval={0}
             >
               <Label
                 value={`${tokenSymbols[0]} / ${tokenSymbols[1]}`}
@@ -87,26 +108,17 @@ class SimulatedDensityChart extends PureComponent<Props, State> {
             </XAxis>
 
             <YAxis
+              domain={[0, 1.25 * maxInvestment]}
               tick={{ fontSize: theme.fontSize.small }}
-              domain={[0, 1.2 * maxInvestment]}
-              label={{
-                value: 'Liquidity',
-                angle: -90,
-                offset: 460,
-                position: 'center',
-                dx: -90,
-                style: {
-                  textAnchor: 'middle',
-                  fontSize: theme.fontSize.normal,
-                  fill: theme.text2,
-                },
-              }}
+              tickFormatter={formatDollarAmount}
+              tickCount={6}
             />
             <ReferenceLine
               x={currentPrice}
               strokeDasharray="3 3"
               isFront
               stroke={theme.pink1}
+              // label={<ReferenceLabel value="Current Price" fill={theme.pink1} fontSize={14} />}
               label={{
                 position: 'top',
                 value: 'Current price',
@@ -121,12 +133,7 @@ class SimulatedDensityChart extends PureComponent<Props, State> {
                 strokeDasharray="3 3"
                 isFront
                 stroke={theme.green1}
-                label={{
-                  position: 'top',
-                  value: 'Simulated',
-                  fill: theme.green1,
-                  fontSize: 14,
-                }}
+                label={<ReferenceLabel value="Simulated price" fill={theme.green1} fontSize={14} />}
               />
             )}
           </AreaChart>

@@ -24,11 +24,6 @@ import styled from 'styled-components'
 import { multiplyArraysElementWise } from 'utils/math'
 import { getDataForSimulatedDensityChart } from 'utils/simulator'
 
-const Wrapper = styled.div`
-  padding-bottom: 40px;
-  width: 100%;
-`
-
 const ContentWrapper = styled.div`
   padding: 10px;
 `
@@ -94,12 +89,22 @@ const SimulationBoxWrapper = styled(ContentWrapper)`
   flex-direction: column;
   `}
 `
+const SimulationBoxAndChartWrapper = styled.div`
+  display: flex;
+`
+const SimulationBoxSectionWrapper = styled.div`
+  width: 50%;
+  margin-right: 10px;
+`
+const LiquidityChartSectionWrapper = styled.div`
+  width: 50%;
+  margin-left: 10px;
+`
 
-const ChartWrapper = styled.div`
+const LiquidityChartWrapper = styled.div`
   padding: 20px;
-  width: 620px;
-  margin-left: 50px;
   background-color: ${({ theme }) => theme.bg0};
+  border-radius: 10px;
 `
 
 const Simulator = ({
@@ -206,31 +211,35 @@ const Simulator = ({
             </AddPositionButtonWrapper>
           </PositionsSelectorWrapper>
           {/* TODO add overall positions overview */}
-          <SectionHeadline>Simulate token prices</SectionHeadline>
-          <SimulationBoxWrapper>
-            <PriceSimulationBox
-              poolId={poolId}
-              tokenSymbols={tokenSymbols}
-              tokenAddresses={tokenAddresses}
-              currentTokenPrices={currentTokenPricesUsd}
-              simulatedCoefficients={simulatedPriceCoefficients}
-              onSliderMoveChange={(newValue, index) => dispatch(setSimulatedPriceCoefficients({ newValue, index }))}
-              onNewDefaultSliderValue={(newValue, index) =>
-                dispatch(setDefaultSliderPriceCoefficient({ newValue, index }))
-              }
-            />
-
-            <ChartWrapper>
-              <SimulatedDensityChart
-                theme={theme}
-                currentPrice={currentPriceRatio}
-                simulatedPrice={simulatedPriceRatio}
-                data={chartData}
-                maxInvestment={maxInvestment}
+          <SimulationBoxAndChartWrapper>
+            <SimulationBoxSectionWrapper>
+              <SectionHeadline>Simulate token prices</SectionHeadline>
+              <PriceSimulationBox
+                poolId={poolId}
                 tokenSymbols={tokenSymbols}
+                tokenAddresses={tokenAddresses}
+                currentTokenPrices={currentTokenPricesUsd}
+                simulatedCoefficients={simulatedPriceCoefficients}
+                onSliderMoveChange={(newValue, index) => dispatch(setSimulatedPriceCoefficients({ newValue, index }))}
+                onNewDefaultSliderValue={(newValue, index) =>
+                  dispatch(setDefaultSliderPriceCoefficient({ newValue, index }))
+                }
               />
-            </ChartWrapper>
-          </SimulationBoxWrapper>
+            </SimulationBoxSectionWrapper>
+            <LiquidityChartSectionWrapper>
+              <SectionHeadline>Liquidity distribution</SectionHeadline>
+              <LiquidityChartWrapper>
+                <SimulatedDensityChart
+                  theme={theme}
+                  currentPrice={currentPriceRatio}
+                  simulatedPrice={simulatedPriceRatio}
+                  data={chartData}
+                  maxInvestment={maxInvestment}
+                  tokenSymbols={tokenSymbols}
+                />
+              </LiquidityChartWrapper>
+            </LiquidityChartSectionWrapper>
+          </SimulationBoxAndChartWrapper>
         </>
       )}
     </PageWrapper>

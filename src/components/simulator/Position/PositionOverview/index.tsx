@@ -1,6 +1,6 @@
 import { ButtonOutlined } from 'components/Button'
-import InlineCircle from 'components/InlineCircle'
 import VerticalCryptoAmounts from 'components/VerticalCryptoAmounts'
+import useTheme from 'hooks/useTheme'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { removePosition } from 'state/simulator/actions'
@@ -8,14 +8,13 @@ import { useAllSimulatorData } from 'state/simulator/hooks'
 import { Position } from 'state/simulator/reducer'
 import styled, { css } from 'styled-components'
 import { getTokenArrayValue, multiplyArraysElementWise, subtractArraysElementWise } from 'utils/math'
-import { formatDollarAmount, formatPercentageValue, getNumberSign, roundToNDecimals } from 'utils/numbers'
+import { formatDollarAmount, formatPercentageValue, getNumberSign } from 'utils/numbers'
 import {
   getCapitalEfficiencyCoefficient,
   getInvestmentIncreaseCoefficient,
   getSimulatedStatsForRange,
 } from 'utils/simulator'
 import GridRow from './GridRow'
-import useTheme from 'hooks/useTheme'
 
 const Wrapper = styled.div`
   display: flex;
@@ -45,7 +44,6 @@ const GridWrapper = styled.div`
   //     /* grid-template-columns: 140px minmax(90px, auto) minmax(90px, auto); */
   //   }
 `
-
 const RightPaddingWrapper = styled.div`
   padding-right: 10px;
 `
@@ -81,7 +79,6 @@ const AddTitle = styled.div`
   flex-grow: 1;
   color: ${({ theme }) => theme.text2};
   font-weight: ${({ theme }) => theme.fontWeight.medium};
-  margin-top: 10px;
 `
 
 const IlValuesWrapper = styled.div`
@@ -98,10 +95,6 @@ const IlAbsolute = styled.div`
   color: ${({ theme }) => theme.text2};
   min-width: 120px;
   text-align: right;
-`
-
-const PositionStatus = styled.div`
-  color: ${({ theme }) => theme.text3};
 `
 
 const RemovePositionWrapper = styled.div`
@@ -173,34 +166,6 @@ export default function PositionOverview({
   // position value for current and simulated prices
   const positionValueCurrentPrices = getTokenArrayValue(realTokenReservesCurrentPrice, currentTokenPricesUsd)
   const positionValueSimulatedPrices = getTokenArrayValue(realTokenReservesSimulatedPrice, simulatedTokenPricesUsd)
-
-  // TODO this shows different values when I switch price ratio order
-  // maybe it's right, but is confusing
-  // TODO show somewhere in the interface current token0/token1 price ratio so it's obvious.
-  const getPositionStatus = (currentPrice: number, priceMin: number, priceMax: number) => {
-    if (currentPrice < priceMin) {
-      return (
-        <PositionStatus>
-          <InlineCircle color={theme.red1} size={22} marginRight={8} />
-          Position is not gaining fees (price is below price range)
-        </PositionStatus>
-      )
-    }
-    if (currentPrice > priceMax) {
-      return (
-        <PositionStatus>
-          <InlineCircle color={theme.red1} size={22} marginRight={8} />
-          Position is not gaining fees (price is above price range)
-        </PositionStatus>
-      )
-    }
-    return (
-      <PositionStatus>
-        <InlineCircle color={theme.green1} size={22} marginRight={8} />
-        Position is gaining fees
-      </PositionStatus>
-    )
-  }
 
   return (
     <Wrapper>
@@ -278,13 +243,6 @@ export default function PositionOverview({
               {formatDollarAmount(ilAbsolute)}
             </IlAbsolute>
           </IlValuesWrapper>
-        </AddRow>
-        <AddRow>
-          {getPositionStatus(
-            simulatedTokenPricesUsd[0] / simulatedTokenPricesUsd[1],
-            infiniteRangeSelected ? 0 : priceMin,
-            infiniteRangeSelected ? Infinity : priceMax
-          )}
         </AddRow>
       </AdditionalInfoWrapper>
       <RemovePositionWrapper>

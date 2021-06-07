@@ -8,7 +8,6 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.bg0};
   padding: 28px;
   border-radius: 10px;
-  width: 600px;
   height: fit-content;
 `
 

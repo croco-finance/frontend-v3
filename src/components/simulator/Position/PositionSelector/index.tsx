@@ -70,12 +70,13 @@ const InvestmentInputWrapper = styled.div`
   width: 120px;
   margin-right: 10px;
 `
-
-const PriceLabel = styled.div`
-  width: 100%;
-  text-align: center;
+const PriceLabelsWrapper = styled.div`
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-self: center;
+`
+const PriceLabel = styled.div`
+  display: flex;
   margin: 4px 0;
 `
 
@@ -199,14 +200,16 @@ export default function PositionSelector({
           <RangeSelector type={rangeSelectorType} positionIndex={positionIndex} disabled={infiniteRangeSelected} />
         </RangeSelectorWrapper> */}
 
-        <PriceLabel>
-          <PriceLabelTitle>Current:</PriceLabelTitle>
-          {`1 ${tokenSymbols[0]} = ${formatNumber(currentPriceRatio)} ${tokenSymbols[1]} `}
-        </PriceLabel>
-        <PriceLabel>
-          <PriceLabelTitle>Simulated:</PriceLabelTitle>
-          {`1 ${tokenSymbols[0]} = ${formatNumber(simulatedPriceRatio)} ${tokenSymbols[1]} `}
-        </PriceLabel>
+        <PriceLabelsWrapper>
+          <PriceLabel>
+            <PriceLabelTitle>Current:</PriceLabelTitle>
+            {`1 ${tokenSymbols[0]} = ${formatNumber(currentPriceRatio)} ${tokenSymbols[1]} `}
+          </PriceLabel>
+          <PriceLabel>
+            <PriceLabelTitle>Simulated:</PriceLabelTitle>
+            {`1 ${tokenSymbols[0]} = ${formatNumber(simulatedPriceRatio)} ${tokenSymbols[1]} `}
+          </PriceLabel>
+        </PriceLabelsWrapper>
 
         <InfiniteRangeWrapper>
           <Checkbox
