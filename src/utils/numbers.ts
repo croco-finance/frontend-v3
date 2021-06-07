@@ -99,3 +99,29 @@ export function roundToNDecimals(value: number, decimals: number) {
   const coeff = decimalsCount < decimals ? 10 ** decimalsCount : 10 ** decimals
   return Math.round(value * coeff) / coeff
 }
+
+export function getPositionOfFirstNonZeroDecimal(value: number) {
+  // get the decimal part only
+  const decimals = value % 1
+  // if there are no decimals, return -1
+  if (decimals === 0) return -1
+  // otherwise return decimals position (ex. for 10.03 return 1)
+  return -Math.floor(Math.log10(decimals))
+}
+
+export function formatNumber(value: number) {
+  // get the decimal part only
+  const firstDecimalPosition = getPositionOfFirstNonZeroDecimal(value)
+
+  if (firstDecimalPosition > 5) return value.toFixed(firstDecimalPosition)
+  if (firstDecimalPosition >= 2) {
+    const tmp = value.toFixed(firstDecimalPosition + 1)
+    // check if te last number of tmp is zero. If so, do not return it
+    if (tmp.charAt(tmp.length - 1) === '0') {
+      return value.toFixed(firstDecimalPosition)
+    } else {
+      return tmp
+    }
+  }
+  return value.toFixed(2)
+}

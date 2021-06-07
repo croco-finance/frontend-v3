@@ -1,30 +1,28 @@
 import { ButtonSecondary } from 'components/Button'
+import Loader from 'components/Loader'
+import SimulatedDensityChart from 'components/SimulatedDensityChart'
+import PoolSelect from 'components/simulator/PoolSelect'
 import Position from 'components/simulator/Position'
 import PriceReferenceSwitch from 'components/simulator/PriceReferenceSwitch'
 import PriceSimulationBox from 'components/simulator/PriceSimulationBox'
+import { useColor } from 'hooks/useColor'
 import useTheme from 'hooks/useTheme'
+import { PageWrapper, ThemedBackground } from 'pages/styled'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { RouteComponentProps } from 'react-router-dom'
+import { usePoolDatas } from 'state/pools/hooks'
 import {
   addPosition,
   setDefaultSliderPriceCoefficient,
-  setSimulatedPriceCoefficients,
   setNewSimulationPoolData,
+  setSimulatedPriceCoefficients,
 } from 'state/simulator/actions'
 import { useAllSimulatorData } from 'state/simulator/hooks'
+import { useAllTokenData } from 'state/tokens/hooks'
 import styled from 'styled-components'
-import SearchSmall from 'components/Search'
-import { usePoolDatas } from 'state/pools/hooks'
-import { RouteComponentProps } from 'react-router-dom'
-import PoolSelect from 'components/simulator/PoolSelect'
-import { useTokenPriceData, useAllTokenData } from 'state/tokens/hooks'
-import { ThemedBackground, PageWrapper } from 'pages/styled'
-import { useColor } from 'hooks/useColor'
-import BarChart from 'components/BarChart'
-import SimulatedDensityChart from 'components/SimulatedDensityChart'
 import { multiplyArraysElementWise } from 'utils/math'
 import { getDataForSimulatedDensityChart } from 'utils/simulator'
-import Loader from 'components/Loader'
 
 const Wrapper = styled.div`
   padding-bottom: 40px;
@@ -180,7 +178,7 @@ const Simulator = ({
       {!loading && address && poolData && allTokens && (
         <>
           <PositionsHeadline>
-            <PositionsTitle>Define your positions</PositionsTitle>
+            <PositionsTitle>Define positions</PositionsTitle>
             {positions.length > 0 && <PriceReferenceSwitch />}
           </PositionsHeadline>
           <PositionsSelectorWrapper>

@@ -1,10 +1,10 @@
-import RangeSelector from 'components/RangeSelector'
 import Input from 'components/Input'
-import { useAllSimulatorData } from 'state/simulator/hooks'
+import RangeSelector from 'components/RangeSelector'
 import React, { useState } from 'react'
-import styled from 'styled-components'
-import { toTwoNonZeroDecimals, roundToNDecimals } from 'utils/numbers'
+import { useAllSimulatorData } from 'state/simulator/hooks'
 import { Position } from 'state/simulator/reducer'
+import styled from 'styled-components'
+import { formatNumber } from 'utils/numbers'
 
 const Wrapper = styled.div`
   color: ${({ theme }) => theme.text2};
@@ -58,27 +58,30 @@ export default function PriceRangeSelector({
 Props) {
   // const dispatch = useDispatch();
   const { currentTokenPricesUsd } = useAllSimulatorData()
-  const [sliderValues, setSliderValues] = useState([priceMin, priceMax])
+  const [sliderValues, setSliderValues] = useState([
+    formatNumber(priceMin).toString(),
+    formatNumber(priceMax).toString(),
+  ])
 
   const currentPriceRatio = currentTokenPricesUsd[0] / currentTokenPricesUsd[1]
 
   // TODO there is some bug. The input values do not change when I change the priceRatioOrder
-  const [sliderMinPrice, setSliderMinPrice] = useState(priceMin)
-  const [sliderMaxPrice, setSliderMaxPrice] = useState(priceMax)
+  const [sliderMinPrice, setSliderMinPrice] = useState(formatNumber(priceMin).toString())
+  const [sliderMaxPrice, setSliderMaxPrice] = useState(formatNumber(priceMax).toString())
 
   const handleSliderLimitPriceChange = (value: string, price: 'min' | 'max') => {
     const typedValueFloat = parseFloat(value)
     if (price === 'min') {
-      setSliderMinPrice(typedValueFloat)
-      setSliderValues([typedValueFloat, sliderValues[1]])
+      setSliderMinPrice(value)
+      setSliderValues([value, sliderValues[1]])
       // call function that saves changes to redux
       if (typedValueFloat) {
         onPriceLimitChange(typedValueFloat, price)
       }
     }
     if (price === 'max') {
-      setSliderMaxPrice(typedValueFloat)
-      setSliderValues([sliderValues[0], typedValueFloat])
+      setSliderMaxPrice(value)
+      setSliderValues([sliderValues[0], value])
       // call function that saves changes to redux && make sure you don't save 0 as max price (avoid division error)
       if (typedValueFloat && typedValueFloat > 0) {
         onPriceLimitChange(typedValueFloat, price)
@@ -87,7 +90,7 @@ Props) {
   }
 
   const handleSliderMoveChange = (newValue: number[]) => {
-    setSliderValues(newValue)
+    setSliderValues([newValue[0].toString(), newValue[1].toString()])
     // call function that saves changes to redux
     onPriceLimitChange(newValue[0], 'min')
     // make sure max price is not zero so you don't come across divison error
@@ -111,7 +114,7 @@ Props) {
 
   const marks = [
     {
-      value: getSliderMarkValue(currentPriceRatio, sliderMinPrice, sliderMaxPrice),
+      value: getSliderMarkValue(currentPriceRatio, parseFloat(sliderMinPrice), parseFloat(sliderMaxPrice)),
       label: '',
     },
   ]
@@ -135,13 +138,12 @@ Props) {
       <SliderWrapper>
         <RangeSelector
           disabled={disabled}
-          min={sliderMinPrice}
-          max={sliderMaxPrice}
-          // TODO compute step based on the amount of decimal of currentPriceRatio
-          step={0.0001}
+          min={parseFloat(sliderMinPrice)}
+          max={parseFloat(sliderMaxPrice)}
+          step={(parseFloat(sliderMaxPrice) - parseFloat(sliderMinPrice)) / 100}
           width={240}
           marks={marks}
-          value={sliderValues}
+          value={[parseFloat(sliderValues[0]), parseFloat(sliderValues[1])]}
           onChange={(_: any, newValue: number[]) => handleSliderMoveChange(newValue)}
         />
       </SliderWrapper>

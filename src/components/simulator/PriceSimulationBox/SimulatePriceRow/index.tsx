@@ -78,20 +78,20 @@ const SimulatePriceRow = ({
   numSteps = 100,
 }: Props) => {
   const theme = useTheme()
-  const [sliderMidValue, setSliderMidValue] = useState(defaultSliderValue)
-  const [sliderValue, setSliderValue] = useState(defaultSliderValue)
+  const [sliderMidValue, setSliderMidValue] = useState(defaultSliderValue.toString())
+  const [sliderValue, setSliderValue] = useState(defaultSliderValue.toString())
 
-  const handleSliderMoveChange = (newValue: number) => {
+  const handleSliderMoveChange = (newValue: string) => {
     setSliderValue(newValue)
-    onSliderMoveChange(newValue)
+    onSliderMoveChange(parseFloat(newValue))
   }
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const typedValueFloat = parseFloat(event.target.value)
-    setSliderValue(typedValueFloat)
+  const handleInputChange = (value: string) => {
+    const typedValueFloat = parseFloat(value)
+    setSliderValue(value)
     if (typedValueFloat) {
-      handleSliderMoveChange(typedValueFloat)
-      setSliderMidValue(typedValueFloat)
+      handleSliderMoveChange(value)
+      setSliderMidValue(value)
       onNewDefaultSliderValue(typedValueFloat)
     }
   }
@@ -109,7 +109,7 @@ const SimulatePriceRow = ({
           type="number"
           value={sliderValue.toString()}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            handleInputChange(event)
+            handleInputChange(event.target.value)
           }}
         />
         <div
@@ -125,12 +125,14 @@ const SimulatePriceRow = ({
         <SliderLeftLabel>0</SliderLeftLabel>
         <Slider
           min={0}
-          max={sliderMidValue * 2}
-          step={sliderMidValue / numSteps}
-          value={sliderValue}
-          onChange={(_: any, newValue: number) => handleSliderMoveChange(newValue)}
+          max={parseFloat(sliderMidValue) * 2}
+          step={parseFloat(sliderMidValue) / numSteps}
+          value={parseFloat(sliderValue)}
+          onChange={(_: any, newValue: number) => handleSliderMoveChange(newValue.toString())}
         />
-        <SliderRightLabel>{sliderMidValue * 2 ? `${sliderMidValue * 2}x` : ''}</SliderRightLabel>
+        <SliderRightLabel>
+          {parseFloat(sliderMidValue) * 2 ? `${parseFloat(sliderMidValue) * 2}x` : ''}
+        </SliderRightLabel>
       </SliderWrapper>
       <SimulatedPrice>{formatDollarAmount(simulatedPrice)}</SimulatedPrice>
     </Wrapper>

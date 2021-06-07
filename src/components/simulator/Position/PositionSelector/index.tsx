@@ -2,18 +2,21 @@ import Checkbox from 'components/Checkbox'
 import Input from 'components/Input'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { setPositionInvestedAmount, toggleInfiniteRange } from 'state/simulator/actions'
+import {
+  setPositionInvestedAmount,
+  setPositionMaxPrice,
+  setPositionMinPrice,
+  toggleInfiniteRange,
+} from 'state/simulator/actions'
+import { useAllSimulatorData } from 'state/simulator/hooks'
 import { Position } from 'state/simulator/reducer'
 import styled from 'styled-components'
+import { multiplyArraysElementWise } from 'utils/math'
+import { formatNumber } from 'utils/numbers'
 import { AppDispatch } from '../../../../state'
-import RangeSelector from './RangeSelector'
-import RangeTypeSelect, { RangeTypes } from './RangeTypeSelect'
-import { useAllSimulatorData } from 'state/simulator/hooks'
 import AbsoluteSelector from './RangeSelector/AbsoluteSelector'
 import RelativeSelector from './RangeSelector/RelativeSelector'
-import { setPositionMinPrice, setPositionMaxPrice } from 'state/simulator/actions'
-import { roundToNDecimals } from 'utils/numbers'
-import { multiplyArraysElementWise } from 'utils/math'
+import RangeTypeSelect, { RangeTypes } from './RangeTypeSelect'
 
 const Wrapper = styled.div`
   color: ${({ theme }) => theme.text3};
@@ -198,11 +201,11 @@ export default function PositionSelector({
 
         <PriceLabel>
           <PriceLabelTitle>Current:</PriceLabelTitle>
-          {`1 ${tokenSymbols[0]} = ${roundToNDecimals(currentPriceRatio, 5)} ${tokenSymbols[1]} `}
+          {`1 ${tokenSymbols[0]} = ${formatNumber(currentPriceRatio)} ${tokenSymbols[1]} `}
         </PriceLabel>
         <PriceLabel>
           <PriceLabelTitle>Simulated:</PriceLabelTitle>
-          {`1 ${tokenSymbols[0]} = ${roundToNDecimals(simulatedPriceRatio, 5)} ${tokenSymbols[1]} `}
+          {`1 ${tokenSymbols[0]} = ${formatNumber(simulatedPriceRatio)} ${tokenSymbols[1]} `}
         </PriceLabel>
 
         <InfiniteRangeWrapper>
@@ -218,7 +221,7 @@ export default function PositionSelector({
       </RangeInputsWrapper>
 
       <InvestmentWrapper>
-        <InvestmentTitle>Your investment in this position:</InvestmentTitle>
+        <InvestmentTitle>Investment in this position:</InvestmentTitle>
         <InvestmentInputWrapper>
           {/* TODO display in formatted fiat format */}
           <Input

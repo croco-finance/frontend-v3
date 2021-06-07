@@ -72,22 +72,22 @@ export default function RelativeRangeSelector({
   disabled,
 }: Props) {
   const { currentTokenPricesUsd } = useAllSimulatorData()
-  const [sliderValues, setSliderValues] = useState([initialMinRatio, initialMaxRatio])
+  const [sliderValues, setSliderValues] = useState([initialMinRatio.toString(), initialMaxRatio.toString()])
 
   const currentPriceRatio = currentTokenPricesUsd[0] / currentTokenPricesUsd[1]
 
   // TODO there is some bug. The input values do not change when I change the priceRatioOrder
-  const [sliderMinPrice, setSliderMinPrice] = useState(initialMinRatio)
-  const [sliderMaxPrice, setSliderMaxPrice] = useState(initialMaxRatio)
+  const [sliderMinPrice, setSliderMinPrice] = useState(initialMinRatio.toString())
+  const [sliderMaxPrice, setSliderMaxPrice] = useState(initialMaxRatio.toString())
   const handleSliderLimitPriceChange = (value: string, price: 'min' | 'max') => {
     const typedValueFloat = parseFloat(value)
     if (price === 'min') {
-      setSliderMinPrice(typedValueFloat)
-      setSliderValues([typedValueFloat, sliderValues[1]])
+      setSliderMinPrice(value)
+      setSliderValues([value, sliderValues[1]])
     }
     if (price === 'max') {
-      setSliderMaxPrice(typedValueFloat)
-      setSliderValues([sliderValues[0], typedValueFloat])
+      setSliderMaxPrice(value)
+      setSliderValues([sliderValues[0], value])
     }
   }
 
@@ -95,7 +95,7 @@ export default function RelativeRangeSelector({
     toTwoNonZeroDecimals(currentPriceRatio + (percentageDifference / 100) * currentPriceRatio)
 
   const handleSliderMoveChange = (newValue: number[]) => {
-    setSliderValues(newValue)
+    setSliderValues([newValue[0].toString(), newValue[1].toString()])
     // call function that saves changes to redux
     // newValue is percentage difference which the user selected. Compute price from that and save that value to redux.
     if (newValue[0]) {
@@ -133,19 +133,19 @@ export default function RelativeRangeSelector({
           <PercentageLabel>%</PercentageLabel>
         </InputWrapper2>
         <AbsValueWrapper>
-          {sliderValues[0] ? getAbsolutePriceRatio(currentPriceRatio, sliderValues[0]) : '-'}
+          {sliderValues[0] ? getAbsolutePriceRatio(currentPriceRatio, parseFloat(sliderValues[0])) : '-'}
         </AbsValueWrapper>
       </InputWrapper>
 
       <SliderWrapper>
         <RangeSelector
           disabled={disabled}
-          min={sliderMinPrice}
-          max={sliderMaxPrice}
+          min={parseFloat(sliderMinPrice)}
+          max={parseFloat(sliderMaxPrice)}
           step={0.01}
           width={240}
           marks={marks}
-          value={sliderValues}
+          value={[parseFloat(sliderValues[0]), parseFloat(sliderValues[1])]}
           onChange={(_: any, newValue: number[]) => handleSliderMoveChange(newValue)}
         />
       </SliderWrapper>
@@ -165,7 +165,7 @@ export default function RelativeRangeSelector({
           <PercentageLabel>%</PercentageLabel>
         </InputWrapper2>
         <AbsValueWrapper>
-          {sliderValues[1] ? getAbsolutePriceRatio(currentPriceRatio, sliderValues[1]) : '-'}
+          {sliderValues[1] ? getAbsolutePriceRatio(currentPriceRatio, parseFloat(sliderValues[1])) : '-'}
         </AbsValueWrapper>
       </InputWrapper>
     </Wrapper>

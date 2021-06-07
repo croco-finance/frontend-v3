@@ -227,7 +227,7 @@ const PoolSelect = ({ ...rest }) => {
             onChange={(e) => {
               setValue(e.target.value)
             }}
-            placeholder="Search pools or tokens"
+            placeholder="Search pools"
             ref={ref}
             onFocus={() => {
               setFocused(true)
