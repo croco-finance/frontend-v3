@@ -119,7 +119,6 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
 
   return (
     <Wrapper>
-      {/* TODO add "REMOVE POSITION button */}
       <CollapsibleContainer
         isOpenedDefault
         onChange={(isOpened: boolean) => {
@@ -128,11 +127,6 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
         header={
           <PositionHeadline isOpened={isExpanded}>
             Position #{positionIndex + 1}
-            {/* {getPositionStatus(
-                        simulatedTokenPricesUsd[0] / simulatedTokenPricesUsd[1],
-                        priceMin,
-                        priceMax,
-                    )} */}
             {getPositionStatus(
               simulatedTokenPricesUsd[0] / simulatedTokenPricesUsd[1],
               infiniteRangeSelected ? 0 : priceMin,
@@ -155,7 +149,6 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
               />
             </PositionSelectorWrapper>
             <PositionOverviewWrapper>
-              {' '}
               <PositionOverview
                 positionIndex={positionIndex}
                 investmentUsd={investmentUsd}

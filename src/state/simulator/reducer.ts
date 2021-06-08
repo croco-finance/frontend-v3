@@ -13,7 +13,19 @@ import {
   removePosition,
 } from './actions'
 
+// creates unique id for a position
+function makeid(length: number) {
+  let result = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const charactersLength = characters.length
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+  }
+  return result
+}
+
 export interface Position {
+  id: string
   investmentUsd: number
   priceMin: number
   priceMax: number
@@ -45,13 +57,6 @@ export interface SimulatorState {
   priceRatioOrder: 'default' | 'reversed'
 }
 
-const initialPosition: Position = {
-  investmentUsd: 0,
-  priceMin: 0,
-  priceMax: Infinity,
-  infiniteRangeSelected: false,
-}
-
 const initialState: SimulatorState = {
   // pool data fetching
   fetchError: false,
@@ -70,41 +75,6 @@ const initialState: SimulatorState = {
   defaultSliderPriceCoefficients: [1, 1],
   // initiate the state with one position on infinite price range
   positions: [],
-  priceRatioOrder: 'default',
-}
-
-const fakeInitialState: SimulatorState = {
-  // pool data fetching
-  fetchError: false,
-  loading: false,
-  // pool data
-  poolId: '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
-  tokenSymbols: ['DAI', 'WETH'],
-  tokenAddresses: ['0x6B175474E89094C44Da98b954EedeAC495271d0F', '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'],
-  tokenWeights: [0.5, 0.5],
-  poolTokenReserves: [73875146, 29406],
-  volume24Usd: 45654504,
-  swapFee: 0.03,
-  currentTokenPricesUsd: [1, 1500],
-  // currentTokenPricesUsd: [1, 3000],
-  // simulation data
-  simulatedPriceCoefficients: [1, 1],
-  defaultSliderPriceCoefficients: [1, 1],
-  // initiate the state with one position on infinite price range
-  positions: [
-    {
-      investmentUsd: 1000000,
-      priceMin: 1 / 2250,
-      priceMax: 1 / 1000,
-      infiniteRangeSelected: false,
-    },
-    // {
-    //     investmentUsd: 500000,
-    //     priceMin: 1 / 900,
-    //     priceMax: 1 / 800,
-    //     infiniteRangeSelected: true,
-    // },
-  ],
   priceRatioOrder: 'default',
 }
 
@@ -135,7 +105,7 @@ export default createReducer(initialState, (builder) =>
       state.swapFee = swapFee
       state.positions = positions
     })
-    .addCase(resetSimulationCoefficients, (state, action) => {
+    .addCase(resetSimulationCoefficients, (state, _) => {
       const tokenCount = state.simulatedPriceCoefficients.length
       state.simulatedPriceCoefficients = new Array(tokenCount).fill(1)
       state.defaultSliderPriceCoefficients = new Array(tokenCount).fill(1)
@@ -214,7 +184,8 @@ export default createReducer(initialState, (builder) =>
       // compute intial maxPrice value
       const priceMax = MAX_PRICE_MULTIPLIER * (currentTokenPricesUsd[0] / currentTokenPricesUsd[1])
       const priceMin = MIN_PRICE_MULTIPLIER * (currentTokenPricesUsd[0] / currentTokenPricesUsd[1])
-      state.positions.push({ investmentUsd: 0, priceMin: priceMin, priceMax, infiniteRangeSelected: false })
+      const id = makeid(5)
+      state.positions.push({ id, investmentUsd: 0, priceMin: priceMin, priceMax, infiniteRangeSelected: false })
     })
     .addCase(removePosition, (state, action) => {
       const { positionIndex } = action.payload

@@ -194,7 +194,7 @@ const Simulator = ({
             {/* TODO change the way how you render this. "positions" array will get re-render every time you change something in any of the positions */}
             {/* Consider using something like React.memo */}
             {positions.map((position, i) => (
-              <PositionWrapper key={`${i}`}>
+              <PositionWrapper key={position.id}>
                 <Position
                   positionIndex={i}
                   investmentUsd={position.investmentUsd}

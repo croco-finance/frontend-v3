@@ -1,6 +1,5 @@
 import { ButtonOutlined } from 'components/Button'
 import VerticalCryptoAmounts from 'components/VerticalCryptoAmounts'
-import useTheme from 'hooks/useTheme'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { removePosition } from 'state/simulator/actions'
@@ -137,7 +136,6 @@ export default function PositionOverview({
   priceMax,
   infiniteRangeSelected,
 }: Props) {
-  const theme = useTheme()
   const dispatch = useDispatch()
   const { simulatedPriceCoefficients, tokenSymbols, currentTokenPricesUsd, priceRatioOrder } = useAllSimulatorData()
 
