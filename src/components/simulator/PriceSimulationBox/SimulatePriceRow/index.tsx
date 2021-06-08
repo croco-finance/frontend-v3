@@ -83,7 +83,9 @@ const SimulatePriceRow = ({
 
   const handleSliderMoveChange = (newValue: string) => {
     setSliderValue(newValue)
-    onSliderMoveChange(parseFloat(newValue))
+    if (parseFloat(newValue)) {
+      onSliderMoveChange(parseFloat(newValue))
+    }
   }
 
   const handleInputChange = (value: string) => {

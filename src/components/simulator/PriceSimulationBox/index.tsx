@@ -95,7 +95,7 @@ const PriceSimulationBox = ({
   return (
     <Wrapper>
       <SubTitlesWrapper>
-        <SubTitleLeft>Set tokens relative price change</SubTitleLeft>
+        <SubTitleLeft>Set relative price change</SubTitleLeft>
         <SubTitleRight>Simulated price</SubTitleRight>
       </SubTitlesWrapper>
 

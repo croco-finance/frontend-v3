@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useAllSimulatorData } from 'state/simulator/hooks'
 import styled from 'styled-components'
 import { toTwoNonZeroDecimals } from 'utils/numbers'
+import { Position } from 'state/simulator/reducer'
 
 const Wrapper = styled.div`
   color: ${({ theme }) => theme.text2};
@@ -59,6 +60,8 @@ interface Props {
   positionIndex: number
   onPriceLimitChange: (value: number, limit: 'min' | 'max') => void
   disabled: boolean
+  priceMin: Position['priceMin']
+  priceMax: Position['priceMax']
 }
 
 // eslint-disable-next-line no-empty-pattern
@@ -67,6 +70,8 @@ export default function RelativeRangeSelector({
   initialMaxRatio = 50,
   onPriceLimitChange,
   disabled,
+  priceMin,
+  priceMax,
 }: Props) {
   const { currentTokenPricesUsd } = useAllSimulatorData()
   const [sliderValues, setSliderValues] = useState([initialMinRatio.toString(), initialMaxRatio.toString()])
@@ -100,14 +105,20 @@ export default function RelativeRangeSelector({
 
   const handleSliderMoveChange = (newValue: number[]) => {
     setSliderValues([newValue[0].toString(), newValue[1].toString()])
-    // call function that saves changes to redux
-    // newValue is percentage difference which the user selected. Compute price from that and save that value to redux.
-    if (newValue[0]) {
-      onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[0]), 'min')
-    }
+    if (
+      newValue[0] < newValue[1] &&
+      getAbsolutePriceRatio(currentPriceRatio, newValue[1]) > priceMin &&
+      getAbsolutePriceRatio(currentPriceRatio, newValue[0]) < priceMax
+    ) {
+      // call function that saves changes to redux
+      // newValue is percentage difference which the user selected. Compute price from that and save that value to redux.
+      if (newValue[0]) {
+        onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[0]), 'min')
+      }
 
-    if (newValue[1] && newValue[0] < newValue[1]) {
-      onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[1]), 'max')
+      if (newValue[1] && newValue[0] < newValue[1]) {
+        onPriceLimitChange(getAbsolutePriceRatio(currentPriceRatio, newValue[1]), 'max')
+      }
     }
   }
 

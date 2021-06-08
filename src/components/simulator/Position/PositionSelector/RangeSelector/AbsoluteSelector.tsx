@@ -83,10 +83,12 @@ export default function PriceRangeSelector({ onPriceLimitChange, disabled, price
   const handleSliderMoveChange = (newValue: number[]) => {
     setSliderValues([newValue[0].toString(), newValue[1].toString()])
     // call function that saves changes to redux
-    onPriceLimitChange(newValue[0], 'min')
-    // make sure max price is not zero so you don't come across divison error
-    if (newValue[1] > 0) {
-      onPriceLimitChange(newValue[1], 'max')
+    if (newValue[0] < newValue[1] && newValue[1] > priceMin && newValue[0] < priceMax) {
+      onPriceLimitChange(newValue[0], 'min')
+      // make sure max price is not zero so you don't come across divison error
+      if (newValue[1] > 0) {
+        onPriceLimitChange(newValue[1], 'max')
+      }
     }
   }
   // todo check if current price is out of range selector range and set the mark value properly so it does not

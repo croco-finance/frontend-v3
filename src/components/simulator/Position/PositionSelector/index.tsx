@@ -142,6 +142,8 @@ export default function PositionSelector({
             disabled={disabled}
             positionIndex={positionIndex}
             onPriceLimitChange={(value, limit) => handlePriceLimitChange(value, limit)}
+            priceMin={priceMin}
+            priceMax={priceMax}
           />
         )
       } else {
@@ -151,6 +153,8 @@ export default function PositionSelector({
             disabled={disabled}
             positionIndex={positionIndex}
             onPriceLimitChange={(value, limit) => handlePriceLimitChange(value, limit)}
+            priceMin={priceMin}
+            priceMax={priceMax}
           />
         )
       }

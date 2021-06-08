@@ -41,11 +41,12 @@ export default function PriceRangeSelector({ type = 'absolute', positionIndex, d
         <div></div>
       )}
       {type === 'relative' && (
-        <RelativeSelector
-          disabled={disabled}
-          positionIndex={positionIndex}
-          onPriceLimitChange={(value, limit) => handlePriceLimitChange(value, limit)}
-        />
+        <div></div>
+        // <RelativeSelector
+        //   disabled={disabled}
+        //   positionIndex={positionIndex}
+        //   onPriceLimitChange={(value, limit) => handlePriceLimitChange(value, limit)}
+        // />
       )}
       {/* {type === 'discrete' && <DiscreteSelector />} */}
     </Wrapper>
