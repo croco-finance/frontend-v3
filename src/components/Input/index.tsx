@@ -9,8 +9,8 @@ interface InputProps extends Props {
 const StyledInput = styled.input<InputProps>`
   font-weight: ${({ theme }) => theme.fontWeight.medium};
   text-align: ${(props) => props.textAlign};
-  padding: 1px ${(props) => (props.textIndent ? `${props.textIndent[1] + 16}px` : '16px')} 0
-    ${(props) => (props.textIndent ? `${props.textIndent[0] + 16}px` : '16px')};
+  padding: 1px ${(props) => (props.textIndent ? `${props.textIndent[1] + 12}px` : '12px')} 0
+    ${(props) => (props.textIndent ? `${props.textIndent[0] + 12}px` : '12px')};
 
   border-radius: 5px;
   border: ${(props) => (props.noBorder ? 'none' : '2px solid')};

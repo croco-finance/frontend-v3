@@ -11,11 +11,22 @@ const Wrapper = styled.div`
   width: 100%;
   align-items: center;
   height: 66px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  width: 100%;
+  flex-direction: column;
+  height: auto;
+  margin-bottom: 28px;
+  `}
+`
+
+const TokenAndSliderWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 const TokenNameWrapper = styled.div`
   display: flex;
-  width: 100px;
+  width: 96px;
   color: ${({ theme }) => theme.text1};
 `
 
@@ -30,7 +41,7 @@ const TokenSymbol = styled.div`
 const InputWrapper = styled.div`
   display: flex;
   align-items: center;
-  max-width: 90px;
+  max-width: 80px;
   margin-right: 20px;
 `
 
@@ -56,6 +67,11 @@ const SimulatedPrice = styled.div`
   text-align: right;
   flex-grow: 1;
   color: ${({ theme }) => theme.text1};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  width: 100%;
+  margin-top: 6px;
+  padding-right: 30px
+  `}
 `
 
 interface Props {
@@ -100,42 +116,44 @@ const SimulatePriceRow = ({
 
   return (
     <Wrapper>
-      <TokenNameWrapper>
-        <CurrencyLogo address={tokenAddress} size={'22px'} />
-        <TokenSymbol>{tokenSymbol}</TokenSymbol>
-      </TokenNameWrapper>
-      <InputWrapper>
-        <Input
-          useWhiteBackground
-          variant="small"
-          type="number"
-          value={sliderValue.toString()}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            handleInputChange(event.target.value)
-          }}
-        />
-        <div
-          style={{
-            color: theme.text3,
-            marginLeft: '6px',
-          }}
-        >
-          x
-        </div>
-      </InputWrapper>
-      <SliderWrapper>
-        <SliderLeftLabel>0</SliderLeftLabel>
-        <Slider
-          min={0}
-          max={parseFloat(sliderMidValue) * 2}
-          step={parseFloat(sliderMidValue) / numSteps}
-          value={parseFloat(sliderValue)}
-          onChange={(_: any, newValue: number) => handleSliderMoveChange(newValue.toString())}
-        />
-        <SliderRightLabel>
-          {parseFloat(sliderMidValue) * 2 ? `${parseFloat(sliderMidValue) * 2}x` : ''}
-        </SliderRightLabel>
-      </SliderWrapper>
+      <TokenAndSliderWrapper>
+        <TokenNameWrapper>
+          <CurrencyLogo address={tokenAddress} size={'20px'} />
+          <TokenSymbol>{tokenSymbol}</TokenSymbol>
+        </TokenNameWrapper>
+        <InputWrapper>
+          <Input
+            useWhiteBackground
+            variant="small"
+            type="number"
+            value={sliderValue.toString()}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              handleInputChange(event.target.value)
+            }}
+          />
+          <div
+            style={{
+              color: theme.text3,
+              marginLeft: '6px',
+            }}
+          >
+            x
+          </div>
+        </InputWrapper>
+        <SliderWrapper>
+          <SliderLeftLabel>0</SliderLeftLabel>
+          <Slider
+            min={0}
+            max={parseFloat(sliderMidValue) * 2}
+            step={parseFloat(sliderMidValue) / numSteps}
+            value={parseFloat(sliderValue)}
+            onChange={(_: any, newValue: number) => handleSliderMoveChange(newValue.toString())}
+          />
+          <SliderRightLabel>
+            {parseFloat(sliderMidValue) * 2 ? `${parseFloat(sliderMidValue) * 2}x` : ''}
+          </SliderRightLabel>
+        </SliderWrapper>
+      </TokenAndSliderWrapper>
       <SimulatedPrice>{formatDollarAmount(simulatedPrice)}</SimulatedPrice>
     </Wrapper>
   )

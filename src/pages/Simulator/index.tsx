@@ -25,7 +25,7 @@ import { multiplyArraysElementWise } from 'utils/math'
 import { getDataForSimulatedDensityChart } from 'utils/simulator'
 
 const ContentWrapper = styled.div`
-  padding: 10px;
+  padding: 10px 0;
 `
 
 const SectionHeadline = styled(ContentWrapper)`
@@ -82,27 +82,31 @@ const AddPositionButton = styled(ButtonSecondary)`
   padding: 10px;
 `
 
-const SimulationBoxWrapper = styled(ContentWrapper)`
-  display: flex;
-  width: 100%;
-  ${({ theme }) => theme.mediaWidth.upToLarge`
-  flex-direction: column;
-  `}
-`
 const SimulationBoxAndChartWrapper = styled.div`
   display: flex;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  flex-direction: column;
+`};
 `
 const SimulationBoxSectionWrapper = styled.div`
   width: 50%;
   margin-right: 10px;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  width: 100%;
+  margin: 0;
+`};
 `
 const LiquidityChartSectionWrapper = styled.div`
   width: 50%;
   margin-left: 10px;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  width: 100%;
+  margin: 0;
+`};
 `
 
 const LiquidityChartWrapper = styled.div`
-  padding: 20px;
+  padding: 10px;
   background-color: ${({ theme }) => theme.bg0};
   border-radius: 10px;
 `

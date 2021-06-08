@@ -4,17 +4,24 @@ import SimulatePriceRow from './SimulatePriceRow'
 import { useAllSimulatorData } from 'state/simulator/hooks'
 import { SimulatorState } from 'state/simulator/reducer'
 import { formatDollarAmount } from 'utils/numbers'
+import CurrencyLogo from 'components/CurrencyLogo'
+
 const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.bg0};
-  padding: 28px;
+  padding: 24px;
   border-radius: 10px;
   height: fit-content;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  padding: 18px;
+  `}
 `
 
 const CurrentPricesWrapper = styled.div`
   display: flex;
+  flex-direction: column;
   padding-top: 20px;
   margin-top: 20px;
+  border-top: 1px solid ${({ theme }) => theme.text5};
 `
 
 const CurrentPricesTitle = styled.div`
@@ -22,27 +29,35 @@ const CurrentPricesTitle = styled.div`
   flex-grow: 1;
   color: ${({ theme }) => theme.text2};
   font-weight: ${({ theme }) => theme.fontWeight.medium};
+  margin-bottom: 20px;
 `
 
-const CurrentPricesValuesWrapper = styled.div`
+const CurrentPricesValuesWrapper = styled.div<{ priceRatioOrder: SimulatorState['priceRatioOrder'] }>`
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: ${(props) => (props.priceRatioOrder === 'default' ? 'row' : 'row-reverse')};
+  justify-content: ${(props) => (props.priceRatioOrder === 'default' ? 'flex-start' : 'flex-end')};
+`
+
+const CurrencyLogoWrapper = styled.div`
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
 `
 
 const CurrentPricesValue = styled.div`
   color: ${({ theme }) => theme.text2};
   display: flex;
-  margin-left: 20px;
-  margin-bottom: 8px;
-  text-align: right;
+  align-items: center;
+  background-color: ${({ theme }) => theme.black};
+  padding: 10px 14px;
+  border-radius: 5px;
+  margin-right: 20px;
 `
 
 const PriceRowsWrapper = styled.div<{ priceRatioOrder: SimulatorState['priceRatioOrder'] }>`
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 5px;
   min-width: fit-content;
   word-break: break-word;
   font-weight: ${({ theme }) => theme.fontWeight.medium};
@@ -120,12 +135,18 @@ const PriceSimulationBox = ({
         </PriceRowsWrapper>
       </XScrollWrapper>
       <CurrentPricesWrapper>
-        <CurrentPricesTitle>Current prices:</CurrentPricesTitle>
-        <CurrentPricesValuesWrapper>
+        <CurrentPricesTitle>Current prices</CurrentPricesTitle>
+        <CurrentPricesValuesWrapper priceRatioOrder={priceRatioOrder}>
           <CurrentPricesValue>
+            <CurrencyLogoWrapper>
+              <CurrencyLogo address={tokenAddresses[0]} size={'20px'} />
+            </CurrencyLogoWrapper>
             {`1 ${tokenSymbols[0]} = ${formatDollarAmount(currentTokenPrices[0])}`}
           </CurrentPricesValue>
           <CurrentPricesValue>
+            <CurrencyLogoWrapper>
+              <CurrencyLogo address={tokenAddresses[1]} size={'20px'} />
+            </CurrencyLogoWrapper>
             {`1 ${tokenSymbols[1]} = ${formatDollarAmount(currentTokenPrices[1])}`}
           </CurrentPricesValue>
         </CurrentPricesValuesWrapper>

@@ -59,10 +59,10 @@ const useStyles = makeStyles((theme) => {
       },
     },
     mark: (props: any) => ({
-      backgroundColor: props.text2,
-      height: 22,
+      backgroundColor: props.pink1,
+      height: 24,
       // width: 2,
-      marginTop: -8,
+      marginTop: -10,
     }),
     markLabel: (props: any) => ({
       marginTop: 14,

@@ -12,17 +12,24 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100%;
   justify-content: center;
-  // margin-bottom: 10px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  flex-direction: column;
+  `};
 `
 
 const InputWrapper = styled.div`
-  width: 120px;
+  width: 124px;
   margin: 0 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding-bottom: 26px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  flex-direction: row;
+  margin: 10px 0;
+  padding: 0;
+  `};
 `
 
 const InputLabel = styled.div`
@@ -30,6 +37,10 @@ const InputLabel = styled.div`
   color: ${({ theme }) => theme.text2};
   margin-bottom: 6px;
   font-size: ${({ theme }) => theme.fontSize.small};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  margin-bottom: 0;
+  margin-right: 10px;
+  `};
 `
 
 const SliderWrapper = styled.div`

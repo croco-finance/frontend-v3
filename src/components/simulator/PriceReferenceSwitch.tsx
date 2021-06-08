@@ -12,17 +12,24 @@ const Wrapper = styled.div`
 const SwitchPriceLabel = styled.div`
   margin-right: 20px;
   color: ${({ theme }) => theme.text2};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  font-size: ${({ theme }) => theme.fontSize.small}
+  margin-right: 5px;
+  `}
 `
 const SwitchPriceButton = styled.button<{ selected: boolean }>`
   padding: 8px;
   border-radius: 5px;
   margin: 0 4px;
   border: none;
-
   background: ${(props) => (props.selected ? props.theme.primary1 : 'inherit')};
   cursor: pointer;
   color: ${(props) => (props.selected ? props.theme.white : props.theme.text3)};
   font-weight: ${({ theme }) => theme.fontWeight.medium};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  padding: 6px;
+  font-size: ${({ theme }) => theme.fontSize.tiny}
+  `}
 `
 
 const PriceReferenceSwitch = () => {
@@ -31,7 +38,7 @@ const PriceReferenceSwitch = () => {
 
   return (
     <Wrapper>
-      <SwitchPriceLabel>Choose price reference:</SwitchPriceLabel>
+      <SwitchPriceLabel>Price reference:</SwitchPriceLabel>
       <SwitchPriceButton
         selected={priceRatioOrder === 'default'}
         // don't allow to click on it when selected

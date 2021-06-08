@@ -41,10 +41,11 @@ const PositionSelectorWrapper = styled.div`
   ${({ theme }) => theme.mediaWidth.upToMedium`
   border-right: none;
   border-bottom: 1px solid ${({ theme }) => theme.text5};
-  padding-right: 0;
   padding-bottom: 20px;
   margin-right: 0;
   margin-bottom: 20px;
+  width: 100%;
+  padding: 20px 10px;
   `}
 `
 
@@ -52,6 +53,11 @@ const PositionOverviewWrapper = styled.div`
   padding: 20px;
   display: flex;
   flex-grow: 1;
+  overflow-x: auto;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  width: 100%;
+  padding: 20px 10px;
+  `}
 `
 
 const ExpandButton = styled.div`

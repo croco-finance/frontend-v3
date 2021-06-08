@@ -12,7 +12,9 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100%;
   justify-content: center;
-  // margin-bottom: 10px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  flex-direction: column;
+  `};
 `
 
 const InputWrapper = styled.div`
@@ -22,6 +24,12 @@ const InputWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  flex-direction: row;
+  width: 200px;
+  margin: 10px 0;
+  padding: 0;
+  `};
 `
 
 const InputWrapper2 = styled.div`
@@ -38,6 +46,10 @@ const AbsValueWrapper = styled.div`
   padding-right: 16px;
   font-size: ${({ theme }) => theme.fontSize.small};
   color: ${({ theme }) => theme.text3};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  margin-top: 0;
+  margin-left: 20px
+  `};
 `
 
 const InputLabel = styled.div`
@@ -46,6 +58,10 @@ const InputLabel = styled.div`
   margin-bottom: 6px;
   padding-right: 16px;
   font-size: ${({ theme }) => theme.fontSize.small};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  margin-bottom: 0;
+  padding-right: 10px;
+  `};
 `
 
 const SliderWrapper = styled.div`

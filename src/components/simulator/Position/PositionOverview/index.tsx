@@ -24,15 +24,14 @@ const Wrapper = styled.div`
 `
 
 const GridWrapper = styled.div`
-  flex-grow: 1;
   display: grid;
   gap: 10px;
   grid-template-columns: minmax(100px, auto) minmax(110px, auto) minmax(120px, auto) 125px;
-  grid-auto-rows: auto;
+  grid-template-rows: 28px auto;
   font-weight: ${({ theme }) => theme.fontWeight.medium};
   align-items: center;
   /* allow x-axis scrolling: useful on small screens when fiat amount is displayed */
-  /* overflow-x: auto; */
+  overflow-x: auto;
   word-break: break-word;
   align-items: baseline;
   width: 100%;
@@ -54,15 +53,15 @@ const PoolValueCryptoFiatWrapper = styled.div`
 `
 
 const PoolValueCryptoFiatWrapperBorder = styled(PoolValueCryptoFiatWrapper)`
+  border-right: 1px solid ${({ theme }) => theme.text4};
   padding-right: 10px;
 `
 
 const AdditionalInfoWrapper = styled.div`
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
-  margin-top: 10px;
-  padding-top: 10px;
-  margin-top: 20px;
+  margin-top: 40px;
 `
 
 const AddRow = styled.div`

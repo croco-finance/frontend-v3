@@ -17,6 +17,7 @@ import { AppDispatch } from '../../../../state'
 import AbsoluteSelector from './RangeSelector/AbsoluteSelector'
 import RelativeSelector from './RangeSelector/RelativeSelector'
 import RangeTypeSelect, { RangeTypes } from './RangeTypeSelect'
+import useTheme from 'hooks/useTheme'
 
 const Wrapper = styled.div`
   color: ${({ theme }) => theme.text3};
@@ -39,12 +40,6 @@ const RangeTypeSelectWrapper = styled.div`
   margin-left: 10px;
 `
 
-const RangeSelectorWrapper = styled.div`
-  height: 120px;
-  display: flex;
-  align-items: center;
-`
-
 const InfiniteRangeWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -57,6 +52,7 @@ const InfiniteRangeWrapper = styled.div`
 
 const InvestmentWrapper = styled.div`
   display: flex;
+  justify-content: center;
   align-items: center;
   padding-top: 20px;
   margin-top: 20px;
@@ -74,6 +70,9 @@ const PriceLabelsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-self: center;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  margin-top: 28px;
+  `};
 `
 const PriceLabel = styled.div`
   display: flex;
@@ -100,6 +99,7 @@ export default function PositionSelector({
   priceMin,
   priceMax,
 }: Props) {
+  const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const [rangeSelectorType, setRangeSelectorType] = useState<RangeTypes>('absolute')
   const [investedAmountState, setInvestedAmountState] = useState(investmentUsd.toString())
@@ -206,7 +206,7 @@ export default function PositionSelector({
 
         <PriceLabelsWrapper>
           <PriceLabel>
-            <PriceLabelTitle>Current:</PriceLabelTitle>
+            <PriceLabelTitle style={{ color: theme.pink1 }}>Current:</PriceLabelTitle>
             {`1 ${tokenSymbols[0]} = ${formatNumber(currentPriceRatio)} ${tokenSymbols[1]} `}
           </PriceLabel>
           <PriceLabel>

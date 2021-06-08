@@ -1,28 +1,17 @@
 /* eslint-disable max-classes-per-file */
 import React, { PureComponent } from 'react'
 import { Area, AreaChart, CartesianGrid, Label, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from 'recharts'
-import styled, { DefaultTheme } from 'styled-components'
+import { DefaultTheme } from 'styled-components'
 import { formatDollarAmount, formatNumber } from 'utils/numbers'
 
-const Title = styled.div`
-  color: ${({ theme }) => theme.text3};
-  font-size: ${({ theme }) => theme.fontSize.small}
-  text-align: center;
-  width: 100%;
-  padding-left: 75px;
-`
-
-const ReferenceLabelWrapper = styled.text`
-  color: red;
-`
 export function ReferenceLabel(props: any) {
   const { fill, value, textAnchor, fontSize, viewBox, dy, dx } = props
   const x = viewBox.width + viewBox.x - 52
   const y = viewBox.y - 22
   return (
-    <ReferenceLabelWrapper x={x} y={y} dy={dy} dx={dx} fill={fill} fontSize={fontSize} textAnchor={textAnchor}>
+    <text x={x} y={y} dy={dy} dx={dx} fill={fill} fontSize={fontSize} textAnchor={textAnchor}>
       {value}
-    </ReferenceLabelWrapper>
+    </text>
   )
 }
 
@@ -52,7 +41,7 @@ class SimulatedDensityChart extends PureComponent<Props, State> {
     return (
       <div>
         {/* <Title>Liquidity distribution</Title> */}
-        <ResponsiveContainer width="100%" height={320}>
+        <ResponsiveContainer width="100%" height={314}>
           <AreaChart
             width={800}
             height={320}
