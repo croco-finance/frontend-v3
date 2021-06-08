@@ -42,7 +42,7 @@ export interface SimulatorState {
   tokenWeights: number[]
   poolTokenReserves: number[] | null
   volume24Usd: number | null
-  swapFee: number | null
+  feeTier: number | null
   currentTokenPricesUsd: number[]
   // simulation data
   simulatedPriceCoefficients: number[]
@@ -68,7 +68,7 @@ const initialState: SimulatorState = {
   tokenWeights: [],
   poolTokenReserves: [],
   volume24Usd: 0,
-  swapFee: 0,
+  feeTier: 0,
   currentTokenPricesUsd: [],
   // simulation data
   simulatedPriceCoefficients: [1, 1],
@@ -92,7 +92,7 @@ export default createReducer(initialState, (builder) =>
         currentTokenPricesUsd,
         poolTokenReserves,
         volume24Usd,
-        swapFee,
+        feeTier,
         positions,
       } = action.payload
       state.poolId = poolId
@@ -102,7 +102,7 @@ export default createReducer(initialState, (builder) =>
       state.currentTokenPricesUsd = currentTokenPricesUsd
       state.poolTokenReserves = poolTokenReserves
       state.volume24Usd = volume24Usd
-      state.swapFee = swapFee
+      state.feeTier = feeTier
       state.positions = positions
     })
     .addCase(resetSimulationCoefficients, (state, _) => {

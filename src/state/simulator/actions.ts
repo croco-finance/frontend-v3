@@ -9,7 +9,7 @@ type SetNewDataType = Pick<
   | 'tokenWeights'
   | 'currentTokenPricesUsd'
   | 'poolTokenReserves'
-  | 'swapFee'
+  | 'feeTier'
   | 'volume24Usd'
   | 'positions'
 >

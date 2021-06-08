@@ -23,6 +23,7 @@ import { useAllTokenData } from 'state/tokens/hooks'
 import styled from 'styled-components'
 import { multiplyArraysElementWise } from 'utils/math'
 import { getDataForSimulatedDensityChart } from 'utils/simulator'
+import DoubleCurrencyLogo from 'components/DoubleLogo'
 
 const ContentWrapper = styled.div`
   padding: 10px 0;
@@ -33,14 +34,35 @@ const SectionHeadline = styled(ContentWrapper)`
   font-size: ${({ theme }) => theme.fontSize.h3};
   font-weight: ${({ theme }) => theme.fontWeight.demiBold};
   color: ${({ theme }) => theme.text2};
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  font-size: ${({ theme }) => theme.fontSize.normal};
+  `};
 `
 
 const PoolSelectTitle = styled.div`
-  margin-right: 20px;
-  width: 150px;
+  margin-right: 10px;
+  width: 140px;
   font-size: ${({ theme }) => theme.fontSize.h3};
   font-weight: ${({ theme }) => theme.fontWeight.demiBold};
   color: ${({ theme }) => theme.text2};
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  font-size: ${({ theme }) => theme.fontSize.normal};
+  `};
+`
+const ChosenPoolWrapper = styled.div`
+  display: flex;
+  aign-items: center;
+  padding-left: 20px;
+  border-left: 1px solid ${({ theme }) => theme.text4};
+  height: 36px;
+  align-items: center;
+`
+const ChosenTokenSymbols = styled.div`
+  margin: 0 10px;
+  font-size: ${({ theme }) => theme.fontSize.normal};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  font-size: ${({ theme }) => theme.fontSize.tiny};
+  `};
 `
 
 const PositionsHeadline = styled(ContentWrapper)`
@@ -54,17 +76,28 @@ const PositionsTitle = styled.div`
   font-size: ${({ theme }) => theme.fontSize.h3};
   font-weight: ${({ theme }) => theme.fontWeight.demiBold};
   color: ${({ theme }) => theme.text2};
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  font-size: ${({ theme }) => theme.fontSize.normal};
+  `};
 `
 
 const PositionWrapper = styled.div`
   margin-bottom: 20px;
 `
 
-const PoolSelectWrapper = styled(ContentWrapper)`
+const PoolSelectHeader = styled(ContentWrapper)`
   align-items: center;
   display: flex;
-  border-bottom: 1px solid ${({ theme }) => theme.text4};
   padding-bottom: 20px;
+`
+
+const Content = styled.div`
+  border-top: 1px solid ${({ theme }) => theme.text4};
+`
+
+const PoolSelectWrapper = styled.div`
+  max-width: 300px;
+  margin-right: 20px;
 `
 
 const PositionsSelectorWrapper = styled(ContentWrapper)``
@@ -131,6 +164,7 @@ const Simulator = ({
     tokenSymbols,
     currentTokenPricesUsd,
     positions,
+    feeTier,
   } = useAllSimulatorData()
 
   const poolData = usePoolDatas([address])[0]
@@ -156,7 +190,7 @@ const Simulator = ({
             tokenWeights: [0.5, 0.5],
             currentTokenPricesUsd: [token0PriceUSD, token1PriceUSD],
             poolTokenReserves: [poolData.tvlToken0, poolData.tvlToken1],
-            swapFee: poolData.feeTier,
+            feeTier: poolData.feeTier,
             volume24Usd: poolData.volumeUSD,
             positions: [], // clear all positions
           })
@@ -179,13 +213,22 @@ const Simulator = ({
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={backgroundColor} />
-      <PoolSelectWrapper>
-        <PoolSelectTitle>Choose pool: </PoolSelectTitle>
-        <PoolSelect />
-      </PoolSelectWrapper>
+      <PoolSelectHeader>
+        <PoolSelectTitle>Choose pool</PoolSelectTitle>
+        <PoolSelectWrapper>
+          <PoolSelect />
+        </PoolSelectWrapper>
+        {!loading && address && poolData && feeTier && (
+          <ChosenPoolWrapper>
+            <DoubleCurrencyLogo address0={tokenAddresses[0]} address1={tokenAddresses[1]} size={22} />
+            <ChosenTokenSymbols>{`${tokenSymbols[0]} / ${tokenSymbols[1]}`}</ChosenTokenSymbols>
+            {feeTier / 10000}%
+          </ChosenPoolWrapper>
+        )}
+      </PoolSelectHeader>
       {loading && <Loader />}
       {!loading && address && poolData && allTokens && (
-        <>
+        <Content>
           <PositionsHeadline>
             <PositionsTitle>Define positions</PositionsTitle>
             {positions.length > 0 && <PriceReferenceSwitch />}
@@ -244,7 +287,7 @@ const Simulator = ({
               </LiquidityChartWrapper>
             </LiquidityChartSectionWrapper>
           </SimulationBoxAndChartWrapper>
-        </>
+        </Content>
       )}
     </PageWrapper>
   )

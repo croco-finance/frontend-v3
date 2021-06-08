@@ -1,23 +1,20 @@
-import React, { useRef, useCallback, useState, useEffect, useMemo } from 'react'
-import styled from 'styled-components'
-import Row, { RowFixed } from 'components/Row'
-import { HideSmall, TYPE } from 'theme'
-import Hotkeys from 'react-hot-keys'
-import { useFetchSearchResults } from 'data/search'
-import { AutoColumn } from 'components/Column'
-import CurrencyLogo from 'components/CurrencyLogo'
-import { formatDollarAmount } from 'utils/numbers'
-import DoubleCurrencyLogo from 'components/DoubleLogo'
-import { GreyBadge } from 'components/Card'
-import { feeTierPercent } from 'utils'
-import { useSavedTokens, useSavedPools } from 'state/user/hooks'
 import { SavedIcon } from 'components/Button'
-import { useHistory } from 'react-router-dom'
-import { useTokenDatas } from 'state/tokens/hooks'
-import { usePoolDatas } from 'state/pools/hooks'
+import { GreyBadge } from 'components/Card'
+import { AutoColumn } from 'components/Column'
+import DoubleCurrencyLogo from 'components/DoubleLogo'
 import HoverInlineText from 'components/HoverInlineText'
-import { TOKEN_HIDE, POOL_HIDE } from '../../../constants/index'
-import { setNewSimulationPoolData } from 'state/simulator/actions'
+import Row, { RowFixed } from 'components/Row'
+import { useFetchSearchResults } from 'data/search'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Hotkeys from 'react-hot-keys'
+import { useHistory } from 'react-router-dom'
+import { usePoolDatas } from 'state/pools/hooks'
+import { useSavedPools } from 'state/user/hooks'
+import styled from 'styled-components'
+import { HideSmall, TYPE } from 'theme'
+import { feeTierPercent } from 'utils'
+import { formatDollarAmount } from 'utils/numbers'
+import { POOL_HIDE } from '../../../constants/index'
 
 const Container = styled.div`
   position: relative;
@@ -28,7 +25,7 @@ const Container = styled.div`
 const Wrapper = styled(Row)`
   background-color: ${({ theme }) => theme.black};
   padding: 10px 16px;
-  width: 500px;
+  width: 300px;
   height: 48px;
   border-radius: 20px;
   positon: relative;
@@ -83,11 +80,13 @@ const Menu = styled.div<{ hide: boolean }>`
   border: 1px solid ${({ theme }) => theme.pink1};
 
   ${({ theme }) => theme.mediaWidth.upToMedium`
-    position: absolute;
-    margin-top: 4px;
-    z-index: 9999;
-    width: 100%;
+    width: 520px;
     max-height: 400px;
+  `};
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  left: -75px;
+  width: 295px;
   `};
 `
 
@@ -169,7 +168,7 @@ const PoolSelect = ({ ...rest }) => {
   const [showMenu, setShowMenu] = useState(false)
   const [value, setValue] = useState('')
 
-  const { tokens, pools } = useFetchSearchResults(value)
+  const { pools } = useFetchSearchResults(value)
 
   useEffect(() => {
     if (value !== '') {
