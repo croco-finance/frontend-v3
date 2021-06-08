@@ -165,6 +165,7 @@ const Simulator = ({
     currentTokenPricesUsd,
     positions,
     feeTier,
+    priceRatioOrder,
   } = useAllSimulatorData()
 
   const poolData = usePoolDatas([address])[0]
@@ -220,8 +221,16 @@ const Simulator = ({
         </PoolSelectWrapper>
         {!loading && address && poolData && feeTier && (
           <ChosenPoolWrapper>
-            <DoubleCurrencyLogo address0={tokenAddresses[0]} address1={tokenAddresses[1]} size={22} />
-            <ChosenTokenSymbols>{`${tokenSymbols[0]} / ${tokenSymbols[1]}`}</ChosenTokenSymbols>
+            <DoubleCurrencyLogo
+              address0={priceRatioOrder === 'default' ? tokenAddresses[0] : tokenAddresses[1]}
+              address1={priceRatioOrder === 'default' ? tokenAddresses[1] : tokenAddresses[0]}
+              size={22}
+            />
+            <ChosenTokenSymbols>
+              {priceRatioOrder === 'default'
+                ? `${tokenSymbols[0]} / ${tokenSymbols[1]}`
+                : `${tokenSymbols[1]} / ${tokenSymbols[0]}`}
+            </ChosenTokenSymbols>
             {feeTier / 10000}%
           </ChosenPoolWrapper>
         )}
