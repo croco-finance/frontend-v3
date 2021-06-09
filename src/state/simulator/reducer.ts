@@ -104,6 +104,8 @@ export default createReducer(initialState, (builder) =>
       state.volume24Usd = volume24Usd
       state.feeTier = feeTier
       state.positions = positions
+      state.simulatedPriceCoefficients = [1, 1]
+      state.defaultSliderPriceCoefficients = [1, 1]
     })
     .addCase(resetSimulationCoefficients, (state, _) => {
       const tokenCount = state.simulatedPriceCoefficients.length
