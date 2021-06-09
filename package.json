@@ -105,7 +105,8 @@
     "storybook": "start-storybook -p 6006",
     "test": "react-scripts test --env=jsdom",
     "codegen:schema": "npx apollo client:download-schema --endpoint=https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-rinkeby",
-    "codegen:generate": "apollo codegen:generate --localSchemaFile=schema.json --target=typescript --includes=src/**/*.ts --tagName=gql --addTypename --globalTypesFile=src/types/graphql-global-types.ts types"
+    "codegen:generate": "apollo codegen:generate --localSchemaFile=schema.json --target=typescript --includes=src/**/*.ts --tagName=gql --addTypename --globalTypesFile=src/types/graphql-global-types.ts types",
+    "deploy": "firebase deploy --only hosting:croco-v3"
   },
   "eslintConfig": {
     "extends": "react-app",

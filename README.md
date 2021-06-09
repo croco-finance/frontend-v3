@@ -21,7 +21,7 @@ yarn start
 ### Deploy to Firebase Hosting
 
 ```bash
-firebase deploy --only hosting:croco-v3
+yarn deploy
 ```
 
 ## Contributions
