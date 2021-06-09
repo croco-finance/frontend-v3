@@ -56,6 +56,8 @@ const ChosenPoolWrapper = styled.div`
   border-left: 1px solid ${({ theme }) => theme.text4};
   height: 36px;
   align-items: center;
+  font-weight: ${({ theme }) => theme.fontWeight.medium};
+  min-width: 160px;
 `
 const ChosenTokenSymbols = styled.div`
   margin: 0 10px;
@@ -96,7 +98,8 @@ const Content = styled.div`
 `
 
 const PoolSelectWrapper = styled.div`
-  max-width: 300px;
+  width: 100%;
+  max-width: 430px;
   margin-right: 20px;
 `
 

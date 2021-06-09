@@ -95,7 +95,7 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
       return (
         <PositionStatus>
           <InlineCircle color={theme.red1} size={20} marginRight={6} />
-          out of range
+          Out of range
           {/* (price is below price range) */}
         </PositionStatus>
       )
@@ -104,7 +104,7 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
       return (
         <PositionStatus>
           <InlineCircle color={theme.red1} size={20} marginRight={6} />
-          out of range
+          Out of range
           {/* (price is above price range) */}
         </PositionStatus>
       )
@@ -112,7 +112,7 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
     return (
       <PositionStatus>
         <InlineCircle color={theme.green1} size={20} marginRight={6} />
-        in range
+        In range
       </PositionStatus>
     )
   }

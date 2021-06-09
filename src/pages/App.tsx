@@ -99,7 +99,7 @@ export default function App() {
             <HideMedium>
               <TopBar />
             </HideMedium>
-            <Header />
+            <Route path="/" component={Header} />
           </HeaderWrapper>
           <BodyWrapper>
             <Popups />

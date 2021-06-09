@@ -22,6 +22,7 @@ import Row, { RowFixed } from '../Row'
 import SearchSmall from 'components/Search'
 import { HideMedium } from 'theme'
 import isValidEthAddress from 'utils/isValidEthAddress'
+import { RouteComponentProps } from 'react-router-dom'
 
 const HeaderFrame = styled.div`
   display: grid;
@@ -225,7 +226,7 @@ export const StyledMenuButton = styled.button`
 //   [ChainId.KOVAN]: 'Kovan',
 // }
 
-export default function Header() {
+export default function Header(props: RouteComponentProps) {
   // const { account, chainId } = useActiveWeb3React()
 
   // const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
@@ -272,7 +273,7 @@ export default function Header() {
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
-        <SearchSmall />
+        {!props.location.pathname.includes('simulator') && <SearchSmall />}
         {/* <HeaderElement>
           <HideSmall>
             {chainId && NETWORK_LABELS[chainId] && (

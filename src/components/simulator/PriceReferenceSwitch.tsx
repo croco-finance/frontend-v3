@@ -18,7 +18,7 @@ const SwitchPriceLabel = styled.div`
   `}
 `
 const SwitchPriceButton = styled.button<{ selected: boolean }>`
-  padding: 8px;
+  padding: 6px 8px;
   border-radius: 5px;
   margin: 0 4px;
   border: none;
