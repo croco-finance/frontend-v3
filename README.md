@@ -18,6 +18,12 @@ yarn
 yarn start
 ```
 
+### Deploy to Firebase Hosting
+
+```bash
+firebase deploy --only hosting:croco-v3
+```
+
 ## Contributions
 
 **Please open all pull requests against the `master` branch.**
