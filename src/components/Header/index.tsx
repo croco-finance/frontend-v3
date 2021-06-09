@@ -21,6 +21,7 @@ import Row, { RowFixed } from '../Row'
 // import Web3Status from '../Web3Status'
 import SearchSmall from 'components/Search'
 import { HideMedium } from 'theme'
+import isValidEthAddress from 'utils/isValidEthAddress'
 
 const HeaderFrame = styled.div`
   display: grid;
@@ -252,7 +253,17 @@ export default function Header() {
           <StyledNavLink id={`stake-nav-link`} to={'/tokens'}>
             Tokens
           </StyledNavLink>
-          <StyledNavLink id={`stake-nav-link`} to={'/simulator'}>
+          <StyledNavLink
+            id={`stake-nav-link`}
+            to={({ pathname }) => {
+              const splitted = pathname.split('/')
+              // if the user wa previsously on poolPage and now clicks on simulator. Redirect him to the same pool
+              // splitted[0] is empty string and splitted[2] is pool address
+              if (splitted[1] === 'pools' && splitted[2] && isValidEthAddress(splitted[2]))
+                return `/simulator/${splitted[2]}`
+              return '/simulator'
+            }}
+          >
             Simulator
           </StyledNavLink>
           {/* <StyledNavLink id={`stake-nav-link`} to={'/wallet'}>

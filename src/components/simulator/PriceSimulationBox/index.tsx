@@ -39,7 +39,7 @@ const CurrentPricesValuesWrapper = styled.div<{ priceRatioOrder: SimulatorState[
 `
 
 const CurrencyLogoWrapper = styled.div`
-  margin-right: 8px;
+  margin-right: 4px;
   display: flex;
   align-items: center;
 `
@@ -48,10 +48,11 @@ const CurrentPricesValue = styled.div`
   color: ${({ theme }) => theme.text2};
   display: flex;
   align-items: center;
-  background-color: ${({ theme }) => theme.black};
-  padding: 10px 14px;
-  border-radius: 5px;
+  background-color: ${({ theme }) => theme.bg2};
+  padding: 8px 12px;
+  border-radius: 10px;
   margin-right: 20px;
+  font-weight: ${({ theme }) => theme.fontWeight.medium}}
 `
 
 const PriceRowsWrapper = styled.div<{ priceRatioOrder: SimulatorState['priceRatioOrder'] }>`
