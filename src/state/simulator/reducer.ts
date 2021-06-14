@@ -11,6 +11,7 @@ import {
   setPositionInvestedAmount,
   addPosition,
   removePosition,
+  setError,
 } from './actions'
 
 // creates unique id for a position
@@ -33,7 +34,7 @@ export interface Position {
 }
 export interface SimulatorState {
   // pool data fetching
-  fetchError: boolean
+  error: boolean
   loading: boolean
   // pool data
   poolId: string
@@ -59,7 +60,7 @@ export interface SimulatorState {
 
 const initialState: SimulatorState = {
   // pool data fetching
-  fetchError: false,
+  error: false,
   loading: false,
   // pool data
   poolId: '',
@@ -192,5 +193,8 @@ export default createReducer(initialState, (builder) =>
     .addCase(removePosition, (state, action) => {
       const { positionIndex } = action.payload
       state.positions.splice(positionIndex, 1)
+    })
+    .addCase(setError, (state, action) => {
+      state.error = action.payload.isError
     })
 )

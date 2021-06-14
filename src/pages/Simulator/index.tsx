@@ -1,4 +1,5 @@
 import { ButtonSecondary } from 'components/Button'
+import DoubleCurrencyLogo from 'components/DoubleLogo'
 import Loader from 'components/Loader'
 import SimulatedDensityChart from 'components/SimulatedDensityChart'
 import PoolSelect from 'components/simulator/PoolSelect'
@@ -15,15 +16,15 @@ import { usePoolDatas } from 'state/pools/hooks'
 import {
   addPosition,
   setDefaultSliderPriceCoefficient,
+  setError,
   setNewSimulationPoolData,
   setSimulatedPriceCoefficients,
 } from 'state/simulator/actions'
 import { useAllSimulatorData } from 'state/simulator/hooks'
-import { useAllTokenData } from 'state/tokens/hooks'
+import { useAddTokenKeys, useAllTokenData } from 'state/tokens/hooks'
 import styled from 'styled-components'
 import { multiplyArraysElementWise } from 'utils/math'
 import { getDataForSimulatedDensityChart } from 'utils/simulator'
-import DoubleCurrencyLogo from 'components/DoubleLogo'
 
 const ContentWrapper = styled.div`
   padding: 10px 0;
@@ -49,6 +50,7 @@ const PoolSelectTitle = styled.div`
   font-size: ${({ theme }) => theme.fontSize.normal};
   `};
 `
+
 const ChosenPoolWrapper = styled.div`
   display: flex;
   aign-items: center;
@@ -124,6 +126,7 @@ const SimulationBoxAndChartWrapper = styled.div`
   flex-direction: column;
 `};
 `
+
 const SimulationBoxSectionWrapper = styled.div`
   width: 50%;
   margin-right: 10px;
@@ -132,6 +135,7 @@ const SimulationBoxSectionWrapper = styled.div`
   margin: 0;
 `};
 `
+
 const LiquidityChartSectionWrapper = styled.div`
   width: 50%;
   margin-left: 10px;
@@ -145,6 +149,14 @@ const LiquidityChartWrapper = styled.div`
   padding: 10px;
   background-color: ${({ theme }) => theme.bg0};
   border-radius: 10px;
+`
+
+const Error = styled.div`
+  width: 100%;
+  color: ${({ theme }) => theme.red1};
+  padding: 20px 0;
+  font-size: ${({ theme }) => theme.fontSize.h3};
+  font-weight: ${({ theme }) => theme.fontWeight.demiBold};
 `
 
 const Simulator = ({
@@ -169,50 +181,88 @@ const Simulator = ({
     positions,
     feeTier,
     priceRatioOrder,
+    error,
   } = useAllSimulatorData()
 
   const poolData = usePoolDatas([address])[0]
   const allTokens = useAllTokenData()
   const [loading, setLoading] = useState(false)
+  const addTokenKeys = useAddTokenKeys()
 
   useEffect(() => {
     setLoading(true)
+    dispatch(setError({ isError: false }))
 
     if (poolData && allTokens && Object.keys(poolData).length !== 0 && Object.keys(allTokens).length !== 0) {
-      const token0Address = poolData.token0.address
-      const token1Address = poolData.token1.address
+      const { token0, token1 } = poolData
+      const token0Address = token0.address
+      const token1Address = token1.address
 
-      const token0PriceUSD = allTokens[token0Address].data?.priceUSD
-      const token1PriceUSD = allTokens[token1Address].data?.priceUSD
+      if (token0Address && token1Address) {
+        // check if we have necessary data
+        if (!allTokens[token0Address]) {
+          addTokenKeys([token0Address])
+          setLoading(false)
+          return
+        }
 
-      if (token0PriceUSD && token1PriceUSD) {
-        dispatch(
-          setNewSimulationPoolData({
-            poolId: address,
-            tokenSymbols: [poolData.token0.symbol, poolData.token1.symbol],
-            tokenAddresses: [poolData.token0.address, poolData.token1.address],
-            tokenWeights: [0.5, 0.5],
-            currentTokenPricesUsd: [token0PriceUSD, token1PriceUSD],
-            poolTokenReserves: [poolData.tvlToken0, poolData.tvlToken1],
-            feeTier: poolData.feeTier,
-            volume24Usd: poolData.volumeUSD,
-            positions: [], // clear all positions
-          })
-        )
-        dispatch(addPosition())
+        if (!allTokens[token1Address]) {
+          addTokenKeys([token1Address])
+          setLoading(false)
+          return
+        }
+
+        // get token prices
+        const token0PriceUSD = allTokens[token0Address].data?.priceUSD
+        const token1PriceUSD = allTokens[token1Address].data?.priceUSD
+
+        // if we have valid prices (number greater than 0, set new simulation data)
+        if (token0PriceUSD && token1PriceUSD) {
+          dispatch(
+            setNewSimulationPoolData({
+              poolId: address,
+              tokenSymbols: [token0.symbol, token1.symbol],
+              tokenAddresses: [token0.address, token1.address],
+              tokenWeights: [0.5, 0.5],
+              currentTokenPricesUsd: [token0PriceUSD, token1PriceUSD],
+              poolTokenReserves: [poolData.tvlToken0, poolData.tvlToken1],
+              feeTier: poolData.feeTier,
+              volume24Usd: poolData.volumeUSD,
+              positions: [], // clear all positions
+            })
+          )
+          dispatch(addPosition())
+        } else {
+          dispatch(
+            setNewSimulationPoolData({
+              poolId: address,
+              tokenSymbols: [token0.symbol, token1.symbol],
+              tokenAddresses: [token0.address, token1.address],
+              tokenWeights: [0.5, 0.5],
+              currentTokenPricesUsd: [token0PriceUSD || 0, token1PriceUSD || 0],
+              poolTokenReserves: [poolData.tvlToken0, poolData.tvlToken1],
+              feeTier: poolData.feeTier,
+              volume24Usd: poolData.volumeUSD,
+              positions: [], // clear all positions
+            })
+          )
+          // set fetch error
+          dispatch(setError({ isError: true }))
+        }
       }
     }
     setLoading(false)
-
-    // check if pool address in url
-    // if not address in url, allow user to set pool via search
-  }, [address, dispatch, poolData, allTokens])
+  }, [address, dispatch, poolData, allTokens, addTokenKeys])
 
   const currentPriceRatio = currentTokenPricesUsd[0] / currentTokenPricesUsd[1]
   const simulatedTokenPricesUsd = multiplyArraysElementWise(currentTokenPricesUsd, simulatedPriceCoefficients)
   const simulatedPriceRatio = simulatedTokenPricesUsd[0] / simulatedTokenPricesUsd[1]
 
   const { chartData, maxInvestment } = getDataForSimulatedDensityChart(positions)
+
+  const showChosenPool = !loading && feeTier && allTokens[tokenAddresses[0]] && allTokens[tokenAddresses[1]]
+  const showContent =
+    !loading && !error && address && poolData && feeTier && allTokens[tokenAddresses[0]] && allTokens[tokenAddresses[1]]
 
   return (
     <PageWrapper>
@@ -222,7 +272,7 @@ const Simulator = ({
         <PoolSelectWrapper>
           <PoolSelect />
         </PoolSelectWrapper>
-        {!loading && address && poolData && feeTier && (
+        {showChosenPool && feeTier ? (
           <ChosenPoolWrapper>
             <DoubleCurrencyLogo
               address0={priceRatioOrder === 'default' ? tokenAddresses[0] : tokenAddresses[1]}
@@ -236,10 +286,11 @@ const Simulator = ({
             </ChosenTokenSymbols>
             {feeTier / 10000}%
           </ChosenPoolWrapper>
-        )}
+        ) : null}
       </PoolSelectHeader>
       {loading && <Loader />}
-      {!loading && address && poolData && allTokens && (
+      {error && <Error>Sorry, we can&apos;t load prices for tokens in this pool.</Error>}
+      {showContent ? (
         <Content>
           <PositionsHeadline>
             <PositionsTitle>Define positions</PositionsTitle>
@@ -300,7 +351,7 @@ const Simulator = ({
             </LiquidityChartSectionWrapper>
           </SimulationBoxAndChartWrapper>
         </Content>
-      )}
+      ) : null}
     </PageWrapper>
   )
 }
