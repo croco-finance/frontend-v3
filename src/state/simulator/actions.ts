@@ -35,3 +35,4 @@ export const setPositionInvestedAmount = createAction<{ value: number; positionI
 )
 export const addPosition = createAction('simulator/addPosition')
 export const removePosition = createAction<{ positionIndex: number }>('simulator/removePosition')
+export const setError = createAction<{ isError: boolean }>('simulator/setError')
