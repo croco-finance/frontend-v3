@@ -254,6 +254,9 @@ export default function Header(props: RouteComponentProps) {
           <StyledNavLink id={`stake-nav-link`} to={'/tokens'}>
             Tokens
           </StyledNavLink>
+          <StyledNavLink id={`stake-nav-link`} to={'/dashboard'}>
+            Dashboard
+          </StyledNavLink>
           <StyledNavLink
             id={`stake-nav-link`}
             to={({ pathname }) => {
