@@ -122,7 +122,7 @@ const SimulationBoxAndChartWrapper = styled.div`
   display: flex;
   ${({ theme }) => theme.mediaWidth.upToMedium`
   flex-direction: column;
-`};
+  `};
 `
 const SimulationBoxSectionWrapper = styled.div`
   width: 50%;

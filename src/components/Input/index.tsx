@@ -8,11 +8,12 @@ interface InputProps extends Props {
 
 const StyledInput = styled.input<InputProps>`
   font-weight: ${({ theme }) => theme.fontWeight.medium};
+  font-size: ${({ theme }) => theme.fontSize.normal};
   text-align: ${(props) => props.textAlign};
   padding: 1px ${(props) => (props.textIndent ? `${props.textIndent[1] + 12}px` : '12px')} 0
     ${(props) => (props.textIndent ? `${props.textIndent[0] + 12}px` : '12px')};
 
-  border-radius: 5px;
+  border-radius: 10px;
   border: ${(props) => (props.noBorder ? 'none' : '2px solid')};
   border-color: ${(props) => (props.useDarkBorder ? props.theme.white : props.theme.text4)};
   outline: none;
@@ -46,6 +47,7 @@ const StyledInput = styled.input<InputProps>`
 `
 
 const InputWrapper = styled.div`
+  width: 100%;
   display: flex;
   position: relative;
   // hide arrows when input type = number

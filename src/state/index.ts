@@ -10,8 +10,9 @@ import protocol from './protocol/reducer'
 import tokens from './tokens/reducer'
 import pools from './pools/reducer'
 import simulator from './simulator/reducer'
+import dashboard from './dashboard/reducer'
 
-const PERSISTED_KEYS: string[] = ['user', 'lists']
+const PERSISTED_KEYS: string[] = ['user', 'lists', 'dashboard']
 
 const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ const store = configureStore({
     tokens,
     pools,
     simulator,
+    dashboard,
   },
   middleware: [...getDefaultMiddleware({ thunk: false, immutableCheck: false }), save({ states: PERSISTED_KEYS })],
   preloadedState: load({ states: PERSISTED_KEYS }),
