@@ -21,7 +21,7 @@ import Row, { RowFixed } from '../Row'
 // import Web3Status from '../Web3Status'
 import SearchSmall from 'components/Search'
 import { HideMedium } from 'theme'
-import isValidEthAddress from 'utils/isValidEthAddress'
+import { isAddress } from 'utils'
 import { RouteComponentProps } from 'react-router-dom'
 
 const HeaderFrame = styled.div`
@@ -263,8 +263,7 @@ export default function Header(props: RouteComponentProps) {
               const splitted = pathname.split('/')
               // if the user wa previsously on poolPage and now clicks on simulator. Redirect him to the same pool
               // splitted[0] is empty string and splitted[2] is pool address
-              if (splitted[1] === 'pools' && splitted[2] && isValidEthAddress(splitted[2]))
-                return `/simulator/${splitted[2]}`
+              if (splitted[1] === 'pools' && splitted[2] && isAddress(splitted[2])) return `/simulator/${splitted[2]}`
               return '/simulator'
             }}
           >
