@@ -1,14 +1,14 @@
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addPositionOwners, updatePositionData } from 'state/dashboard/actions'
-import { PositionInState } from 'state/dashboard/reducer'
+import { PositionData } from 'state/dashboard/reducer'
 import { notEmpty } from 'utils'
 import { AppDispatch, AppState } from './../index'
 
 export function useAllPositionData(): {
-  [owner: string]: PositionInState[] | undefined
+  [owner: string]: { data: PositionData[] | undefined; lastUpdated: number | undefined }
 } {
-  return useSelector((state: AppState) => state.dashboard.positions.byOwner)
+  return useSelector((state: AppState) => state.positions.byOwner)
 }
 
 export function useAddPositionOwners(): (owners: string[]) => void {
@@ -16,18 +16,20 @@ export function useAddPositionOwners(): (owners: string[]) => void {
   return useCallback((owners: string[]) => dispatch(addPositionOwners({ owners })), [dispatch])
 }
 
-export function useUpdatePositionData(): (positions: { [owner: string]: PositionInState[] }) => void {
+export function useUpdatePositionData(): (positions: { [owner: string]: PositionData[] }) => void {
   const dispatch = useDispatch<AppDispatch>()
 
   return useCallback(
-    (positions: { [owner: string]: PositionInState[] }) => {
+    (positions: { [owner: string]: PositionData[] }) => {
       dispatch(updatePositionData({ positions }))
     },
     [dispatch]
   )
 }
 
-export function usePositionDatas(owners: string[] | undefined): PositionInState[] | undefined {
+export function usePositionDatas(
+  owners: string[] | undefined
+): { data: PositionData[] | undefined; latestUpdate: number | undefined } {
   const allPositionsData = useAllPositionData()
   const addPositionOwners = useAddPositionOwners()
   const allTrackedOwners = Object.keys(allPositionsData)
@@ -39,28 +41,36 @@ export function usePositionDatas(owners: string[] | undefined): PositionInState[
     }
   })
 
-  const data = useMemo(() => {
+  const { data, latestUpdate } = useMemo(() => {
     if (!owners) {
-      return undefined
+      return { data: undefined, latestUpdate: undefined }
     }
-    let allPositions: PositionInState[] = []
+    let allPositions: PositionData[] = []
+    let latestTimestamp
+
     owners.forEach((o) => {
-      const data = allPositionsData[o]
-      if (data) {
-        allPositions = allPositions.concat(data)
+      if (allPositionsData[o]) {
+        const data = allPositionsData[o].data
+        const ownerLastUpdate = allPositionsData[o].lastUpdated
+
+        if (data) {
+          allPositions = allPositions.concat(data)
+        }
+
+        if (ownerLastUpdate) latestTimestamp = ownerLastUpdate
       }
     })
-    return allPositions.filter(notEmpty)
+    return { data: allPositions.filter(notEmpty), latestUpdate: latestTimestamp }
   }, [owners, allPositionsData])
 
-  return data
+  return { data, latestUpdate }
 }
 
 // const expandedData = useExpandedData(position)
 // export function useExpandedInfo(tokenId: number): any {
 //   console.log('useExpandedInfo')
 //   const dispatch = useDispatch<AppDispatch>()
-//   const positions = useSelector((state: AppState) => state.dashboard.positions)
+//   const positions = useSelector((state: AppState) => state.positions.positions)
 //   const position = positions.filter((position) => position.tokenId === tokenId)[0]
 //   const expandedInfo = position?.expanded
 //   const [error, setError] = useState(false)

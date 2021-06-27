@@ -4,7 +4,7 @@ import { Pool, Position } from '@uniswap/v3-sdk'
 import { BigNumber } from 'ethers'
 import { formatUnits } from 'ethers/lib/utils'
 import gql from 'graphql-tag'
-import { PositionInState } from 'state/dashboard/reducer'
+import { PositionData } from 'state/dashboard/reducer'
 
 // See https://docs.uniswap.org/reference/core/libraries/FixedPoint128 for details
 const Q128 = BigNumber.from('0x100000000000000000000000000000000')
@@ -223,7 +223,7 @@ export function usePositionDatas(
 ): {
   loading: boolean
   error: boolean
-  data: { [owner: string]: PositionInState[] } | undefined
+  data: { [owner: string]: PositionData[] } | undefined
 } {
   // get blocks from historic timestamps
   const { loading, error, data } = useQuery<PositionsResponse>(POSITIONS_BULK(owners), {
@@ -239,7 +239,7 @@ export function usePositionDatas(
     }
   }
 
-  const positionsFormatted: { [key: string]: PositionInState[] } = {}
+  const positionsFormatted: { [key: string]: PositionData[] } = {}
 
   if (data) {
     const ethPrice = Number(data.bundle.ethPriceUSD)

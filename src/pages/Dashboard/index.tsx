@@ -10,11 +10,10 @@ import { useColor } from 'hooks/useColor'
 import useTheme from 'hooks/useTheme'
 import { PageWrapper, ThemedBackground } from 'pages/styled'
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router-dom'
 import { useDashboardAddressesModalToggle } from 'state/application/hooks'
 import { usePositionDatas } from 'state/dashboard/hooks'
-import { PositionInState } from 'state/dashboard/reducer'
+import { PositionData } from 'state/dashboard/reducer'
 import { useWatchedAddresses } from 'state/user/hooks'
 import { UserState } from 'state/user/reducer'
 import styled from 'styled-components'
@@ -67,16 +66,16 @@ const PoolSelectWrapper = styled(AddressSelectWrapper)`
 `
 
 const NoPositionsFound = styled.div`
-  color: ${({ theme }) => theme.text3};
+  color: ${({ theme }) => theme.warning};
   font-weight: ${({ theme }) => theme.fontWeight.medium};
   font-size: ${({ theme }) => theme.fontSize.normal}
   text-align: center;
 `
 
 const getFilteredPositions = (
-  positions: PositionInState[] | undefined,
+  positions: PositionData[] | undefined,
   poolOption: PoolOption
-): PositionInState[] | undefined => {
+): PositionData[] | undefined => {
   if (!positions) return undefined
   // return all positions
   if (poolOption.value === 'all') return positions
@@ -110,7 +109,6 @@ const Dashboard = ({
   // theming
   const theme = useTheme()
   const backgroundColor = useColor(address)
-  const dispatch = useDispatch()
   const toggleAddressesModal = useDashboardAddressesModalToggle()
   const watchedAddresses = useWatchedAddresses()
 
@@ -132,7 +130,7 @@ const Dashboard = ({
     }
   }
   // get positions for selected owners
-  const positions = usePositionDatas(ownersToUse)
+  const { data: positions, latestUpdate } = usePositionDatas(ownersToUse)
 
   // todo get array of all positions assigned to those addresses
   const handlePoolSelect = (option: PoolOption) => {
@@ -192,10 +190,10 @@ const Dashboard = ({
         )}
       </Header>
       <Content>
-        {ownersToUse && positions && positions?.length < 1 ? (
+        {ownersToUse && positions && positions?.length < 1 && latestUpdate ? (
           <NoPositionsFound>{"We didn't find any posssitions associated with this address"}</NoPositionsFound>
         ) : null}
-        {!positions && ownersToUse ? (
+        {!positions && ownersToUse && !latestUpdate ? (
           <Loader />
         ) : (
           <>
