@@ -1,10 +1,13 @@
 import { ButtonGray } from 'components/Button'
 import { DarkCard } from 'components/Card'
 import AddressSelect from 'components/dashboard/AddressSelect'
+import FirstAddressInput from 'components/dashboard/FirstAddressInput'
 import PoolSelect, { PoolOption } from 'components/dashboard/PoolSelect'
 import PositionsList from 'components/dashboard/PositionsList'
 import Icon from 'components/Icon'
+import Loader from 'components/Loader'
 import { useColor } from 'hooks/useColor'
+import useTheme from 'hooks/useTheme'
 import { PageWrapper, ThemedBackground } from 'pages/styled'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -13,11 +16,9 @@ import { useDashboardAddressesModalToggle } from 'state/application/hooks'
 import { usePositionDatas } from 'state/dashboard/hooks'
 import { PositionInState } from 'state/dashboard/reducer'
 import { useWatchedAddresses } from 'state/user/hooks'
-import styled from 'styled-components'
-import useTheme from 'hooks/useTheme'
-import { isAddress } from 'utils'
 import { UserState } from 'state/user/reducer'
-import Loader from 'components/Loader'
+import styled from 'styled-components'
+import { isAddress } from 'utils'
 
 const Header = styled(DarkCard)`
   display: flex;
@@ -54,8 +55,22 @@ const AddressSelectWrapper = styled.div`
   margin-right: 0;
   `};
 `
+
+const FirstAddressWrapper = styled(AddressSelectWrapper)`
+  margin-right: 0;
+  width: 100%;
+  max-width: 640px;
+`
+
 const PoolSelectWrapper = styled(AddressSelectWrapper)`
   margin-right: 0;
+`
+
+const NoPositionsFound = styled.div`
+  color: ${({ theme }) => theme.text3};
+  font-weight: ${({ theme }) => theme.fontWeight.medium};
+  font-size: ${({ theme }) => theme.fontSize.normal}
+  text-align: center;
 `
 
 const getFilteredPositions = (
@@ -151,24 +166,35 @@ const Dashboard = ({
     <PageWrapper>
       <ThemedBackground backgroundColor={backgroundColor} />
       <Header>
-        <AddressSelectWrapper>
-          <InputLabel>Ethereum Address</InputLabel>
-          <AddressSelect urlAddress={address} />
-        </AddressSelectWrapper>
-        <PoolSelectWrapper>
-          <InputLabel>Filter by pool</InputLabel>
-          <PoolSelect
-            positions={positions}
-            onPoolSelect={(option: PoolOption) => {
-              handlePoolSelect(option)
-            }}
-          />
-        </PoolSelectWrapper>
-        <OpenAddressModalButton onClick={toggleAddressesModal}>
-          <Icon icon="SETTINGS" size={20} color={theme.text1} />
-        </OpenAddressModalButton>
+        {!watchedAddresses || Object.keys(watchedAddresses).length < 1 ? (
+          <FirstAddressWrapper>
+            <FirstAddressInput />
+          </FirstAddressWrapper>
+        ) : (
+          <>
+            <AddressSelectWrapper>
+              <InputLabel>Ethereum Address</InputLabel>
+              <AddressSelect urlAddress={address} />
+            </AddressSelectWrapper>
+            <PoolSelectWrapper>
+              <InputLabel>Filter by pool</InputLabel>
+              <PoolSelect
+                positions={positions}
+                onPoolSelect={(option: PoolOption) => {
+                  handlePoolSelect(option)
+                }}
+              />
+            </PoolSelectWrapper>
+            <OpenAddressModalButton onClick={toggleAddressesModal}>
+              <Icon icon="SETTINGS" size={20} color={theme.text1} />
+            </OpenAddressModalButton>
+          </>
+        )}
       </Header>
       <Content>
+        {ownersToUse && positions && positions?.length < 1 ? (
+          <NoPositionsFound>{"We didn't find any posssitions associated with this address"}</NoPositionsFound>
+        ) : null}
         {!positions && ownersToUse ? (
           <Loader />
         ) : (

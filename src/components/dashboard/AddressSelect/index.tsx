@@ -70,15 +70,14 @@ interface Props {
   urlAddress: string
 }
 const AddressSelect = ({ urlAddress }: Props) => {
-  const theme = useTheme()
   const history = useHistory()
   const watchedAddresses = useWatchedAddresses()
 
   const handleNav = (address: string) => {
     if (address === 'bundled') {
-      history.push('/dashboard')
+      history.push('/positions')
     } else {
-      history.push('/dashboard/' + address)
+      history.push('/positions/' + address)
     }
   }
 

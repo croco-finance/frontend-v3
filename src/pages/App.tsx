@@ -113,8 +113,8 @@ export default function App() {
               <Route exact strict path="/pools/:address" component={PoolPage} />
               <Route exact strict path="/simulator" component={Simulator} />
               <Route exact strict path="/simulator/:address" component={Simulator} />
-              <Route exact strict path="/dashboard" component={Dashboard} />
-              <Route exact strict path="/dashboard/:address" component={Dashboard} />
+              <Route exact strict path="/positions" component={Dashboard} />
+              <Route exact strict path="/positions/:address" component={Dashboard} />
             </Switch>
             <Marginer />
           </BodyWrapper>

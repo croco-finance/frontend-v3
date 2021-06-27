@@ -253,6 +253,14 @@ export function usePositionDatas(
       })
     }
   }
+
+  // if there is no data for a given address, save empty arr so that we know we dodn't find any positions
+  owners.forEach((owner) => {
+    if (!Object.keys(positionsFormatted).includes(owner)) {
+      positionsFormatted[owner] = []
+    }
+  })
+
   return {
     loading,
     error: false,
