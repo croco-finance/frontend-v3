@@ -2,7 +2,7 @@ import { client } from 'apollo/client'
 import gql from 'graphql-tag'
 import dayjs from 'dayjs'
 import { BigNumber } from 'ethers'
-import { getFeeGrowthInside, getTotalPositionFees, parseTick, Tick, TokenFees } from './positionsOverview'
+import { getFeeGrowthInside, getTotalPositionFees, parseTick, Tick, TokenFees } from './overviewData'
 
 const POSITION_AND_SNAPS = gql`
   query tickIds($positionId: String) {

@@ -1,9 +1,10 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addPositionOwners, updatePositionData } from 'state/dashboard/actions'
+import { addPositionOwners, updatePositionData, updateExtendedData } from 'state/dashboard/actions'
 import { PositionData } from 'state/dashboard/reducer'
 import { notEmpty } from 'utils'
 import { AppDispatch, AppState } from './../index'
+import { getExpandedPosition } from 'data/dashboard/expandedData'
 
 export function useAllPositionData(): {
   [owner: string]: { data: PositionData[] | undefined; lastUpdated: number | undefined }
@@ -66,31 +67,40 @@ export function usePositionDatas(
   return { data, latestUpdate }
 }
 
-// const expandedData = useExpandedData(position)
-// export function useExpandedInfo(tokenId: number): any {
-//   console.log('useExpandedInfo')
-//   const dispatch = useDispatch<AppDispatch>()
-//   const positions = useSelector((state: AppState) => state.positions.positions)
-//   const position = positions.filter((position) => position.tokenId === tokenId)[0]
-//   const expandedInfo = position?.expanded
-//   const [error, setError] = useState(false)
+/**
+ * Owner is unncecessary but it makes search for position with given tokenId faster
+ * @param owner
+ * @param tokenId
+ * @returns
+ */
+export function useExpandedData(owner: string, tokenId: number) {
+  console.log('useExpandedData')
+  const dispatch = useDispatch<AppDispatch>()
+  const positions = useSelector((state: AppState) => state.positions.byOwner[owner].data)
+  // find position with given token id
+  const position = positions ? positions.filter((position) => position.tokenId === tokenId)[0] : undefined
+  // check if expanded data is available
+  const expandedData = position?.expanded
+  const [error, setError] = useState(false)
 
-//   useEffect(() => {
-//     async function fetch() {
-//       const { data, error } = await getExpandedPosition(position.overview)
-//       console.log('getExpandedPosition(), data: ', data)
+  useEffect(() => {
+    async function fetch() {
+      if (position) {
+        const { data, error } = await getExpandedPosition(position.overview)
+        console.log('getExpandedPosition(), data: ', data)
 
-//       if (!error && data) {
-//         dispatch(updateExtendedData({ tokenId, data }))
-//       }
-//       if (error) {
-//         setError(error)
-//       }
-//     }
-//     if (!expandedInfo && !error) {
-//       fetch()
-//     }
-//   }, [expandedInfo, dispatch, position, error, tokenId])
+        if (!error && data) {
+          dispatch(updateExtendedData({ owner, tokenId, data }))
+        }
+        if (error) {
+          setError(error)
+        }
+      }
+    }
+    if (position && !expandedData && !error) {
+      fetch()
+    }
+  }, [expandedData, dispatch, position, error, tokenId, owner])
 
-//   return expandedInfo
-// }
+  return expandedData
+}

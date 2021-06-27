@@ -1,10 +1,10 @@
-import { PositionInOverview, getPositions } from './positionsOverview'
+import { CurrencyAmount, Token } from '@uniswap/sdk-core'
+import { Position } from '@uniswap/v3-sdk'
 import { client } from 'apollo/client'
+import dayjs from 'dayjs'
 import gql from 'graphql-tag'
 import { computeFees, DailyFees } from './dailyFees'
-import dayjs from 'dayjs'
-import { Position } from '@uniswap/v3-sdk'
-import { CurrencyAmount, Token } from '@uniswap/sdk-core'
+import { PositionInOverview } from './overviewData'
 
 export interface Transaction {
   id: string // tx hash
@@ -200,10 +200,3 @@ export async function getExpandedPosition(positionInOverview: PositionInOverview
     error,
   }
 }
-
-// ;(async function main() {
-//   const owners = ['0x95ae3008c4ed8c2804051dd00f7a27dad5724ed1']
-//   const positions = await getPositions(owners)
-//   const expandedPosition = await getExpandedPosition(positions[0])
-//   console.log(expandedPosition)
-// })().catch((error) => console.error(error))
