@@ -8,6 +8,7 @@ import styled from 'styled-components'
 import { multiplyArraysElementWise } from 'utils/math'
 import PositionOverview from './PositionOverview'
 import PositionSelector from './PositionSelector'
+import Icon from 'components/Icon'
 
 const Wrapper = styled.div``
 
@@ -120,12 +121,14 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
   return (
     <Wrapper>
       <CollapsibleContainer
-        isOpenedDefault
-        onChange={(isOpened: boolean) => {
-          setIsExpanded(isOpened)
-        }}
+        isOpened={isExpanded}
         header={
-          <PositionHeadline isOpened={isExpanded}>
+          <PositionHeadline
+            isOpened={isExpanded}
+            onClick={() => {
+              setIsExpanded(!isExpanded)
+            }}
+          >
             Position #{positionIndex + 1}
             {getPositionStatus(
               simulatedTokenPricesUsd[0] / simulatedTokenPricesUsd[1],
@@ -133,7 +136,7 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
               infiniteRangeSelected ? Infinity : priceMax
             )}
             <ExpandButton>
-              {/* <Icon icon={isExpanded ? 'ARROW_UP' : 'ARROW_DOWN'} size={16} color={theme.FONT_MEDIUM} /> */}
+              <Icon icon={isExpanded ? 'ARROW_UP' : 'ARROW_DOWN'} size={16} color={theme.text2} />
             </ExpandButton>
           </PositionHeadline>
         }

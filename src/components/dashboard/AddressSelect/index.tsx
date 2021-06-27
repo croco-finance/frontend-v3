@@ -1,13 +1,11 @@
-import Icon from 'components/Icon'
 import Select from 'components/Select'
 import useTheme from 'hooks/useTheme'
-import { useHistory } from 'react-router-dom'
 import React from 'react'
-import { useDashboardAddresses } from 'state/dashboard/hooks'
+import { useHistory } from 'react-router-dom'
+import { useWatchedAddresses } from 'state/user/hooks'
+import { UserState } from 'state/user/reducer'
 import styled from 'styled-components'
-import { DashboardState } from 'state/dashboard/reducer'
-import { useModalOpen, useDashboardAddressesModalToggle } from 'state/application/hooks'
-import { ApplicationModal } from 'state/application/actions'
+import { isAddress } from 'utils'
 import AddressModal from '../ManageAddessesModal'
 
 const Wrapper = styled.div`
@@ -16,31 +14,12 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
 `
-
-const ManageAddressesButton = styled.button`
-  border: none;
-  padding: 12px 15px;
-  border-radius: 10px;
-  margin-left: 10px;
-  cursor: pointer;
-  background-color: ${({ theme }) => theme.bg3};
-
-  &:focus {
-    border: none;
-    outline: none;
-  }
-
-  &:hover {
-    background-color: ${({ theme }) => theme.bg4};
-  }
-`
-
 const buildAddressOption = (address: string, ens: string): AddressOption => ({
   value: address,
   label: ens || address,
 })
 
-const buildAddressOptions = (addresses: any) => {
+const buildAddressOptions = (addresses: UserState['watchedAddresses']) => {
   if (!addresses) return null
 
   let numberOfBundled = 0
@@ -71,7 +50,8 @@ const buildAddressOptions = (addresses: any) => {
   return options
 }
 
-const getBundledAddresses = (addresses: DashboardState['userAddresses']): string[] => {
+const getBundledAddresses = (addresses: UserState['watchedAddresses'] | null): string[] => {
+  if (!addresses) return []
   const addressesArr: string[] = []
 
   Object.keys(addresses).forEach((address) => {
@@ -87,39 +67,55 @@ interface AddressOption {
 }
 
 interface Props {
-  onAddressChange?: any
+  urlAddress: string
 }
-
-const AddressSelect = ({ onAddressChange }: Props) => {
+const AddressSelect = ({ urlAddress }: Props) => {
   const theme = useTheme()
   const history = useHistory()
-  const userAddresses = useDashboardAddresses()
-  const addressesModalOpen = useModalOpen(ApplicationModal.DASHBOARD_ADDRESSES)
-  const toggleAddressesModal = useDashboardAddressesModalToggle()
+  const watchedAddresses = useWatchedAddresses()
 
   const handleNav = (address: string) => {
     if (address === 'bundled') {
-      const addresses = getBundledAddresses(userAddresses).join('+')
-      history.push('/dashboard/' + addresses)
+      history.push('/dashboard')
     } else {
       history.push('/dashboard/' + address)
     }
   }
 
+  const getSelectedOption = (options: AddressOption[] | null, address: string) => {
+    if (!options) return null
+    if (!address) {
+      const bundledAddresses = getBundledAddresses(watchedAddresses)
+      // if there are some bundled addresses
+      if (bundledAddresses.length > 0) {
+        return options?.filter((o) => o.value === 'bundled')
+      } else {
+        return null
+      }
+    }
+
+    if (isAddress(address)) {
+      return options?.filter((o) => o.value === address)
+    }
+
+    return null
+  }
+
+  const options = buildAddressOptions(watchedAddresses)
+  const selectedOption = getSelectedOption(options, urlAddress)
+
   return (
     <Wrapper>
       <Select
-        options={buildAddressOptions(userAddresses)}
+        options={options}
         onChange={(option: AddressOption) => {
           handleNav(option.value)
         }}
-        placeholder="Select your Ethereum address..."
+        placeholder="Select Ethereum address..."
         isSearchable={false}
+        value={selectedOption}
+        useLightBackground
       />
-
-      <ManageAddressesButton onClick={toggleAddressesModal}>
-        <Icon icon="SETTINGS" size={20} color={theme.text1} />
-      </ManageAddressesButton>
       <AddressModal />
     </Wrapper>
   )

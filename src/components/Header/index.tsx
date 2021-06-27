@@ -275,7 +275,9 @@ export default function Header(props: RouteComponentProps) {
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
-        {!props.location.pathname.includes('simulator') && <SearchSmall />}
+        {!props.location.pathname.includes('simulator') && !props.location.pathname.includes('dashboard') && (
+          <SearchSmall />
+        )}
         {/* <HeaderElement>
           <HideSmall>
             {chainId && NETWORK_LABELS[chainId] && (
