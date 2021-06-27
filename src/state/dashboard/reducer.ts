@@ -1,22 +1,26 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { ExpandedPositionInfo } from 'data/dashboard/positionExpanded'
 import { PositionInOverview } from 'data/dashboard/positionsOverview'
-import { updateExtendedData, addPositionOwners, updatePositionData } from './actions'
+import { currentTimestamp } from './../../utils/index'
+import { addPositionOwners, updatePositionData } from './actions'
 
-export interface PositionInState {
+export interface PositionData {
   tokenId: number
   overview: PositionInOverview
   expanded: ExpandedPositionInfo | undefined
 }
 
-export interface DashboardState {
-  positions: { byOwner: { [key: string]: PositionInState[] | undefined } }
-  // positions: PositionInState[]
+interface PositionsState {
+  byOwner: {
+    [owner: string]: {
+      data: PositionData[] | undefined
+      lastUpdated: number | undefined
+    }
+  }
 }
 
-const initialState: DashboardState = {
-  positions: { byOwner: {} },
-  // positions: [],
+const initialState: PositionsState = {
+  byOwner: {},
 }
 
 export default createReducer(
@@ -26,15 +30,18 @@ export default createReducer(
       // add owners if not included yet
       .addCase(addPositionOwners, (state, { payload: { owners } }) => {
         owners.map((owner) => {
-          if (!state.positions.byOwner[owner.toLocaleLowerCase()]) {
-            state.positions.byOwner[owner.toLocaleLowerCase()] = undefined
+          if (!state.byOwner[owner.toLocaleLowerCase()]) {
+            state.byOwner[owner.toLocaleLowerCase()] = {
+              data: undefined,
+              lastUpdated: undefined,
+            }
           }
         })
       })
 
       .addCase(updatePositionData, (state, { payload: { positions } }) => {
         Object.keys(positions).map((owner) => {
-          state.positions.byOwner[owner] = positions[owner]
+          state.byOwner[owner] = { data: positions[owner], lastUpdated: currentTimestamp() }
         })
       })
 

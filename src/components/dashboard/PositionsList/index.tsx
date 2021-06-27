@@ -1,5 +1,5 @@
 import React from 'react'
-import { PositionInState } from 'state/dashboard/reducer'
+import { PositionData } from 'state/dashboard/reducer'
 import styled from 'styled-components'
 import Position from 'components/dashboard/Position'
 
@@ -8,7 +8,7 @@ const Wrapper = styled.div`
 `
 
 interface Props {
-  positions: PositionInState[]
+  positions: PositionData[]
 }
 
 const PositionsList = ({ positions }: Props) => {

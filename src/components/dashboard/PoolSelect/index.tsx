@@ -2,7 +2,7 @@ import Badge from 'components/Badge'
 import DoubleCurrencyLogo from 'components/DoubleLogo'
 import Select from 'components/Select'
 import React from 'react'
-import { PositionInState } from 'state/dashboard/reducer'
+import { PositionData } from 'state/dashboard/reducer'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 
@@ -46,7 +46,7 @@ export interface PoolOption {
 //     };
 // }
 
-const buildPoolOptions = (positions: PositionInState[] | undefined): PoolOption[] => {
+const buildPoolOptions = (positions: PositionData[] | undefined): PoolOption[] => {
   if (!positions) return []
 
   const uniquePools: string[] = [] // {address}_{feeTier}
@@ -102,7 +102,7 @@ const PoolOption = ({ value }: PoolOption) => {
 }
 
 interface Props {
-  positions: PositionInState[] | undefined
+  positions: PositionData[] | undefined
   onPoolSelect: any
 }
 

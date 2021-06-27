@@ -26,7 +26,7 @@ export default function Updater(): null {
     return Object.keys(allPositionData).reduce((accum: string[], key) => {
       const positionsData = allPositionData[key]
       // if there are no possitions (not even ampty array) associated with this user
-      if (!positionsData) {
+      if (!positionsData.data || !positionsData.lastUpdated) {
         accum.push(key)
       }
       return accum

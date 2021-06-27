@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { PositionInState } from 'state/dashboard/reducer'
+import { PositionData } from 'state/dashboard/reducer'
 import styled from 'styled-components'
 import CollapsibleContainer from 'components/CollapsibleContainer'
 import useTheme from 'hooks/useTheme'
@@ -18,7 +18,7 @@ const PositionExpandedWrapper = styled.div`
 
 interface Props {
   positionIndex: number
-  position: PositionInState
+  position: PositionData
 }
 
 const Position = ({ position, positionIndex }: Props) => {
