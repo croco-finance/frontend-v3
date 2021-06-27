@@ -191,7 +191,7 @@ const Dashboard = ({
       </Header>
       <Content>
         {ownersToUse && positions && positions?.length < 1 && latestUpdate ? (
-          <NoPositionsFound>{"We didn't find any posssitions associated with this address"}</NoPositionsFound>
+          <NoPositionsFound>{"We didn't find any positions associated with this address"}</NoPositionsFound>
         ) : null}
         {!positions && ownersToUse && !latestUpdate ? (
           <Loader />
