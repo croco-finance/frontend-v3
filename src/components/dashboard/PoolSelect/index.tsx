@@ -110,9 +110,6 @@ const PoolSelect = ({ positions, onPoolSelect }: Props) => {
   // TODO Select All Pools by default and show Loader when pools are being loaded
   const options = buildPoolOptions(positions)
 
-  console.log('getFilteredPositions positions: ', positions)
-  console.log('getFilteredPositions options: ', options)
-
   return (
     <Wrapper>
       <Select

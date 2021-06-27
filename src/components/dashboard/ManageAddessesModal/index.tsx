@@ -16,22 +16,6 @@ import { isAddress } from 'utils'
 import { ReactComponent as Close } from '../../../assets/images/x.svg'
 import Modal from '../../Modal'
 
-const CloseIcon = styled.div`
-  position: absolute;
-  right: 1rem;
-  top: 14px;
-  &:hover {
-    cursor: pointer;
-    opacity: 0.6;
-  }
-`
-
-const CloseColor = styled(Close)`
-  path {
-    stroke: ${({ theme }) => theme.text4};
-  }
-`
-
 const Wrapper = styled.div`
   ${({ theme }) => theme.flexColumnNoWrap}
   margin: 0;
