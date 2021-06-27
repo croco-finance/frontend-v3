@@ -12,7 +12,7 @@ import pools from './pools/reducer'
 import simulator from './simulator/reducer'
 import dashboard from './dashboard/reducer'
 
-const PERSISTED_KEYS: string[] = ['user', 'lists', 'dashboard']
+const PERSISTED_KEYS: string[] = ['user', 'lists']
 
 const store = configureStore({
   reducer: {
@@ -26,7 +26,21 @@ const store = configureStore({
     simulator,
     dashboard,
   },
-  middleware: [...getDefaultMiddleware({ thunk: false, immutableCheck: false }), save({ states: PERSISTED_KEYS })],
+  middleware: [
+    ...getDefaultMiddleware({
+      thunk: false,
+      immutableCheck: false,
+      serializableCheck: {
+        // Ignore these action types
+        ignoredActions: ['dashboard/updatePositionData'],
+        // Ignore these field paths in all actions
+        ignoredActionPaths: ['meta.arg', 'payload.timestamp'],
+        // Ignore these paths in the state
+        ignoredPaths: ['dashboard.positions'],
+      },
+    }),
+    save({ states: PERSISTED_KEYS }),
+  ],
   preloadedState: load({ states: PERSISTED_KEYS }),
 })
 

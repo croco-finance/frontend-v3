@@ -1,4 +1,5 @@
-import gql from 'graphql-tag'
+// import gql from 'graphql-tag'
+import { gql } from '@apollo/client/core'
 import { client } from 'apollo/client'
 import { BigNumber } from 'ethers'
 
@@ -99,6 +100,7 @@ export function getTotalPositionFees(
 }
 
 export async function getTotalUserPoolFees(user: string, pool: string): Promise<TokenFees> {
+  console.log(`getTotalUserPoolFees(), user: ${user}, pool: ${pool}`)
   const result = await client.query({
     query: POSITIONS_QUERY,
     variables: {
@@ -106,6 +108,8 @@ export async function getTotalUserPoolFees(user: string, pool: string): Promise<
       pool: pool,
     },
   })
+
+  console.log(`result`, result)
 
   const totalFees: TokenFees = {
     feesToken0: BigNumber.from(0),
@@ -131,5 +135,6 @@ export async function getTotalUserPoolFees(user: string, pool: string): Promise<
     totalFees.feesToken0 = totalFees.feesToken0.add(fees.feesToken0)
     totalFees.feesToken1 = totalFees.feesToken1.add(fees.feesToken1)
   }
+
   return totalFees
 }

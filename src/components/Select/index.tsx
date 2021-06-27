@@ -10,7 +10,7 @@ const selectStyle = (
   usePointerCursor: boolean,
   fontFamily: string,
   noBorder: boolean,
-  useWhiteBackground: boolean,
+  useLightBackground: boolean,
   useDarkBorder: boolean,
   theme: any,
   maxDropdownHeight: string
@@ -42,9 +42,9 @@ const selectStyle = (
     height: variant === 'small' ? '36px' : '48px',
     borderRadius: '10px',
     borderWidth: noBorder ? 0 : '2px',
-    borderColor: useDarkBorder ? theme.bg5 : theme.bg0,
+    borderColor: useDarkBorder ? theme.bg5 : theme.bg2,
     boxShadow: 'none',
-    backgroundColor: useWhiteBackground ? theme.black : theme.bg0,
+    backgroundColor: useLightBackground ? theme.bg1 : theme.bg0,
     '&:hover, &:focus': {
       cursor: 'pointer',
       borderRadius: '10px',
@@ -67,9 +67,11 @@ const selectStyle = (
   menu: (base: Record<string, any>) => ({
     ...base,
     margin: '5px 0',
-    boxShadow: 'box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.15)',
+    // boxShadow: 'box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.15)',
     zIndex: 9,
     borderRadius: '10px',
+    border: `2px solid ${theme.blue1}`,
+    backgroundColor: theme.bg1,
   }),
   menuList: (base: Record<string, any>) => ({
     ...base,
@@ -110,12 +112,14 @@ const selectStyle = (
     ...base,
     color: theme.text2,
     fontWeight: theme.fontWeight.medium,
-    background: isFocused ? theme.bg0 : theme.bg2,
+    // background: isFocused ? theme.bg0 : theme.bg2,
+    background: theme.bg1,
     borderRadius: 0,
     fontSize: theme.fontSize.normal,
     fontFamily: `${fontFamily} !important`,
     '&:hover': {
       cursor: 'pointer',
+      backgroundColor: theme.bg3,
     },
   }),
   input: (base: Record<string, any>) => ({
@@ -150,7 +154,7 @@ interface Props extends Omit<SelectProps, 'components'> {
   usePointerCursor?: boolean
   fontFamily?: string
   noBorder?: boolean
-  useWhiteBackground?: boolean
+  useLightBackground?: boolean
   useDarkBorder?: boolean
   maxDropdownHeight?: string
 }
@@ -163,9 +167,9 @@ const Select = ({
   label,
   width,
   variant = 'large',
-  fontFamily = 'Open Sans',
+  fontFamily = 'Inter var',
   noBorder = false,
-  useWhiteBackground = false,
+  useLightBackground = false,
   useDarkBorder = false,
   maxDropdownHeight = '260px',
   ...props
@@ -178,7 +182,7 @@ const Select = ({
     usePointerCursor,
     fontFamily,
     noBorder,
-    useWhiteBackground,
+    useLightBackground,
     useDarkBorder,
     theme,
     maxDropdownHeight

@@ -1,12 +1,13 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 
 export const client = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-testing',
+  uri: 'https://api.thegraph.com/subgraphs/name/benesjan/uniswap-v3-subgraph',
   cache: new InMemoryCache(),
   queryDeduplication: true,
   defaultOptions: {
     watchQuery: {
       fetchPolicy: 'no-cache',
+      errorPolicy: 'ignore',
     },
     query: {
       fetchPolicy: 'no-cache',

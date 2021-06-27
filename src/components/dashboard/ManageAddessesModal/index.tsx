@@ -9,8 +9,8 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { ApplicationModal } from 'state/application/actions'
 import { useDashboardAddressesModalToggle, useModalOpen } from 'state/application/hooks'
-import { addAddress, deleteAddress, setBundledAddress } from 'state/dashboard/actions'
-import { useDashboardAddresses } from 'state/dashboard/hooks'
+import { addAddress, deleteAddress, setBundledAddress } from 'state/user/actions'
+import { useWatchedAddresses } from 'state/user/hooks'
 import styled from 'styled-components'
 import { isAddress } from 'utils'
 import { ReactComponent as Close } from '../../../assets/images/x.svg'
@@ -157,7 +157,7 @@ const AddressModal = () => {
 
   const addressesModalOpen = useModalOpen(ApplicationModal.DASHBOARD_ADDRESSES)
   const toggleAddressesModal = useDashboardAddressesModalToggle()
-  const userAddresses = useDashboardAddresses()
+  const watchedAddresses = useWatchedAddresses()
 
   const [ensName, setEnsName] = useState('')
   const [loadingEnsDomain, setLoadingEnsDomain] = useState(false)
@@ -219,6 +219,7 @@ const AddressModal = () => {
               setAddress(event.target.value.trim())
             }}
             value={address}
+            textAlign="left"
           />
           <AddAddressButton
             onClick={() => {
@@ -229,10 +230,10 @@ const AddressModal = () => {
             {loadingEnsDomain ? <Loader /> : 'Add to watch list'}
           </AddAddressButton>
         </NewAddressContentWrapper>
-        {Object.keys(userAddresses).length > 0 && (
+        {Object.keys(watchedAddresses).length > 0 && (
           <>
             <WatchedHeadline>Watched addresses</WatchedHeadline>
-            {Object.keys(userAddresses).map((address) => {
+            {Object.keys(watchedAddresses).map((address) => {
               // just double check the address is valid
               if (address) {
                 return (
@@ -249,10 +250,10 @@ const AddressModal = () => {
                         </AddressLink>
 
                         <BundleButton
-                          isBundled={userAddresses[address].bundled}
+                          isBundled={watchedAddresses[address].bundled}
                           onClick={() => dispatch(setBundledAddress({ address }))}
                         >
-                          {userAddresses[address].bundled ? (
+                          {watchedAddresses[address].bundled ? (
                             <>
                               Bundled
                               <CheckIcon icon="CHECK" size={16} color={theme.white} />
@@ -272,7 +273,7 @@ const AddressModal = () => {
                       </ButtonsWrapper>
                     </MainRowWrapper>
 
-                    {userAddresses[address].ens && <EnsName>{userAddresses[address].ens}</EnsName>}
+                    {watchedAddresses[address].ens && <EnsName>{watchedAddresses[address].ens}</EnsName>}
                   </InputWrapper>
                 )
               }
