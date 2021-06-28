@@ -41,7 +41,13 @@ const Position = ({ position, positionIndex }: Props) => {
         }
         collapseBody={
           <PositionExpandedWrapper>
-            {isExpanded ? <PositionExpanded tokenId={position.tokenId} owner={position.overview.owner} /> : null}
+            {isExpanded ? (
+              <PositionExpanded
+                tokenId={position.tokenId}
+                owner={position.overview.owner}
+                poolAddress={position.overview.poolAddress}
+              />
+            ) : null}
           </PositionExpandedWrapper>
         }
       />
