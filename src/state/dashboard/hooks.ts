@@ -87,8 +87,6 @@ export function useExpandedData(owner: string, tokenId: number) {
     async function fetch() {
       if (position) {
         const { data, error } = await getExpandedPosition(position.overview)
-        console.log('getExpandedPosition(), data: ', data)
-
         if (!error && data) {
           dispatch(updateExtendedData({ owner, tokenId, data }))
         }
