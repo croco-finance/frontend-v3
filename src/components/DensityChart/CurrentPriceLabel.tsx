@@ -38,7 +38,7 @@ export function CurrentPriceLabel({ data, chartProps, poolData, small }: Current
     const price1 = entryData.price1
     return (
       <g>
-        <foreignObject x={labelData.x - 80} y={small ? 258 : 318} width={'100%'} height={100}>
+        <foreignObject x={labelData.x - 80} y={small ? 240 : 318} width={'100%'} height={100}>
           <Wrapper>
             <AutoColumn gap="6px">
               <RowFixed align="center">
