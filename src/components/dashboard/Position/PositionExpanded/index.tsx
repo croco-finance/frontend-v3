@@ -50,6 +50,8 @@ interface Props {
   token1Symbol: string | undefined
   token0Address: string
   token1Address: string
+  tickLower: number
+  tickUpper: number
 }
 
 const PositionExpanded = ({
@@ -60,6 +62,8 @@ const PositionExpanded = ({
   token1Address,
   token0Symbol,
   token1Symbol,
+  tickLower,
+  tickUpper,
 }: Props) => {
   const theme = useTheme()
   const expandedInfo = useExpandedData(owner, tokenId)
@@ -84,8 +88,10 @@ const PositionExpanded = ({
       <DensityChartWrapper>
         {poolData ? (
           <DensityChartWrapper2>
-            <TYPE.mediumHeader fontSize="16px">Liquidity Distribution</TYPE.mediumHeader>
-            <DensityChart address={poolAddress} small />
+            <TYPE.mediumHeader fontSize="16px" paddingBottom="16px">
+              Liquidity Distribution
+            </TYPE.mediumHeader>
+            <DensityChart address={poolAddress} tickLower={tickLower} tickUpper={tickUpper} small />
           </DensityChartWrapper2>
         ) : (
           <Loader />

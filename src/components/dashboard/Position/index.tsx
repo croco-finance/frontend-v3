@@ -50,6 +50,8 @@ const Position = ({ position, positionIndex }: Props) => {
                 token1Address={position.overview.pool.token1.address}
                 token0Symbol={position.overview.pool.token0.symbol}
                 token1Symbol={position.overview.pool.token1.symbol}
+                tickLower={position.overview.tickLower}
+                tickUpper={position.overview.tickUpper}
               />
             ) : null}
           </PositionExpandedWrapper>
