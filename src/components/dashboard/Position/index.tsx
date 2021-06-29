@@ -46,6 +46,10 @@ const Position = ({ position, positionIndex }: Props) => {
                 tokenId={position.tokenId}
                 owner={position.overview.owner}
                 poolAddress={position.overview.poolAddress}
+                token0Address={position.overview.pool.token0.address}
+                token1Address={position.overview.pool.token1.address}
+                token0Symbol={position.overview.pool.token0.symbol}
+                token1Symbol={position.overview.pool.token1.symbol}
               />
             ) : null}
           </PositionExpandedWrapper>

@@ -14,10 +14,10 @@ import CustomToolTip from './CustomToolTip'
 import { Token, CurrencyAmount } from '@uniswap/sdk-core'
 import JSBI from 'jsbi'
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ small?: boolean }>`
   position: relative;
   width: 100%;
-  height: 400px;
+  height: ${(props) => (props.small ? '340px' : '400px')};
 `
 
 const ControlsWrapper = styled.div`
@@ -53,6 +53,7 @@ const ActionButton = styled.div<{ disabled?: boolean }>`
 
 interface DensityChartProps {
   address: string
+  small?: boolean
 }
 
 export interface ChartEntry {
@@ -82,7 +83,7 @@ const initialState = {
   refAreaRight: '',
 }
 
-export default function DensityChart({ address }: DensityChartProps) {
+export default function DensityChart({ address, small }: DensityChartProps) {
   const theme = useTheme()
 
   // poolData
@@ -262,12 +263,12 @@ export default function DensityChart({ address }: DensityChartProps) {
     )
   }
   return (
-    <Wrapper>
+    <Wrapper small>
       {!loading ? (
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             width={500}
-            height={300}
+            height={small ? 200 : 300}
             data={zoomedData}
             margin={{
               top: 5,
@@ -297,7 +298,9 @@ export default function DensityChart({ address }: DensityChartProps) {
               <LabelList
                 dataKey="activeLiquidity"
                 position="inside"
-                content={(props) => <CurrentPriceLabel chartProps={props} poolData={poolData} data={zoomedData} />}
+                content={(props) => (
+                  <CurrentPriceLabel chartProps={props} poolData={poolData} data={zoomedData} small />
+                )}
               />
             </Bar>
           </BarChart>

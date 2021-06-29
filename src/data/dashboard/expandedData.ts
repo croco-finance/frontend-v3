@@ -126,7 +126,7 @@ function dailyFeesToChartFormat(dailyFees: DailyFees, decimals0: number, decimal
   for (const timestamp in dailyFees) {
     const tokenFees: TokenFees = dailyFees[timestamp]
     entryArray.push({
-      date: Number(timestamp),
+      date: Number(timestamp) * 1000,
       feesToken0: Number(formatUnits(tokenFees.amount0, decimals0)),
       feesToken1: Number(formatUnits(tokenFees.amount1, decimals1)),
     })
