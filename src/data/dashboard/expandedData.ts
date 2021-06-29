@@ -2,9 +2,11 @@ import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Position } from '@uniswap/v3-sdk'
 import { client } from 'apollo/client'
 import dayjs from 'dayjs'
+import { formatUnits } from 'ethers/lib/utils'
 import gql from 'graphql-tag'
+import { FeesChartEntry } from 'state/dashboard/reducer'
 import { computeFees, DailyFees } from './dailyFees'
-import { PositionInOverview } from './overviewData'
+import { PositionInOverview, TokenFees } from './overviewData'
 
 export interface Transaction {
   id: string // tx hash
@@ -38,7 +40,6 @@ export interface ExpandedPositionInfo {
   // Sum of all collected fees
   collectedFeesToken0: number
   collectedFeesToken1: number
-
   dailyFees: DailyFees
   snapshots: Snapshot[]
 }
@@ -83,32 +84,54 @@ const POSITION_AND_SNAPS = gql`
 
 function buildQuery(pool: string, minTimestamp: number, relevantTickIds: string[], snapBlocks: string[]): string {
   let query = `{
-            poolDayDatas(where: {pool: "${pool}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: asc) {
-                date
-                tick
-                feeGrowthGlobal0X128
-                feeGrowthGlobal1X128
-            }`
+          poolDayDatas(where: {pool: "${pool}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: asc) {
+              date
+              tick
+              feeGrowthGlobal0X128
+              feeGrowthGlobal1X128
+          }`
   for (const block of snapBlocks) {
     query += `
-        b${block}: bundle(id: "1", block: {number: ${block}}) {
-            ethPriceUSD
-        }`
+      b${block}: bundle(id: "1", block: {number: ${block}}) {
+          ethPriceUSD
+      }`
   }
   for (const tickId of relevantTickIds) {
     const processedId = tickId.replace('#', '_').replace('-', '_')
     query += `
-        t${processedId}: tickDayDatas(where: {tick: "${tickId}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: asc) {
-            date
-            tick {
-                tickIdx
-            }
-            feeGrowthOutside0X128
-            feeGrowthOutside1X128
-        }`
+      t${processedId}: tickDayDatas(where: {tick: "${tickId}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: asc) {
+          date
+          tick {
+              tickIdx
+          }
+          feeGrowthOutside0X128
+          feeGrowthOutside1X128
+      }`
+    query += `
+      t${processedId}_first_smaller: tickDayDatas(first: 1, where: {tick: "${tickId}", date_lte: ${minTimestamp}}, orderBy: date, orderDirection: desc) {
+          date
+          tick {
+              tickIdx
+          }
+          feeGrowthOutside0X128
+          feeGrowthOutside1X128
+      }`
   }
   query += '}'
   return query
+}
+
+function dailyFeesToChartFormat(dailyFees: DailyFees, decimals0: number, decimals1: number): FeesChartEntry[] {
+  const entryArray: FeesChartEntry[] = []
+  for (const timestamp in dailyFees) {
+    const tokenFees: TokenFees = dailyFees[timestamp]
+    entryArray.push({
+      date: Number(timestamp),
+      feesToken0: Number(formatUnits(tokenFees.amount0, decimals0)),
+      feesToken1: Number(formatUnits(tokenFees.amount1, decimals1)),
+    })
+  }
+  return entryArray
 }
 
 export async function getExpandedPosition(positionInOverview: PositionInOverview) {
@@ -178,17 +201,21 @@ export async function getExpandedPosition(positionInOverview: PositionInOverview
           ethPriceUSD: Number(result.data['b' + snap.blockNumber].ethPriceUSD),
         },
       })
+    }
 
-      // 7. create ExpandedPositionInfo and return
-      return {
-        data: {
-          collectedFeesToken0: snapshots[snapshots.length - 1].collectedFeesToken0,
-          collectedFeesToken1: snapshots[snapshots.length - 1].collectedFeesToken1,
+    // 7. create ExpandedPositionInfo and return
+    return {
+      data: {
+        collectedFeesToken0: snapshots[snapshots.length - 1].collectedFeesToken0,
+        collectedFeesToken1: snapshots[snapshots.length - 1].collectedFeesToken1,
+        dailyFees: dailyFeesToChartFormat(
           dailyFees,
-          snapshots,
-        },
-        error,
-      }
+          positionInOverview.pool.token0.decimals,
+          positionInOverview.pool.token1.decimals
+        ),
+        snapshots,
+      },
+      error,
     }
   } catch {
     error = true
