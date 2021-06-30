@@ -1,5 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { PositionInOverview } from 'data/dashboard/overviewData'
+import { Snapshot } from 'data/dashboard/expandedData'
 import { currentTimestamp } from './../../utils/index'
 import { addPositionOwners, updateExtendedData, updatePositionData } from './actions'
 
@@ -12,7 +13,7 @@ export type FeesChartEntry = {
 
 export interface ExpandedPostionData {
   dailyFees: FeesChartEntry[]
-  snapshots: any
+  snapshots: Snapshot[]
   collectedFeesToken0: number
   collectedFeesToken1: number
 }
