@@ -216,21 +216,23 @@ export default function DensityChart({ address, small, tickLower, tickUpper }: D
   const atZoomMin = zoomState.left - ZOOM_INTERVAL < 0
 
   const handleZoomIn = useCallback(() => {
-    !atZoomMax &&
+    if (!atZoomMax) {
       setZoomState({
         ...zoomState,
         left: zoomState.left + ZOOM_INTERVAL,
         right: zoomState.right - ZOOM_INTERVAL,
       })
 
-    if (tickLowerIndex.current && tickUpperIndex.current) {
-      tickLowerIndex.current -= ZOOM_INTERVAL
-      tickUpperIndex.current -= ZOOM_INTERVAL
+      if (tickLowerIndex.current && tickUpperIndex.current) {
+        tickLowerIndex.current -= ZOOM_INTERVAL
+        tickUpperIndex.current -= ZOOM_INTERVAL
+      }
     }
   }, [zoomState, atZoomMax])
 
   const handleZoomOut = useCallback(() => {
     if (atZoomMin) {
+      // fetches new data
       setLoading(true)
       setTicksToFetch(ticksToFetch + ZOOM_INTERVAL)
       setFormattedData(undefined)
@@ -245,10 +247,10 @@ export default function DensityChart({ address, small, tickLower, tickUpper }: D
         left: zoomState.left - ZOOM_INTERVAL,
         right: zoomState.right + ZOOM_INTERVAL,
       })
-    }
-    if (tickLowerIndex.current && tickUpperIndex.current) {
-      tickLowerIndex.current += ZOOM_INTERVAL
-      tickUpperIndex.current += ZOOM_INTERVAL
+      if (tickLowerIndex.current && tickUpperIndex.current) {
+        tickLowerIndex.current += ZOOM_INTERVAL
+        tickUpperIndex.current += ZOOM_INTERVAL
+      }
     }
   }, [amountTicks, atZoomMin, ticksToFetch, zoomState])
 
