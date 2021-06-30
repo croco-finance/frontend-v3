@@ -142,6 +142,8 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(addAddress, (state, action) => {
       const { address, ens, bundled } = action.payload
+      // this variable is loaed from local-storage and it might happen it's missing there
+      if (!state.watchedAddresses) state.watchedAddresses = {}
       state.watchedAddresses[address] = { bundled: bundled || false, ens }
     })
     .addCase(deleteAddress, (state, action) => {
