@@ -115,6 +115,10 @@ const Dashboard = ({
   // based on value of poolSelected we will fiter pools rendered to user
   const [poolSelected, setPoolSelected] = useState<PoolOption>({ value: 'all', label: 'All pools' })
 
+  useEffect(() => {
+    setPoolSelected({ value: 'all', label: 'All pools' })
+  }, [address])
+
   // get for which adddresses to fetch positions
   let ownersToUse: string[] | undefined
 
@@ -177,6 +181,7 @@ const Dashboard = ({
             <PoolSelectWrapper>
               <InputLabel>Filter by pool</InputLabel>
               <PoolSelect
+                value={poolSelected}
                 positions={positions}
                 onPoolSelect={(option: PoolOption) => {
                   handlePoolSelect(option)
