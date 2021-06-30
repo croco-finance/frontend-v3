@@ -104,9 +104,10 @@ const PoolOption = ({ value }: PoolOption) => {
 interface Props {
   positions: PositionData[] | undefined
   onPoolSelect: any
+  value: PoolOption
 }
 
-const PoolSelect = ({ positions, onPoolSelect }: Props) => {
+const PoolSelect = ({ positions, onPoolSelect, value }: Props) => {
   // TODO Select All Pools by default and show Loader when pools are being loaded
   const options = buildPoolOptions(positions)
 
@@ -114,6 +115,7 @@ const PoolSelect = ({ positions, onPoolSelect }: Props) => {
     <Wrapper>
       <Select
         options={options}
+        value={value}
         onChange={(option: PoolOption) => {
           onPoolSelect(option)
         }}
