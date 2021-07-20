@@ -12,7 +12,8 @@ import { useExpandedData } from 'state/dashboard/hooks'
 import { usePoolDatas } from 'state/pools/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
-import { formatAmount, formatDollarAmount, formatPercentageValue } from 'utils/numbers'
+import { formatAmount, formatDollarAmount, formatPercentageValue, toTwoNonZeroDecimals } from 'utils/numbers'
+import { getRelativeImpLoss } from 'utils/simulator'
 
 const Wrapper = styled.div`
   display: flex;
@@ -103,19 +104,47 @@ interface ImpermanentLossInfo {
   impLossUSD: number
   impLossRelative: number
 }
-const getImpermanentLoss = (snapshots: Snapshot[]): ImpermanentLossInfo => {
+const getImpermanentLoss = (
+  snapshots: Snapshot[],
+  token0CurrentAmount: number,
+  token1CurrentAmount: number,
+  token0priceUSD: number,
+  token1priceUSD: number
+): ImpermanentLossInfo => {
   //  returns impermanent loss and token differences since last snapshot (deposit/withdrawal)
-  snapshots.forEach((snap: Snapshot) => {
-    // TODO get necessary token amounts adn perform computations
-    // console.log('snap 0', snap.amountToken0.toSignificant(4))
-    // console.log('snap 1', snap.amountToken1.toSignificant(4))
-    // console.log('--------------------------')
+  // find last snap accociated with deposit or withdrawal (not fee collection)
+  let lastSnap = snapshots[0]
+
+  snapshots.forEach((snap) => {
+    // if there is some change in deposits, set new lastSnap
+    if (
+      snap.depositedToken0 !== lastSnap.depositedToken0 ||
+      snap.depositedToken1 !== lastSnap.depositedToken1 ||
+      snap.withdrawnToken0 !== lastSnap.withdrawnToken0 ||
+      snap.withdrawnToken1 !== lastSnap.withdrawnToken1
+    ) {
+      lastSnap = snap
+    }
   })
+
+  const token0LastSnapAmount = Number(lastSnap.amountToken0.toSignificant())
+  const token1LastSnapAmount = Number(lastSnap.amountToken1.toSignificant())
+
+  // compute impermanent loss
+  const hodlValueUSD = token0LastSnapAmount * token0priceUSD + token1LastSnapAmount * token1priceUSD
+  const currentValueUSD = token0CurrentAmount * token0priceUSD + token1CurrentAmount * token1priceUSD
+
+  const impLossUSD = hodlValueUSD - currentValueUSD
+  const impLossRelative = getRelativeImpLoss(currentValueUSD, hodlValueUSD)
+
+  const differenceToken0 = token0CurrentAmount - token0LastSnapAmount
+  const differenceToken1 = token1CurrentAmount - token1LastSnapAmount
+
   return {
-    differenceToken0: 0,
-    differenceToken1: 0,
-    impLossUSD: 0,
-    impLossRelative: 0,
+    differenceToken0: differenceToken0 || 0,
+    differenceToken1: differenceToken1 || 0,
+    impLossUSD: impLossUSD || 0,
+    impLossRelative: impLossRelative || 0,
   }
 }
 
@@ -129,6 +158,10 @@ interface Props {
   token1Address: string
   tickLower: number
   tickUpper: number
+  token0priceUSD: number
+  token1priceUSD: number
+  token0CurrentAmount: number
+  token1CurrentAmount: number
 }
 
 const PositionExpanded = ({
@@ -141,12 +174,24 @@ const PositionExpanded = ({
   token1Symbol,
   tickLower,
   tickUpper,
+  token0priceUSD,
+  token1priceUSD,
+  token0CurrentAmount,
+  token1CurrentAmount,
 }: Props) => {
   const theme = useTheme()
   const expandedInfo = useExpandedData(owner, tokenId)
   // liquidity distribution data
   const poolData = usePoolDatas([poolAddress])[0]
-  const impLossData = expandedInfo?.snapshots ? getImpermanentLoss(expandedInfo.snapshots) : undefined
+  const impLossData = expandedInfo?.snapshots
+    ? getImpermanentLoss(
+        expandedInfo.snapshots,
+        Number(token0CurrentAmount),
+        Number(token1CurrentAmount),
+        token0priceUSD,
+        token1priceUSD
+      )
+    : undefined
 
   return (
     <Wrapper>
@@ -181,26 +226,32 @@ const PositionExpanded = ({
             {impLossData ? (
               <>
                 <RowBetween>
-                  <MouseoverTooltip text="Impermanent loss since your last deposit / withdrawal">
-                    <Label>Impermanent Loss:</Label>
-                  </MouseoverTooltip>
+                  <Label>Impermanent Loss:</Label>
 
-                  <Il style={{ color: theme.red1 }}>
-                    {formatDollarAmount(impLossData?.impLossUSD)}
-                    <RelIl>{formatPercentageValue(impLossData?.impLossRelative)}</RelIl>
-                  </Il>
+                  <MouseoverTooltip text="Impermanent loss since your last deposit or withdrawal">
+                    <Il style={{ color: theme.red1 }}>
+                      {formatDollarAmount(impLossData.impLossUSD)}
+                      <RelIl>{formatPercentageValue(impLossData.impLossRelative)}</RelIl>
+                    </Il>
+                  </MouseoverTooltip>
                 </RowBetween>
                 <RowBetween>
                   <RowFixed>
                     <TYPE.main>{token0Symbol}</TYPE.main>
                   </RowFixed>
-                  <TYPE.main>{formatAmount(impLossData?.differenceToken0)}</TYPE.main>
+                  <TYPE.main>
+                    {impLossData.differenceToken0 > 0 ? '+' : ''}
+                    {toTwoNonZeroDecimals(impLossData.differenceToken0)}
+                  </TYPE.main>
                 </RowBetween>
                 <RowBetween>
                   <RowFixed>
                     <TYPE.main>{token1Symbol}</TYPE.main>
                   </RowFixed>
-                  <TYPE.main>{formatAmount(impLossData?.differenceToken1)}</TYPE.main>
+                  <TYPE.main>
+                    {impLossData.differenceToken1 > 0 ? '+' : ''}
+                    {toTwoNonZeroDecimals(impLossData.differenceToken1)}
+                  </TYPE.main>
                 </RowBetween>
               </>
             ) : (

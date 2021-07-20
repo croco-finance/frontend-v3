@@ -171,7 +171,7 @@ export async function getExpandedPosition(positionInOverview: PositionInOverview
         oldestSnapTimestamp = snapTimestamp
       }
     }
-    const minTimestamp = Math.max(dayjs().subtract(30, 'day').unix(), oldestSnapTimestamp)
+    const minTimestamp = Math.max(dayjs().subtract(365, 'day').unix(), oldestSnapTimestamp)
 
     // 4. fetch positions, snapshots, pool, tick day data and eth prices in snap creation times
     result = await client.query({

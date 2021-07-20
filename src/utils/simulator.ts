@@ -2,7 +2,7 @@ import { getTokenArrayValue } from 'utils/math'
 import { Position } from 'state/simulator/reducer'
 
 // compute relative impermanent loss from known current and HOLD value
-function getRelativeImpLoss(poolValue: number, holdValue: number) {
+export function getRelativeImpLoss(poolValue: number, holdValue: number) {
   return 1 - poolValue / holdValue
 }
 

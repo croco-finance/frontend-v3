@@ -1,11 +1,10 @@
+import { DarkCard } from 'components/Card'
+import CollapsibleContainer from 'components/CollapsibleContainer'
+import PositionExpanded from 'components/dashboard/Position/PositionExpanded'
+import PositionOverview from 'components/dashboard/Position/PositionOverview'
 import React, { useState } from 'react'
 import { PositionData } from 'state/dashboard/reducer'
 import styled from 'styled-components'
-import CollapsibleContainer from 'components/CollapsibleContainer'
-import useTheme from 'hooks/useTheme'
-import PositionOverview from 'components/dashboard/Position/PositionOverview'
-import PositionExpanded from 'components/dashboard/Position/PositionExpanded'
-import { DarkCard } from 'components/Card'
 
 const Wrapper = styled(DarkCard)`
   margin-bottom: 28px;
@@ -51,6 +50,10 @@ const Position = ({ position, positionIndex }: Props) => {
                 token1Symbol={position.overview.pool.token1.symbol}
                 tickLower={position.overview.tickLower}
                 tickUpper={position.overview.tickUpper}
+                token0priceUSD={position.overview.token0priceUSD}
+                token1priceUSD={position.overview.token1priceUSD}
+                token0CurrentAmount={Number(position.overview.amount0.toSignificant())}
+                token1CurrentAmount={Number(position.overview.amount1.toSignificant())}
               />
             ) : null}
           </PositionExpandedWrapper>
