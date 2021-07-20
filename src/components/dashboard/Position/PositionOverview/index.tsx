@@ -145,6 +145,10 @@ const Label = styled(({ end, ...props }) => <TYPE.label {...props} />)<{ end?: b
   align-items: center;
 `
 
+const PositionIDLink = styled.a`
+  text-decoration: none;
+`
+
 export function getPriceOrderingFromPositionForUI(
   position?: PositionInOverview
 ): {
@@ -350,9 +354,9 @@ interface Props {
   handleShowExpanded: () => void
 }
 
-const PositionOverview = ({ position, positionIndex, isExpanded, handleShowExpanded }: Props) => {
+const PositionOverview = ({ position, isExpanded, handleShowExpanded }: Props) => {
   const theme = useTheme()
-  const { pool, tickLower, tickUpper } = position
+  const { pool, tickLower, tickUpper, tokenId } = position
   const { token0, token1, fee } = position.pool
 
   let { priceLower, priceUpper, base, quote } = getPriceOrderingFromPositionForUI(position)
@@ -398,6 +402,11 @@ const PositionOverview = ({ position, positionIndex, isExpanded, handleShowExpan
               <BadgeText>{new Percent(fee, 1_000_000).toSignificant()}%</BadgeText>
             </Badge>
           </Name>
+          <PositionIDLink href={`https://app.uniswap.org/#/pool/${tokenId}`} target="_blank" rel="noreferrer noopener">
+            <Badge style={{ marginRight: '8px' }}>
+              <BadgeText>{`ID: ${tokenId}`}</BadgeText>
+            </Badge>
+          </PositionIDLink>
           <RangeBadge removed={removed} inRange={inRange} />
         </NameAndStatus>
         {currencyBase && currencyQuote && (
