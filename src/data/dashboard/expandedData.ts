@@ -1,5 +1,5 @@
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
-import { Position } from '@uniswap/v3-sdk'
+import { Pool, Position } from '@uniswap/v3-sdk'
 import { client } from 'apollo/client'
 import dayjs from 'dayjs'
 import { formatUnits } from 'ethers/lib/utils'
@@ -92,9 +92,14 @@ function buildQuery(pool: string, minTimestamp: number, relevantTickIds: string[
           }`
   for (const block of snapBlocks) {
     query += `
-      b${block}: bundle(id: "1", block: {number: ${block}}) {
-          ethPriceUSD
-      }`
+    b${block}: bundle(id: "1", block: {number: ${block}}) {
+      ethPriceUSD
+  }
+  s${block}: pool(id: "${pool}", block: {number: ${block}}) {
+      liquidity
+      sqrtPrice
+      tick
+  }`
   }
   for (const tickId of relevantTickIds) {
     const processedId = tickId.replace('#', '_').replace('-', '_')
@@ -180,7 +185,14 @@ export async function getExpandedPosition(positionInOverview: PositionInOverview
     const snapshots: Snapshot[] = []
     for (const snap of rawSnaps) {
       const snapPosition = new Position({
-        pool: positionInOverview.pool,
+        pool: new Pool(
+          positionInOverview.pool.token0,
+          positionInOverview.pool.token1,
+          positionInOverview.pool.fee,
+          result.data['s' + snap.blockNumber].sqrtPrice,
+          result.data['s' + snap.blockNumber].liquidity,
+          parseInt(result.data['s' + snap.blockNumber].tick)
+        ),
         liquidity: snap.liquidity,
         tickLower: positionInOverview.tickLower,
         tickUpper: positionInOverview.tickUpper,

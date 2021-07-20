@@ -74,7 +74,6 @@ export function usePositionDatas(
  * @returns
  */
 export function useExpandedData(owner: string, tokenId: number) {
-  console.log('useExpandedData')
   const dispatch = useDispatch<AppDispatch>()
   const positions = useSelector((state: AppState) => state.positions.byOwner[owner].data)
   // find position with given token id

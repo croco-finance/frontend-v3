@@ -110,8 +110,8 @@ export class PositionInOverview extends Position {
           poolData.token1.name
         ),
         parseInt(poolData.feeTier),
-        parseInt(poolData.sqrtPrice),
-        parseInt(poolData.liquidity),
+        poolData.sqrtPrice,
+        poolData.liquidity,
         parseInt(poolData.tick)
       ),
       liquidity: positionData.liquidity,
