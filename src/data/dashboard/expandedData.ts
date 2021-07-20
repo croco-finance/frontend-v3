@@ -184,15 +184,24 @@ export async function getExpandedPosition(positionInOverview: PositionInOverview
     // 6. process snapshots
     const snapshots: Snapshot[] = []
     for (const snap of rawSnaps) {
-      const snapPosition = new Position({
-        pool: new Pool(
+      const additionalPoolInfo = result.data['s' + snap.blockNumber]
+      // additionalPoolInfo.tick is null when the positionSnapshot is the pool's
+      // first snapshot. To avoid "Error: Invariant failed: TICK" error
+      // I set current pool info instead of the snap's
+      let pool = positionInOverview.pool
+      if (additionalPoolInfo.tick !== null) {
+        pool = new Pool(
           positionInOverview.pool.token0,
           positionInOverview.pool.token1,
           positionInOverview.pool.fee,
-          result.data['s' + snap.blockNumber].sqrtPrice,
-          result.data['s' + snap.blockNumber].liquidity,
-          parseInt(result.data['s' + snap.blockNumber].tick)
-        ),
+          additionalPoolInfo.sqrtPrice,
+          additionalPoolInfo.liquidity,
+          parseInt(additionalPoolInfo.tick)
+        )
+      }
+
+      const snapPosition = new Position({
+        pool,
         liquidity: snap.liquidity,
         tickLower: positionInOverview.tickLower,
         tickUpper: positionInOverview.tickUpper,
