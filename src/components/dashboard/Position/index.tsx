@@ -22,7 +22,6 @@ interface Props {
 }
 
 const Position = ({ position, positionIndex }: Props) => {
-  const theme = useTheme()
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
