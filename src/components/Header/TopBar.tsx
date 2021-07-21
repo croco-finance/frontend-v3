@@ -41,19 +41,6 @@ const IconLinkWrapper = styled.a`
 
 const TopBar = () => {
   const ethPrices = useEthPrices()
-  const socialLinks = (
-    <>
-      <IconLinkWrapper rel="noreferrer" target="_blank" href={TWITTER_LINK}>
-        <Icon icon="TWITTER" size={16} />
-      </IconLinkWrapper>
-      <IconLinkWrapper rel="noreferrer" target="_blank" href={DISCORD_LINK}>
-        <Icon icon="DISCORD" size={16} />
-      </IconLinkWrapper>
-      <IconLinkWrapper rel="noreferrer" target="_blank" href={TELEGRAM_LINK}>
-        <Icon icon="TELEGRAM" size={16} />
-      </IconLinkWrapper>
-    </>
-  )
 
   return (
     <Wrapper>
@@ -68,7 +55,16 @@ const TopBar = () => {
           </RowFixed>
         </AutoRow>
         <AutoRow gap="6px" style={{ justifyContent: 'flex-end' }}>
-          {socialLinks}
+          <IconLinkWrapper rel="noreferrer" target="_blank" href={TWITTER_LINK}>
+            <Icon icon="TWITTER" size={16} />
+          </IconLinkWrapper>
+          <IconLinkWrapper rel="noreferrer" target="_blank" href={DISCORD_LINK}>
+            <Icon icon="DISCORD" size={16} />
+          </IconLinkWrapper>
+          <IconLinkWrapper rel="noreferrer" target="_blank" href={TELEGRAM_LINK}>
+            <Icon icon="TELEGRAM" size={16} />
+          </IconLinkWrapper>
+
           {/* <StyledLink href="https://v2.info.uniswap.org/#/">V2 Analytics</StyledLink> */}
           {/* <StyledLink href="https://docs.uniswap.org/">Uniswap Docs</StyledLink> */}
           <StyledLink href="https://app.uniswap.org/#/swap">Uniswap</StyledLink>

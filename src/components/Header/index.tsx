@@ -12,7 +12,7 @@ import { useLayoutSize } from 'state/application/hooks'
 import styled from 'styled-components'
 import { isAddress } from 'utils'
 // import Logo from '../../assets/svg/logo.svg'
-import LogoDark from '../../assets/svg/logo_white.svg'
+import LogoDark from '../../assets/svg/croco_uni_logo_dark.svg'
 
 const NAVBAR_HEIGHT = '50px'
 
@@ -268,7 +268,7 @@ export default function Header(props: RouteComponentProps) {
           }}
         >
           <UniIcon>
-            <img width={'24px'} src={LogoDark} alt="logo" />
+            <img width={'48px'} src={LogoDark} alt="logo" />
           </UniIcon>
         </Title>
 
