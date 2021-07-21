@@ -100,7 +100,6 @@ export function getTotalPositionFees(
 }
 
 export async function getTotalUserPoolFees(user: string, pool: string): Promise<TokenFees> {
-  console.log(`getTotalUserPoolFees(), user: ${user}, pool: ${pool}`)
   const result = await client.query({
     query: POSITIONS_QUERY,
     variables: {
@@ -108,8 +107,6 @@ export async function getTotalUserPoolFees(user: string, pool: string): Promise<
       pool: pool,
     },
   })
-
-  console.log(`result`, result)
 
   const totalFees: TokenFees = {
     feesToken0: BigNumber.from(0),
