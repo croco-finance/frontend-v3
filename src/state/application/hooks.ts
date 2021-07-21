@@ -1,8 +1,9 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useActiveWeb3React } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
 import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal, updateSubgraphStatus } from './actions'
+import { bindActionCreators, ActionCreatorsMapObject } from 'redux'
 
 export function useBlockNumber(): number | undefined {
   const { chainId } = useActiveWeb3React()
@@ -90,4 +91,16 @@ export function useSubgraphStatus(): [
     [dispatch]
   )
   return [status, update]
+}
+
+export const useLayoutSize = () => {
+  const layoutSize = useSelector((state: AppState) => state.application.screen.screenSize)
+  const isMobileLayout = !['LARGE', 'LARGE', 'NORMAL'].includes(layoutSize)
+  return { isMobileLayout, layoutSize }
+}
+
+export const useActions = <M extends ActionCreatorsMapObject<any>>(actions: M) => {
+  const dispatch = useDispatch()
+  const ref = useRef(actions)
+  return useMemo(() => bindActionCreators(ref.current, dispatch), [dispatch, ref])
 }
