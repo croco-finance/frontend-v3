@@ -238,7 +238,12 @@ function PriceCard({
     <PriceCardWrapper>
       <AutoColumn gap="8px" justify="center">
         <ExtentsText>{title}</ExtentsText>
-        <TYPE.mediumHeader textAlign="center">{price}</TYPE.mediumHeader>
+        <TYPE.mediumHeader
+          textAlign="center"
+          style={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '160px' }}
+        >
+          {price}
+        </TYPE.mediumHeader>
         <ExtentsText>
           {currencyQuote?.symbol} per {currencyBase?.symbol}
         </ExtentsText>
