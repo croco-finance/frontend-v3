@@ -108,6 +108,7 @@ interface ImpermanentLossInfo {
   impLossUSD: number
   impLossRelative: number
   impLossSinceTimestamp: number
+  lastSnapAction: 'DEPOSIT' | 'WITHDRAW'
 }
 const getImpermanentLoss = (
   snapshots: Snapshot[],
@@ -119,6 +120,7 @@ const getImpermanentLoss = (
   //  returns impermanent loss and token differences since last snapshot (deposit/withdrawal)
   // find last snap accociated with deposit or withdrawal (not fee collection)
   let lastSnap = snapshots[0]
+  let lastSnapAction: ImpermanentLossInfo['lastSnapAction'] = 'DEPOSIT'
 
   snapshots.forEach((snap) => {
     // if there is some change in deposits, set new lastSnap
@@ -128,6 +130,12 @@ const getImpermanentLoss = (
       snap.withdrawnToken0 !== lastSnap.withdrawnToken0 ||
       snap.withdrawnToken1 !== lastSnap.withdrawnToken1
     ) {
+      if (snap.depositedToken0 > lastSnap.depositedToken0 || snap.depositedToken1 > lastSnap.depositedToken1)
+        lastSnapAction = 'DEPOSIT'
+
+      if (snap.withdrawnToken0 > lastSnap.withdrawnToken0 || snap.withdrawnToken1 > lastSnap.withdrawnToken1)
+        lastSnapAction = 'WITHDRAW'
+
       lastSnap = snap
     }
   })
@@ -151,6 +159,7 @@ const getImpermanentLoss = (
     impLossUSD: impLossUSD || 0,
     impLossRelative: impLossRelative || 0,
     impLossSinceTimestamp: lastSnap.transaction.timestamp * 1000,
+    lastSnapAction,
   }
 }
 
@@ -232,22 +241,22 @@ const PositionExpanded = ({
             {impLossData ? (
               <>
                 <RowBetween>
-                  <Label>Impermanent Loss:</Label>
-
                   <MouseoverTooltip
-                    text={`Impermanent loss since your last deposit or withdrawal (${dayjs(
-                      impLossData.impLossSinceTimestamp
-                    ).format('MMM D, YYYY')})`}
+                    text={`Impermanent loss since ${dayjs(impLossData.impLossSinceTimestamp).format(
+                      'MMM D, YYYY'
+                    )} - date of your last ${impLossData.lastSnapAction === 'DEPOSIT' ? 'deposit' : 'withdrawal'}`}
                   >
-                    {impLossData.impLossUSD > 0 ? (
-                      <Il style={{ color: theme.red1 }}>
-                        {formatDollarAmount(impLossData.impLossUSD)}
-                        <RelIl>{formatPercentageValue(impLossData.impLossRelative)}</RelIl>
-                      </Il>
-                    ) : (
-                      '-'
-                    )}
+                    <Label>Imp. loss since {dayjs(impLossData.impLossSinceTimestamp).format('MMM D, YYYY')}:</Label>
                   </MouseoverTooltip>
+
+                  {impLossData.impLossUSD > 0 ? (
+                    <Il style={{ color: theme.red1 }}>
+                      {formatDollarAmount(impLossData.impLossUSD)}
+                      <RelIl>{formatPercentageValue(impLossData.impLossRelative)}</RelIl>
+                    </Il>
+                  ) : (
+                    '-'
+                  )}
                 </RowBetween>
                 <RowBetween>
                   <RowFixed>
