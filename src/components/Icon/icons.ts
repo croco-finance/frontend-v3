@@ -38,6 +38,7 @@ export const ICONS = {
   HAMBURGER_MENU: require('../../assets/images/icons/hamburger_menu.svg'),
   UNKNOWN_TOKEN: require('../../assets/images/icons/unknown_token.svg'),
   PLUS: require('../../assets/images/icons/plus.svg'),
+  SWITCH: require('../../assets/images/icons/switch.svg'),
 
   // themes
   LIGHT_MODE: require('../../assets/images/icons/light-mode.svg'),

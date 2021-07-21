@@ -1,6 +1,6 @@
 import { fetchTicksSurroundingPrice, TickProcessed } from 'data/pools/tickData'
-import React, { useEffect, useMemo, useState, useCallback } from 'react'
-import { BarChart, Bar, LabelList, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import { BarChart, Bar, LabelList, XAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
 import Loader from 'components/Loader'
 import styled from 'styled-components'
 import useTheme from 'hooks/useTheme'
@@ -14,10 +14,10 @@ import CustomToolTip from './CustomToolTip'
 import { Token, CurrencyAmount } from '@uniswap/sdk-core'
 import JSBI from 'jsbi'
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ small?: boolean }>`
   position: relative;
   width: 100%;
-  height: 400px;
+  height: ${(props) => (props.small ? '320px' : '400px')};
 `
 
 const ControlsWrapper = styled.div`
@@ -53,6 +53,10 @@ const ActionButton = styled.div<{ disabled?: boolean }>`
 
 interface DensityChartProps {
   address: string
+  small?: boolean
+  // colors those limit ticks with different color
+  tickLower?: number
+  tickUpper?: number
 }
 
 export interface ChartEntry {
@@ -63,6 +67,8 @@ export interface ChartEntry {
   price1: number
   tvlToken0: number
   tvlToken1: number
+  isLower: boolean
+  isUpper: boolean
 }
 
 interface ZoomStateProps {
@@ -82,7 +88,7 @@ const initialState = {
   refAreaRight: '',
 }
 
-export default function DensityChart({ address }: DensityChartProps) {
+export default function DensityChart({ address, small, tickLower, tickUpper }: DensityChartProps) {
   const theme = useTheme()
 
   // poolData
@@ -90,6 +96,10 @@ export default function DensityChart({ address }: DensityChartProps) {
   const formattedAddress0 = isAddress(poolData.token0.address)
   const formattedAddress1 = isAddress(poolData.token1.address)
   const feeTier = poolData?.feeTier
+
+  // indexes of lower and upper ticks
+  const tickLowerIndex = useRef<number | undefined>(undefined)
+  const tickUpperIndex = useRef<number | undefined>(undefined)
 
   // parsed tokens
   const token0 = useMemo(() => {
@@ -130,6 +140,11 @@ export default function DensityChart({ address }: DensityChartProps) {
         const newData = await Promise.all(
           poolTickData.ticksProcessed.map(async (t: TickProcessed, i) => {
             const active = t.tickIdx === poolTickData.activeTickIdx
+            const isLower = t.tickIdx === tickLower
+            const isUpper = t.tickIdx === tickUpper
+            if (isLower) tickLowerIndex.current = i
+            if (isUpper) tickUpperIndex.current = i
+
             const sqrtPriceX96 = TickMath.getSqrtRatioAtTick(t.tickIdx)
             const feeAmount: FeeAmount = poolData.feeTier
             const mockTicks = [
@@ -163,6 +178,8 @@ export default function DensityChart({ address }: DensityChartProps) {
             return {
               index: i,
               isCurrent: active,
+              isLower,
+              isUpper,
               activeLiquidity: parseFloat(t.liquidityActive.toString()),
               price0: parseFloat(t.price0),
               price1: parseFloat(t.price1),
@@ -193,22 +210,29 @@ export default function DensityChart({ address }: DensityChartProps) {
     if (!formattedData) {
       formatData()
     }
-  }, [feeTier, formattedData, loading, poolData.feeTier, poolTickData, token0, token1])
+  }, [feeTier, formattedData, loading, poolData.feeTier, poolTickData, tickLower, tickUpper, token0, token1])
 
   const atZoomMax = zoomState.left + ZOOM_INTERVAL >= zoomState.right - ZOOM_INTERVAL - 1
   const atZoomMin = zoomState.left - ZOOM_INTERVAL < 0
 
   const handleZoomIn = useCallback(() => {
-    !atZoomMax &&
+    if (!atZoomMax) {
       setZoomState({
         ...zoomState,
         left: zoomState.left + ZOOM_INTERVAL,
         right: zoomState.right - ZOOM_INTERVAL,
       })
+
+      if (tickLowerIndex.current && tickUpperIndex.current) {
+        tickLowerIndex.current -= ZOOM_INTERVAL
+        tickUpperIndex.current -= ZOOM_INTERVAL
+      }
+    }
   }, [zoomState, atZoomMax])
 
   const handleZoomOut = useCallback(() => {
     if (atZoomMin) {
+      // fetches new data
       setLoading(true)
       setTicksToFetch(ticksToFetch + ZOOM_INTERVAL)
       setFormattedData(undefined)
@@ -223,6 +247,10 @@ export default function DensityChart({ address }: DensityChartProps) {
         left: zoomState.left - ZOOM_INTERVAL,
         right: zoomState.right + ZOOM_INTERVAL,
       })
+      if (tickLowerIndex.current && tickUpperIndex.current) {
+        tickLowerIndex.current += ZOOM_INTERVAL
+        tickUpperIndex.current += ZOOM_INTERVAL
+      }
     }
   }, [amountTicks, atZoomMin, ticksToFetch, zoomState])
 
@@ -262,12 +290,12 @@ export default function DensityChart({ address }: DensityChartProps) {
     )
   }
   return (
-    <Wrapper>
+    <Wrapper small>
       {!loading ? (
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             width={500}
-            height={300}
+            height={small ? 180 : 300}
             data={zoomedData}
             margin={{
               top: 5,
@@ -292,14 +320,49 @@ export default function DensityChart({ address }: DensityChartProps) {
               }}
             >
               {zoomedData?.map((entry, index) => {
-                return <Cell key={`cell-${index}`} fill={entry.isCurrent ? theme.pink1 : theme.blue1} />
+                return (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.isCurrent ? theme.pink1 : entry.isLower || entry.isUpper ? theme.white : theme.blue1}
+                  />
+                )
               })}
               <LabelList
                 dataKey="activeLiquidity"
                 position="inside"
-                content={(props) => <CurrentPriceLabel chartProps={props} poolData={poolData} data={zoomedData} />}
+                content={(props) => (
+                  <CurrentPriceLabel chartProps={props} poolData={poolData} data={zoomedData} small />
+                )}
               />
             </Bar>
+            {tickLowerIndex ? (
+              <ReferenceLine
+                x={tickLowerIndex.current}
+                strokeDasharray="3 3"
+                isFront
+                stroke={theme.white}
+                label={{
+                  position: 'top',
+                  // value: 'Lim. Price',
+                  fill: theme.white,
+                  fontSize: 14,
+                }}
+              />
+            ) : null}
+            {tickUpperIndex ? (
+              <ReferenceLine
+                x={tickUpperIndex.current}
+                strokeDasharray="3 3"
+                isFront
+                stroke={theme.white}
+                label={{
+                  position: 'top',
+                  // value: 'Lim. Price',
+                  fill: theme.white,
+                  fontSize: 14,
+                }}
+              />
+            ) : null}
           </BarChart>
         </ResponsiveContainer>
       ) : (

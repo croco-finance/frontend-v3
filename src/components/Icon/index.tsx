@@ -34,7 +34,7 @@ const SvgWrapper = styled.div<{ size: number; color?: string; hoverColor?: strin
     ${(props) =>
       props.hoverColor
         ? css`
-            transition: 0.2s;
+            // transition: 0.05s;
             fill: ${props.hoverColor} !important;
           `
         : null}
@@ -44,7 +44,7 @@ const SvgWrapper = styled.div<{ size: number; color?: string; hoverColor?: strin
     ${(props) =>
       props.hoverColor
         ? css`
-            transition: 0.2s;
+            // transition: 0.05s;
             fill: ${props.hoverColor} !important;
           `
         : null}

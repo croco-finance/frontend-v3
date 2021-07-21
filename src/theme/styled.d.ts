@@ -50,6 +50,10 @@ export interface Colors {
   blue1: Color
   blue2: Color
   black1: Color
+
+  error: Color
+  success: Color
+  warning: Color
 }
 
 export interface Grids {

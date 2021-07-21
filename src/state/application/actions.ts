@@ -14,6 +14,7 @@ export enum ApplicationModal {
   WALLET,
   SETTINGS,
   MENU,
+  DASHBOARD_ADDRESSES,
 }
 
 export const updateBlockNumber = createAction<{ chainId: number; blockNumber: number }>('application/updateBlockNumber')

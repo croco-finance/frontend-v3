@@ -143,3 +143,7 @@ export function useURLWarningToggle(): () => void {
   const dispatch = useDispatch()
   return useCallback(() => dispatch(toggleURLWarning()), [dispatch])
 }
+
+export function useWatchedAddresses(): AppState['user']['watchedAddresses'] {
+  return useSelector((state: AppState) => state.user.watchedAddresses)
+}
