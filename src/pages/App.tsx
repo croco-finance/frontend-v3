@@ -19,6 +19,7 @@ import PoolPage from './Pool/PoolPage'
 import { ExternalLink, HideMedium, TYPE } from 'theme'
 import { useSubgraphStatus } from 'state/application/hooks'
 import { DarkGreyCard } from 'components/Card'
+import Resize from 'components/Resize'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -76,6 +77,7 @@ export default function App() {
 
   return (
     <Suspense fallback={null}>
+      <Resize />
       <Route component={GoogleAnalyticsReporter} />
       <Route component={DarkModeQueryParamReader} />
       {loading ? (

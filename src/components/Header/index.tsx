@@ -1,28 +1,64 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // import { ChainId } from '@uniswap/sdk'
-import React from 'react'
-// import { Text } from 'rebass'
-import { NavLink } from 'react-router-dom'
-import { darken } from 'polished'
-
-import styled from 'styled-components'
-
-// import Logo from '../../assets/svg/logo.svg'
-import LogoDark from '../../assets/svg/logo_white.svg'
-// import { useActiveWeb3React } from '../../hooks'
-// import { useDarkModeManager } from '../../state/user/hooks'
-// import { useETHBalances } from '../../state/wallet/hooks'
-
-// import { YellowCard } from '../Card'
-// import { Moon, Sun } from 'react-feather'
-import Menu from '../Menu'
-
-import Row, { RowFixed } from '../Row'
+import Icon from 'components/Icon'
 // import Web3Status from '../Web3Status'
 import SearchSmall from 'components/Search'
-import { HideMedium } from 'theme'
+import useTheme from 'hooks/useTheme'
+import { darken } from 'polished'
+import React, { useState } from 'react'
+// import { Text } from 'rebass'
+import { NavLink, RouteComponentProps } from 'react-router-dom'
+import { useLayoutSize } from 'state/application/hooks'
+import styled from 'styled-components'
 import { isAddress } from 'utils'
-import { RouteComponentProps } from 'react-router-dom'
+// import Logo from '../../assets/svg/logo.svg'
+import LogoDark from '../../assets/svg/logo_white.svg'
+
+const NAVBAR_HEIGHT = '50px'
+
+const Navbar = styled.div`
+  padding: 4px 0;
+`
+
+const NavBarContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+`
+
+const NavItems = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 0%;
+
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+  flex-direction: column;
+  flex: 1 1 0%;
+  `};
+`
+
+const HamburgerIcon = styled(Icon)`
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+`
+
+const MobileMenuWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: ${NAVBAR_HEIGHT};
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16px;
+  z-index: 999;
+  overflow-y: hidden;
+  background-color: ${({ theme }) => theme.bg0};
+`
+
+// ****************************** */
 
 const HeaderFrame = styled.div`
   display: grid;
@@ -38,15 +74,14 @@ const HeaderFrame = styled.div`
   padding: 1rem;
   z-index: 2;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-
   background-color: ${({ theme }) => theme.bg0};
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  @media only screen and (max-width: 1060px) {
     grid-template-columns: 1fr;
-    padding: 0 1rem;
+    padding: 1rem 1rem 0.5rem 1rem;
     width: calc(100%);
     position: relative;
-  `};
+  }
 
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
         padding: 0.5rem 1rem;
@@ -60,7 +95,7 @@ const HeaderControls = styled.div`
   justify-self: flex-end;
 
   ${({ theme }) => theme.mediaWidth.upToMedium`
-      padding-bottom: 1rem;
+      padding-top: 0.5rem;
       width: 100%;
   `};
 `
@@ -79,25 +114,6 @@ const HeaderControls = styled.div`
 //     align-items: center;
 //   `};
 // `
-
-const HeaderElementWrap = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-const HeaderRow = styled(RowFixed)`
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-   width: 100%;
-  `};
-`
-
-const HeaderLinks = styled(Row)`
-  justify-content: center;
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-    padding: 1rem 0 1rem 1rem;
-    justify-content: flex-end;
-`};
-`
 
 // const AccountElement = styled.div<{ active: boolean }>`
 //   display: flex;
@@ -188,6 +204,10 @@ const StyledNavLink = styled(NavLink).attrs({
   :focus {
     color: ${({ theme }) => darken(0.1, theme.text1)};
   }
+
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+  margin: 4px;
+ `}
 `
 
 export const StyledMenuButton = styled.button`
@@ -227,53 +247,142 @@ export const StyledMenuButton = styled.button`
 // }
 
 export default function Header(props: RouteComponentProps) {
+  const theme = useTheme()
+  const [mobileMenuOpened, setMobileMenuOpened] = useState(false)
+  const { layoutSize } = useLayoutSize()
+  const isMobileLayout = layoutSize === 'TINY'
+
   // const { account, chainId } = useActiveWeb3React()
 
   // const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
   // const [isDark] = useDarkModeManager()
   // const [darkMode, toggleDarkMode] = useDarkModeManager()
 
-  return (
-    <HeaderFrame>
-      <HeaderRow>
-        <Title to="/">
+  const navBar = (
+    <Navbar>
+      <NavBarContent>
+        <Title
+          to="/"
+          onClick={() => {
+            setMobileMenuOpened(false)
+          }}
+        >
           <UniIcon>
             <img width={'24px'} src={LogoDark} alt="logo" />
           </UniIcon>
         </Title>
-        <HeaderLinks>
-          <StyledNavLink id={`pool-nav-link`} to={'/'} isActive={(match, { pathname }) => pathname === '/'}>
-            Overview
-          </StyledNavLink>
-          {/* <StyledNavLink id={`swap-nav-link`} to={'/protocol'}>
+
+        {/* On mobile layout show hamburger menu, otherwise navigation items */}
+        {isMobileLayout ? (
+          <HamburgerIcon
+            icon={mobileMenuOpened ? 'CLOSE' : 'HAMBURGER_MENU'}
+            size={mobileMenuOpened ? 20 : 26}
+            color={theme.text1}
+            onClick={() => setMobileMenuOpened(!mobileMenuOpened)}
+          />
+        ) : (
+          <NavItems>
+            <StyledNavLink id={`pool-nav-link`} to={'/'} isActive={(match, { pathname }) => pathname === '/'}>
+              Overview
+            </StyledNavLink>
+            {/* <StyledNavLink id={`swap-nav-link`} to={'/protocol'}>
             Protocol
           </StyledNavLink> */}
-          <StyledNavLink id={`stake-nav-link`} to={'/pools'}>
-            Pools
-          </StyledNavLink>
-          <StyledNavLink id={`stake-nav-link`} to={'/tokens'}>
-            Tokens
-          </StyledNavLink>
-          <StyledNavLink id={`stake-nav-link`} to={'/positions'}>
-            Positions
-          </StyledNavLink>
-          <StyledNavLink
-            id={`stake-nav-link`}
-            to={({ pathname }) => {
-              const splitted = pathname.split('/')
-              // if the user wa previsously on poolPage and now clicks on simulator. Redirect him to the same pool
-              // splitted[0] is empty string and splitted[2] is pool address
-              if (splitted[1] === 'pools' && splitted[2] && isAddress(splitted[2])) return `/simulator/${splitted[2]}`
-              return '/simulator'
-            }}
-          >
-            Simulator
-          </StyledNavLink>
-          {/* <StyledNavLink id={`stake-nav-link`} to={'/wallet'}>
-            Wallet
+            <StyledNavLink id={`stake-nav-link`} to={'/pools'}>
+              Pools
+            </StyledNavLink>
+            <StyledNavLink id={`stake-nav-link`} to={'/tokens'}>
+              Tokens
+            </StyledNavLink>
+            <StyledNavLink id={`stake-nav-link`} to={'/positions'}>
+              Positions
+            </StyledNavLink>
+            <StyledNavLink
+              id={`stake-nav-link`}
+              to={({ pathname }) => {
+                const splitted = pathname.split('/')
+                // if the user wa previsously on poolPage and now clicks on simulator. Redirect him to the same pool
+                // splitted[0] is empty string and splitted[2] is pool address
+                if (splitted[1] === 'pools' && splitted[2] && isAddress(splitted[2])) return `/simulator/${splitted[2]}`
+                return '/simulator'
+              }}
+            >
+              Simulator
+            </StyledNavLink>
+          </NavItems>
+        )}
+      </NavBarContent>
+    </Navbar>
+  )
+
+  const mobileMenu = (
+    <MobileMenuWrapper>
+      <NavItems>
+        <StyledNavLink
+          id={`pool-nav-link`}
+          to={'/'}
+          isActive={(match, { pathname }) => pathname === '/'}
+          onClick={() => {
+            setMobileMenuOpened(false)
+          }}
+        >
+          Overview
+        </StyledNavLink>
+        {/* <StyledNavLink id={`swap-nav-link`} to={'/protocol'}>
+            Protocol
           </StyledNavLink> */}
-        </HeaderLinks>
-      </HeaderRow>
+        <StyledNavLink
+          id={`stake-nav-link`}
+          to={'/pools'}
+          onClick={() => {
+            setMobileMenuOpened(false)
+          }}
+        >
+          Pools
+        </StyledNavLink>
+        <StyledNavLink
+          id={`stake-nav-link`}
+          to={'/tokens'}
+          onClick={() => {
+            setMobileMenuOpened(false)
+          }}
+        >
+          Tokens
+        </StyledNavLink>
+        <StyledNavLink
+          id={`stake-nav-link`}
+          to={'/positions'}
+          onClick={() => {
+            setMobileMenuOpened(false)
+          }}
+        >
+          Positions
+        </StyledNavLink>
+        <StyledNavLink
+          id={`stake-nav-link`}
+          to={({ pathname }) => {
+            const splitted = pathname.split('/')
+            // if the user wa previsously on poolPage and now clicks on simulator. Redirect him to the same pool
+            // splitted[0] is empty string and splitted[2] is pool address
+            if (splitted[1] === 'pools' && splitted[2] && isAddress(splitted[2])) return `/simulator/${splitted[2]}`
+            return '/simulator'
+          }}
+          onClick={() => {
+            setMobileMenuOpened(false)
+          }}
+        >
+          Simulator
+        </StyledNavLink>
+      </NavItems>
+    </MobileMenuWrapper>
+  )
+
+  return (
+    <HeaderFrame>
+      {navBar}
+
+      {/* Mobile menu */}
+      {mobileMenuOpened && isMobileLayout && mobileMenu}
       <HeaderControls>
         {!props.location.pathname.includes('simulator') && !props.location.pathname.includes('dashboard') && (
           <SearchSmall />
@@ -293,14 +402,14 @@ export default function Header(props: RouteComponentProps) {
             <Web3Status />
           </AccountElement>
         </HeaderElement> */}
-        <HideMedium>
+        {/* <HideMedium>
           <HeaderElementWrap>
-            {/* <StyledMenuButton onClick={() => toggleDarkMode()}>
+            <StyledMenuButton onClick={() => toggleDarkMode()}>
             {darkMode ? <Moon size={20} /> : <Sun size={20} />}
-          </StyledMenuButton> */}
+          </StyledMenuButton>
             <Menu />
           </HeaderElementWrap>
-        </HideMedium>
+        </HideMedium> */}
       </HeaderControls>
     </HeaderFrame>
   )

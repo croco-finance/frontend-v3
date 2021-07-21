@@ -237,3 +237,8 @@ export const BLOCKED_ADDRESSES: string[] = [
   '0x901bb9583b24D97e995513C6778dc6888AB6870e',
   '0xA7e5d5A720f06526557c513402f2e6B5fA20b008',
 ]
+
+export const GITHUB_LINK = 'https://github.com/croco-finance'
+export const TELEGRAM_LINK = 'https://t.me/crocofinancechat'
+export const TWITTER_LINK = 'https://twitter.com/CrocoFinance'
+export const DISCORD_LINK = 'https://discord.gg/X6PnFqy'
