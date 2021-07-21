@@ -40,8 +40,14 @@ export const formatAmount = (num: number | undefined, digits = 2, signed = false
   if (num < 0.001 && !signed) {
     return '<0.001'
   }
-  const nf = new Intl.NumberFormat()
-  return nf.format(parseFloat(num.toFixed(num > 1000 ? 0 : digits)))
+  return numbro(num).format({
+    average: true,
+    mantissa: num > 1000 ? 2 : digits,
+    abbreviations: {
+      million: 'M',
+      billion: 'B',
+    },
+  })
 }
 
 export function toTwoNonZeroDecimals(n: number) {
