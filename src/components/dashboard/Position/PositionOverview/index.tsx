@@ -66,6 +66,7 @@ const NameAndStatus = styled.div`
   flex-grow: 1;
   padding-left: 5px;
   font-size: ${({ theme }) => theme.fontSize.h3};
+  align-items: center;
 `
 const RateToggleButton = styled.button`
   margin-right: 30px;
