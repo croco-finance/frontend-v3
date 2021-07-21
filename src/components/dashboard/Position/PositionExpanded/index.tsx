@@ -14,6 +14,10 @@ import styled from 'styled-components'
 import { TYPE } from 'theme'
 import { formatAmount, formatDollarAmount, formatPercentageValue, toTwoNonZeroDecimals } from 'utils/numbers'
 import { getRelativeImpLoss } from 'utils/simulator'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
 
 const Wrapper = styled.div`
   display: flex;
@@ -103,6 +107,7 @@ interface ImpermanentLossInfo {
   differenceToken1: number
   impLossUSD: number
   impLossRelative: number
+  impLossSinceTimestamp: number
 }
 const getImpermanentLoss = (
   snapshots: Snapshot[],
@@ -145,6 +150,7 @@ const getImpermanentLoss = (
     differenceToken1: differenceToken1 || 0,
     impLossUSD: impLossUSD || 0,
     impLossRelative: impLossRelative || 0,
+    impLossSinceTimestamp: lastSnap.transaction.timestamp * 1000,
   }
 }
 
@@ -228,11 +234,19 @@ const PositionExpanded = ({
                 <RowBetween>
                   <Label>Impermanent Loss:</Label>
 
-                  <MouseoverTooltip text="Impermanent loss since your last deposit or withdrawal">
-                    <Il style={{ color: theme.red1 }}>
-                      {formatDollarAmount(impLossData.impLossUSD)}
-                      <RelIl>{formatPercentageValue(impLossData.impLossRelative)}</RelIl>
-                    </Il>
+                  <MouseoverTooltip
+                    text={`Impermanent loss since your last deposit or withdrawal (${dayjs(
+                      impLossData.impLossSinceTimestamp
+                    ).format('MMM D, YYYY')})`}
+                  >
+                    {impLossData.impLossUSD > 0 ? (
+                      <Il style={{ color: theme.red1 }}>
+                        {formatDollarAmount(impLossData.impLossUSD)}
+                        <RelIl>{formatPercentageValue(impLossData.impLossRelative)}</RelIl>
+                      </Il>
+                    ) : (
+                      '-'
+                    )}
                   </MouseoverTooltip>
                 </RowBetween>
                 <RowBetween>
@@ -241,7 +255,7 @@ const PositionExpanded = ({
                   </RowFixed>
                   <TYPE.main>
                     {impLossData.differenceToken0 > 0 ? '+' : ''}
-                    {toTwoNonZeroDecimals(impLossData.differenceToken0)}
+                    {impLossData.differenceToken0 ? toTwoNonZeroDecimals(impLossData.differenceToken0) : '-'}
                   </TYPE.main>
                 </RowBetween>
                 <RowBetween>
@@ -250,7 +264,7 @@ const PositionExpanded = ({
                   </RowFixed>
                   <TYPE.main>
                     {impLossData.differenceToken1 > 0 ? '+' : ''}
-                    {toTwoNonZeroDecimals(impLossData.differenceToken1)}
+                    {impLossData.differenceToken0 ? toTwoNonZeroDecimals(impLossData.differenceToken1) : '-'}
                   </TYPE.main>
                 </RowBetween>
               </>
