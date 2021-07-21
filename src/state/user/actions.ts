@@ -24,3 +24,7 @@ export const removeSerializedPair = createAction<{ chainId: number; tokenAAddres
   'user/removeSerializedPair'
 )
 export const toggleURLWarning = createAction<void>('app/toggleURLWarning')
+// address management
+export const setBundledAddress = createAction<{ address: string }>('user/setBundledAddress')
+export const addAddress = createAction<{ address: string; ens: string; bundled?: boolean }>('user/addNewAddress')
+export const deleteAddress = createAction<{ address: string }>('user/deleteAddress')

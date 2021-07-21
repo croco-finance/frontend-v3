@@ -12,9 +12,17 @@ import {
   toggleURLWarning,
   addSavedToken,
   addSavedPool,
+  setBundledAddress,
+  addAddress,
+  deleteAddress,
 } from './actions'
 
 const currentTimestamp = () => new Date().getTime()
+
+interface AddressData {
+  bundled: boolean
+  ens: string
+}
 
 export interface UserState {
   // the timestamp of the last updateVersion action
@@ -38,6 +46,7 @@ export interface UserState {
 
   savedTokens: string[]
   savedPools: string[]
+  watchedAddresses: { [key: string]: AddressData }
 
   timestamp: number
   URLWarningVisible: boolean
@@ -56,6 +65,7 @@ export const initialState: UserState = {
   savedPools: [],
   timestamp: currentTimestamp(),
   URLWarningVisible: true,
+  watchedAddresses: {},
 }
 
 export default createReducer(initialState, (builder) =>
@@ -124,5 +134,20 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(toggleURLWarning, (state) => {
       state.URLWarningVisible = !state.URLWarningVisible
+    })
+    .addCase(setBundledAddress, (state, action) => {
+      const { address } = action.payload
+      const { bundled } = state.watchedAddresses[address]
+      state.watchedAddresses[address].bundled = !bundled
+    })
+    .addCase(addAddress, (state, action) => {
+      const { address, ens, bundled } = action.payload
+      // this variable is loaed from local-storage and it might happen it's missing there
+      if (!state.watchedAddresses) state.watchedAddresses = {}
+      state.watchedAddresses[address] = { bundled: bundled || false, ens }
+    })
+    .addCase(deleteAddress, (state, action) => {
+      const { address } = action.payload
+      delete state.watchedAddresses[address]
     })
 )

@@ -21,7 +21,7 @@ import Row, { RowFixed } from '../Row'
 // import Web3Status from '../Web3Status'
 import SearchSmall from 'components/Search'
 import { HideMedium } from 'theme'
-import isValidEthAddress from 'utils/isValidEthAddress'
+import { isAddress } from 'utils'
 import { RouteComponentProps } from 'react-router-dom'
 
 const HeaderFrame = styled.div`
@@ -254,14 +254,16 @@ export default function Header(props: RouteComponentProps) {
           <StyledNavLink id={`stake-nav-link`} to={'/tokens'}>
             Tokens
           </StyledNavLink>
+          <StyledNavLink id={`stake-nav-link`} to={'/positions'}>
+            Positions
+          </StyledNavLink>
           <StyledNavLink
             id={`stake-nav-link`}
             to={({ pathname }) => {
               const splitted = pathname.split('/')
               // if the user wa previsously on poolPage and now clicks on simulator. Redirect him to the same pool
               // splitted[0] is empty string and splitted[2] is pool address
-              if (splitted[1] === 'pools' && splitted[2] && isValidEthAddress(splitted[2]))
-                return `/simulator/${splitted[2]}`
+              if (splitted[1] === 'pools' && splitted[2] && isAddress(splitted[2])) return `/simulator/${splitted[2]}`
               return '/simulator'
             }}
           >
@@ -273,7 +275,9 @@ export default function Header(props: RouteComponentProps) {
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
-        {!props.location.pathname.includes('simulator') && <SearchSmall />}
+        {!props.location.pathname.includes('simulator') && !props.location.pathname.includes('dashboard') && (
+          <SearchSmall />
+        )}
         {/* <HeaderElement>
           <HideSmall>
             {chainId && NETWORK_LABELS[chainId] && (
