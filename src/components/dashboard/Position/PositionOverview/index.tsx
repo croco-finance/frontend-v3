@@ -55,9 +55,29 @@ const FirstRowCard = styled(LightCard)`
 `
 
 const PriceCardWrapper = styled(FirstRowCard)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
   max-width: 160px;
   ${({ theme }) => theme.mediaWidth.upToMedium`
   max-width: 100%;
+  flex-direction: row;
+  justify-content: flex-start;
+  `};
+`
+
+const PriceNumber = styled.div`
+  overflow: hidden;
+  textoverflow: ellipsis;
+  maxwidth: 160px;
+  color: ${({ theme }) => theme.text3};
+  font-weight: ${({ theme }) => theme.fontWeight.medium};
+  font-size: ${({ theme }) => theme.fontSize.h3};
+  margin: 6px 0;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  margin: 0 6px 0 2px;
+  font-size: ${({ theme }) => theme.fontSize.normal};
   `};
 `
 
@@ -83,8 +103,22 @@ const RateToggleButton = styled.button`
   justify-content: center;
   ${({ theme }) => theme.mediaWidth.upToMedium`
   margin-right: 0px;
-
   `};
+`
+
+const RateToggleButtonDesktop = styled(RateToggleButton)`
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  display: none;
+  `};
+`
+
+const RateToggleButtonMobile = styled(RateToggleButton)`
+  display: none;
+  align-self: flex-end;
+  margin-top: 10px;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+display: flex;
+`}
 `
 
 const SwitchIcon = styled(Icon)`
@@ -94,6 +128,7 @@ const ExpandButton = styled(ButtonSecondary)``
 
 const ExpandButtonDesktop = styled(ExpandButton)`
   width: 160px;
+  padding: 8px;
   ${({ theme }) => theme.mediaWidth.upToMedium`
   display: none;
   `}
@@ -236,18 +271,11 @@ function PriceCard({
 
   return (
     <PriceCardWrapper>
-      <AutoColumn gap="8px" justify="center">
-        <ExtentsText>{title}</ExtentsText>
-        <TYPE.mediumHeader
-          textAlign="center"
-          style={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '160px' }}
-        >
-          {price}
-        </TYPE.mediumHeader>
-        <ExtentsText>
-          {currencyQuote?.symbol} per {currencyBase?.symbol}
-        </ExtentsText>
-      </AutoColumn>
+      <ExtentsText>{title}</ExtentsText>
+      <PriceNumber>{price}</PriceNumber>
+      <ExtentsText>
+        {currencyQuote?.symbol} per {currencyBase?.symbol}
+      </ExtentsText>
     </PriceCardWrapper>
   )
 }
@@ -416,10 +444,10 @@ const PositionOverview = ({ position, isExpanded, handleShowExpanded }: Props) =
           <RangeBadge removed={removed} inRange={inRange} />
         </NameAndStatus>
         {currencyBase && currencyQuote && (
-          <RateToggleButton onClick={() => setManuallyInverted(!manuallyInverted)}>
+          <RateToggleButtonDesktop onClick={() => setManuallyInverted(!manuallyInverted)}>
             Switch price
             <SwitchIcon icon="SWITCH" color={theme.text3} size={14} />
-          </RateToggleButton>
+          </RateToggleButtonDesktop>
         )}
         <ExpandButtonDesktop onClick={() => handleShowExpanded()}>
           {isExpanded ? 'Show Less' : 'Show More'}
@@ -457,6 +485,12 @@ const PositionOverview = ({ position, isExpanded, handleShowExpanded }: Props) =
           currencyQuote={currencyQuote}
         />
       </SecondRow>
+      {currencyBase && currencyQuote && (
+        <RateToggleButtonMobile onClick={() => setManuallyInverted(!manuallyInverted)}>
+          Switch price
+          <SwitchIcon icon="SWITCH" color={theme.text3} size={14} />
+        </RateToggleButtonMobile>
+      )}
       <ExpandButtonMobile onClick={() => handleShowExpanded()}>
         {isExpanded ? 'Show Less' : 'Show More'}
         <ExpandIconWrapper>
