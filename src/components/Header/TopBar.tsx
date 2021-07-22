@@ -67,7 +67,7 @@ const TopBar = () => {
 
           {/* <StyledLink href="https://v2.info.uniswap.org/#/">V2 Analytics</StyledLink> */}
           {/* <StyledLink href="https://docs.uniswap.org/">Uniswap Docs</StyledLink> */}
-          <StyledLink href="https://app.uniswap.org/#/swap">Uniswap</StyledLink>
+          <StyledLink href="https://app.uniswap.org/#/swap">Swap Tokens</StyledLink>
         </AutoRow>
       </RowBetween>
     </Wrapper>

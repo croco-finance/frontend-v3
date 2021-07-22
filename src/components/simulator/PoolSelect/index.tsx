@@ -77,7 +77,7 @@ const Menu = styled.div<{ hide: boolean }>`
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.04);
   display: ${({ hide }) => hide && 'none'};
-  border: 1px solid ${({ theme }) => theme.pink1};
+  border: 1px solid ${({ theme }) => theme.blue1};
 
   ${({ theme }) => theme.mediaWidth.upToMedium`
     width: 520px;
@@ -143,8 +143,8 @@ const OptionButton = styled.div<{ enabled: boolean }>`
   margin-right: 10px;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme, enabled }) => (enabled ? theme.pink1 : 'transparent')};
-  color: ${({ theme, enabled }) => (enabled ? theme.white : theme.pink1)};
+  background-color: ${({ theme, enabled }) => (enabled ? theme.green1 : 'transparent')};
+  color: ${({ theme, enabled }) => (enabled ? theme.white : theme.green1)};
   :hover {
     opacity: 0.6;
     cursor: pointer;
