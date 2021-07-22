@@ -111,12 +111,6 @@ const ResponsiveGrid = styled.div`
   `};
 `
 
-const Break = styled.div`
-  height: 1px;
-  background-color: ${({ theme }) => theme.bg1};
-  width: 100%;
-`
-
 const HoverText = styled.div<{ hide?: boolean | undefined }>`
   color: ${({ theme }) => theme.blue1}
   display: ${({ hide = false }) => hide && 'none'};

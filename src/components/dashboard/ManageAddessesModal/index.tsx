@@ -216,7 +216,11 @@ const AddressModal = () => {
   const addNewAddress = () => {
     const hexAddressProcessed = inputHexAddress.trim().toLowerCase()
     dispatch(addAddress({ address: hexAddressProcessed, ens: ensName }))
-    setAddress('') // clear the input
+    // clear the input
+    setAddress('')
+    setEnsName('')
+    setInputHexAddress('')
+    setIsValidAddress(false)
   }
 
   const getModalContent = () => {
