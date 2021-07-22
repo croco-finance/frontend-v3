@@ -85,8 +85,7 @@ const Menu = styled.div<{ hide: boolean }>`
   `};
 
   ${({ theme }) => theme.mediaWidth.upToSmall`
-  left: -75px;
-  width: 295px;
+  width: 340px;
   `};
 `
 

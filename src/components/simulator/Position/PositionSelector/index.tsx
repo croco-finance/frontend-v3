@@ -29,6 +29,7 @@ const Headline = styled.div`
   font-weight: ${({ theme }) => theme.fontWeight.medium};
   margin-bottom: 30px;
   align-items: center;
+  justify-content: center;
 `
 
 const RangeInputsWrapper = styled.div`

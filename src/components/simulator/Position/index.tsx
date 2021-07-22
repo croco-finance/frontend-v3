@@ -1,5 +1,6 @@
+import RangeBadge from 'components/Badge/RangeBadge'
 import CollapsibleContainer from 'components/CollapsibleContainer'
-import InlineCircle from 'components/InlineCircle'
+import Icon from 'components/Icon'
 import useTheme from 'hooks/useTheme'
 import React, { useState } from 'react'
 import { useAllSimulatorData } from 'state/simulator/hooks'
@@ -8,7 +9,6 @@ import styled from 'styled-components'
 import { multiplyArraysElementWise } from 'utils/math'
 import PositionOverview from './PositionOverview'
 import PositionSelector from './PositionSelector'
-import Icon from 'components/Icon'
 
 const Wrapper = styled.div``
 
@@ -72,11 +72,6 @@ const ExpandButton = styled.div`
   justify-content: flex-end;
 `
 
-const PositionStatus = styled.div`
-  color: ${({ theme }) => theme.text3};
-  margin-left: 20px;
-`
-
 interface Props {
   positionIndex: number
   investmentUsd: PositionInterface['investmentUsd']
@@ -91,31 +86,9 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
   const { simulatedPriceCoefficients, currentTokenPricesUsd } = useAllSimulatorData()
   const simulatedTokenPricesUsd = multiplyArraysElementWise(currentTokenPricesUsd, simulatedPriceCoefficients)
 
-  const getPositionStatus = (currentPrice: number, priceMin: number, priceMax: number) => {
-    if (currentPrice < priceMin) {
-      return (
-        <PositionStatus>
-          <InlineCircle color={theme.red1} size={20} marginRight={6} />
-          Out of range
-          {/* (price is below price range) */}
-        </PositionStatus>
-      )
-    }
-    if (currentPrice > priceMax) {
-      return (
-        <PositionStatus>
-          <InlineCircle color={theme.red1} size={20} marginRight={6} />
-          Out of range
-          {/* (price is above price range) */}
-        </PositionStatus>
-      )
-    }
-    return (
-      <PositionStatus>
-        <InlineCircle color={theme.green1} size={20} marginRight={6} />
-        In range
-      </PositionStatus>
-    )
+  const getIfInRange = (currentPrice: number, priceMin: number, priceMax: number) => {
+    if (currentPrice < priceMin || currentPrice > priceMax) return false
+    return true
   }
 
   return (
@@ -130,11 +103,16 @@ export default function Position({ positionIndex, investmentUsd, priceMin, price
             }}
           >
             Position #{positionIndex + 1}
-            {getPositionStatus(
-              simulatedTokenPricesUsd[0] / simulatedTokenPricesUsd[1],
-              infiniteRangeSelected ? 0 : priceMin,
-              infiniteRangeSelected ? Infinity : priceMax
-            )}
+            <div style={{ marginLeft: '8px' }}>
+              <RangeBadge
+                removed={false}
+                inRange={getIfInRange(
+                  simulatedTokenPricesUsd[0] / simulatedTokenPricesUsd[1],
+                  infiniteRangeSelected ? 0 : priceMin,
+                  infiniteRangeSelected ? Infinity : priceMax
+                )}
+              />
+            </div>
             <ExpandButton>
               <Icon icon={isExpanded ? 'ARROW_UP' : 'ARROW_DOWN'} size={16} color={theme.text2} />
             </ExpandButton>
