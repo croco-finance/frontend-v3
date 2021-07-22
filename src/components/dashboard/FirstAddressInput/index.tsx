@@ -105,6 +105,9 @@ const FirstAddressInput = () => {
     dispatch(addAddress({ address: hexAddressProcessed, ens: ensName }))
     history.push('/positions/' + hexAddressProcessed)
     setAddress('') // clear the input
+    setEnsName('')
+    setInputHexAddress('')
+    setIsValidAddress(false)
   }
 
   return (
