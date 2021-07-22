@@ -7,7 +7,7 @@ import utc from 'dayjs/plugin/utc'
 import useTheme from 'hooks/useTheme'
 import { darken } from 'polished'
 import React, { Dispatch, ReactNode, SetStateAction, useEffect, useMemo, useState } from 'react'
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { FeesChartEntry } from 'state/dashboard/reducer'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
@@ -43,8 +43,18 @@ const RightFeesCard = styled.div`
 `
 
 const FeesCard = styled.div`
-  margin-bottom: 6px;
-  // margin-top: 6px;
+  margin-bottom: 10px;
+`
+
+const StyledPollingDot = styled.div<{ color: string }>`
+  width: 8px;
+  height: 8px;
+  min-height: 8px;
+  min-width: 8px;
+  border-radius: 50%;
+  position: relative;
+  background-color: ${(props) => props.color};
+  margin-right: 8px;
 `
 
 const getAvergeFees = (dailyFees: FeesChartEntry[]): { feesToken0: number; feesToken1: number } => {
@@ -130,6 +140,7 @@ const Chart = ({
             <FeesCard>
               <RowBetween>
                 <RowFixed height="34px">
+                  <StyledPollingDot color={theme.blue1} />
                   <CurrencyLogo address={token0Address} size="14px" style={{ marginRight: '0.5rem' }} />
                   <TYPE.main fontSize="14px">{token0Symbol}</TYPE.main>
                 </RowFixed>
@@ -138,6 +149,7 @@ const Chart = ({
 
               <RowBetween>
                 <RowFixed>
+                  <StyledPollingDot color={theme.green1} />
                   <CurrencyLogo address={token1Address} size="14px" style={{ marginRight: '0.5rem' }} />
                   <TYPE.main fontSize="14px">{token1Symbol}</TYPE.main>
                 </RowFixed>
@@ -198,6 +210,8 @@ const Chart = ({
             tickFormatter={(time) => dayjs(time).format('DD')}
             minTickGap={10}
           />
+          <YAxis hide={true} yAxisId="left" tick={false} tickLine={false} axisLine={false} />
+          <YAxis hide={true} yAxisId="right" orientation="right" tick={false} tickLine={false} axisLine={false} />
           <Tooltip
             cursor={{ stroke: theme.bg2 }}
             contentStyle={{ display: 'none' }}
@@ -218,6 +232,7 @@ const Chart = ({
             }}
           />
           <Line
+            yAxisId="left"
             dataKey="feesToken0"
             type="monotone"
             stroke={theme.blue1}
@@ -226,6 +241,7 @@ const Chart = ({
             dot={false}
           />
           <Line
+            yAxisId="right"
             dataKey="feesToken1"
             type="monotone"
             stroke={theme.green1}
