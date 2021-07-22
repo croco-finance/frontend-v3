@@ -1,5 +1,5 @@
 import React from 'react'
-import v3 from '../../assets/images/whitev3.svg'
+import v3 from '../../assets/images/croco_uni_logo_dark.svg'
 import styled, { keyframes, css } from 'styled-components'
 
 const rotate = keyframes`
@@ -72,7 +72,7 @@ const Wrapper = styled.div<{ fill: number; height?: string }>`
 const AnimatedImg = styled.div`
   animation: ${pulse} 800ms linear infinite;
   & > * {
-    width: 72px;
+    width: 102px;
   }
 `
 
