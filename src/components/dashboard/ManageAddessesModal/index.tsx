@@ -13,7 +13,6 @@ import { addAddress, deleteAddress, setBundledAddress } from 'state/user/actions
 import { useWatchedAddresses } from 'state/user/hooks'
 import styled from 'styled-components'
 import { isAddress } from 'utils'
-import { ReactComponent as Close } from '../../../assets/images/x.svg'
 import Modal from '../../Modal'
 
 const Wrapper = styled.div`
@@ -25,6 +24,34 @@ const Wrapper = styled.div`
 
 const Content = styled.div`
   padding: 28px 20px 10px 20px;
+  overflow-y: auto;
+  ::-webkit-scrollbar {
+    background-color: ${(props) => props.theme.bg0};
+    width: 8px;
+    border-radius: 8px;
+  }
+  /* background of the scrollbar except button or resizer */
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  /* scrollbar itself */
+  ::-webkit-scrollbar-thumb {
+    /* 7F7F7F for mac-like color */
+    background-color: ${(props) => props.theme.text4};
+    border-radius: 10px;
+    border: 1px solid ${(props) => props.theme.text4};
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    /* 7F7F7F for mac-like color */
+    background-color: ${(props) => props.theme.text3};
+    border: 1px solid ${(props) => props.theme.text3};
+  }
+
+  /* set button(top and bottom of the scrollbar) */
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
 `
 
 const Headline = styled.div`
@@ -135,6 +162,8 @@ const NewAddressInputWrapper = styled(Input)`
   display: flex;
   flex-grow: 1;
 `
+
+const WatchedAddressesList = styled.div``
 const AddressModal = () => {
   const theme = useTheme()
   const dispatch = useDispatch()
@@ -217,52 +246,54 @@ const AddressModal = () => {
         {Object.keys(watchedAddresses).length > 0 && (
           <>
             <WatchedHeadline>Watched addresses</WatchedHeadline>
-            {Object.keys(watchedAddresses).map((address) => {
-              // just double check the address is valid
-              if (address) {
-                return (
-                  <InputWrapper key={address}>
-                    <MainRowWrapper>
-                      <WatchedAddress>{address}</WatchedAddress>
-                      <ButtonsWrapper>
-                        <AddressLink
-                          href={`https://etherscan.io/address/${address}`}
-                          rel="noreferrer noopener"
-                          target="_blank"
-                        >
-                          <StyledIcon icon="EXTERNAL_LINK" size={18} color={theme.text2} />
-                        </AddressLink>
+            <WatchedAddressesList>
+              {Object.keys(watchedAddresses).map((address) => {
+                // just double check the address is valid
+                if (address) {
+                  return (
+                    <InputWrapper key={address}>
+                      <MainRowWrapper>
+                        <WatchedAddress>{address}</WatchedAddress>
+                        <ButtonsWrapper>
+                          <AddressLink
+                            href={`https://etherscan.io/address/${address}`}
+                            rel="noreferrer noopener"
+                            target="_blank"
+                          >
+                            <StyledIcon icon="EXTERNAL_LINK" size={18} color={theme.text2} />
+                          </AddressLink>
 
-                        <BundleButton
-                          isBundled={watchedAddresses[address].bundled}
-                          onClick={() => dispatch(setBundledAddress({ address }))}
-                        >
-                          {watchedAddresses[address].bundled ? (
-                            <>
-                              Bundled
-                              <CheckIcon icon="CHECK" size={16} color={theme.white} />
-                            </>
-                          ) : (
-                            'Bundle'
-                          )}
-                        </BundleButton>
-                        {/* <StyledIcon icon="edit" size={16} color={colors.FONT_LIGHT} /> */}
-                        <StyledIcon
-                          icon="CLOSE"
-                          size={18}
-                          color={theme.text2}
-                          hoverColor={theme.red1}
-                          onClick={() => dispatch(deleteAddress({ address }))}
-                        />
-                      </ButtonsWrapper>
-                    </MainRowWrapper>
+                          <BundleButton
+                            isBundled={watchedAddresses[address].bundled}
+                            onClick={() => dispatch(setBundledAddress({ address }))}
+                          >
+                            {watchedAddresses[address].bundled ? (
+                              <>
+                                Bundled
+                                <CheckIcon icon="CHECK" size={16} color={theme.white} />
+                              </>
+                            ) : (
+                              'Bundle'
+                            )}
+                          </BundleButton>
+                          {/* <StyledIcon icon="edit" size={16} color={colors.FONT_LIGHT} /> */}
+                          <StyledIcon
+                            icon="CLOSE"
+                            size={18}
+                            color={theme.text2}
+                            hoverColor={theme.red1}
+                            onClick={() => dispatch(deleteAddress({ address }))}
+                          />
+                        </ButtonsWrapper>
+                      </MainRowWrapper>
 
-                    {watchedAddresses[address].ens && <EnsName>{watchedAddresses[address].ens}</EnsName>}
-                  </InputWrapper>
-                )
-              }
-              return null
-            })}
+                      {watchedAddresses[address].ens && <EnsName>{watchedAddresses[address].ens}</EnsName>}
+                    </InputWrapper>
+                  )
+                }
+                return null
+              })}
+            </WatchedAddressesList>
           </>
         )}
         {/* <CloseIcon onClick={toggleAddressesModal}>
