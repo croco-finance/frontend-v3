@@ -14,6 +14,7 @@ import styled from 'styled-components'
 import { TYPE } from 'theme'
 import { formatAmount, formatDollarAmount, formatPercentageValue, toTwoNonZeroDecimals } from 'utils/numbers'
 import { getRelativeImpLoss } from 'utils/simulator'
+import Icon from 'components/Icon'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
@@ -213,7 +214,8 @@ const PositionExpanded = ({
       <CardsWrapper>
         <FirstRowCard>
           <AutoColumn gap="md">
-            {expandedInfo?.collectedFeesToken0 && expandedInfo?.collectedFeesToken1 ? (
+            {typeof expandedInfo?.collectedFeesToken0 === 'number' &&
+            typeof expandedInfo?.collectedFeesToken1 === 'number' ? (
               <>
                 <RowBetween>
                   <Label>Collected Fees:</Label>
@@ -244,9 +246,13 @@ const PositionExpanded = ({
                   <MouseoverTooltip
                     text={`Impermanent loss since ${dayjs(impLossData.impLossSinceTimestamp).format(
                       'MMM D, YYYY'
-                    )} - date of your last ${impLossData.lastSnapAction === 'DEPOSIT' ? 'deposit' : 'withdrawal'}`}
+                    )} - date of your last ${impLossData.lastSnapAction === 'DEPOSIT' ? 'deposit' : 'withdrawal'} 
+                    (This is how much you've lost compared to just holding the underlying tokens).`}
                   >
-                    <Label>Imp. loss since {dayjs(impLossData.impLossSinceTimestamp).format('MMM D, YYYY')}:</Label>
+                    <Label>
+                      Imp. loss since {dayjs(impLossData.impLossSinceTimestamp).format('MMM D, YYYY')}:
+                      <Icon icon="QUESTION_ACTIVE" size={18} color={theme.text3} style={{ marginLeft: '2px' }} />
+                    </Label>
                   </MouseoverTooltip>
 
                   {impLossData.impLossUSD > 0 ? (
