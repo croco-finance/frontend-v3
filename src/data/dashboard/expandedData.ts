@@ -1,6 +1,6 @@
 import { CurrencyAmount, Token } from '@uniswap/sdk-core'
 import { Pool, Position } from '@uniswap/v3-sdk'
-import { client } from 'apollo/client'
+import { clientCroco as client } from 'apollo/client'
 import dayjs from 'dayjs'
 import { formatUnits } from 'ethers/lib/utils'
 import gql from 'graphql-tag'

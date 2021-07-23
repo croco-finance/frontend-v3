@@ -1,6 +1,6 @@
 // import gql from 'graphql-tag'
 import { gql } from '@apollo/client/core'
-import { client } from 'apollo/client'
+import { clientCroco as client } from 'apollo/client'
 import { BigNumber } from 'ethers'
 
 // See https://docs.uniswap.org/reference/core/libraries/FixedPoint128 for details

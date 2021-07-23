@@ -1,4 +1,4 @@
-import { client } from 'apollo/client'
+import { clientCroco as client } from 'apollo/client'
 import dayjs from 'dayjs'
 import { BigNumber } from 'ethers'
 import gql from 'graphql-tag'
