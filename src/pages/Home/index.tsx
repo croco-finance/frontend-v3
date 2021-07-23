@@ -20,6 +20,7 @@ import { notEmpty } from 'utils'
 import TransactionsTable from '../../components/TransactionsTable'
 import { useAllTokenData } from 'state/tokens/hooks'
 import { MonoSpace } from 'components/shared'
+import Icon from 'components/Icon'
 import dayjs from 'dayjs'
 
 const ChartWrapper = styled.div`
@@ -28,6 +29,40 @@ const ChartWrapper = styled.div`
   ${({ theme }) => theme.mediaWidth.upToSmall`
     width: 100%;
   `};
+`
+
+const OldCrocoBanner = styled.div`
+  color: white;
+  background-color: ${({ theme }) => theme.green1};
+  font-size: ${({ theme }) => theme.fontSize.h3};
+  font-weight: ${({ theme }) => theme.fontWeight.medium}
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: end;
+  margin-bottom: 16px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  padding: 10px;
+  font-size: ${({ theme }) => theme.fontSize.normal};
+  `};
+`
+const OldCrocoText = styled.div``
+
+const OldCrocoLink = styled.a`
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
+  font-size: ${({ theme }) => theme.fontSize.h3};
+  text-recoration: none;
+  margin-left: 6px;
+  color: #ffed00;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  font-weight: ${({ theme }) => theme.fontWeight.demiBold};
+  font-size: ${({ theme }) => theme.fontSize.normal};
+  `};
+`
+const OldCrocoDesc = styled.div`
+  font-weight: ${({ theme }) => theme.fontWeight.regular};
+  font-size: ${({ theme }) => theme.fontSize.normal};
+  margin-top: 6px;
 `
 
 export default function Home() {
@@ -104,6 +139,16 @@ export default function Home() {
     <PageWrapper>
       <ThemedBackgroundGlobal backgroundColor={'#1054b5'} />
       <AutoColumn gap="16px">
+        <OldCrocoBanner>
+          <Icon icon="INFO" size={22} style={{ marginRight: '10px' }} color="white" />
+          <OldCrocoText>
+            The previous version of Croco Finance was moved to:
+            <OldCrocoLink rel="noreferrer" target="_blank" href="https://old.croco.finance/">
+              www.old.croco.finance
+            </OldCrocoLink>
+            .<OldCrocoDesc>We are now fully focused on the support of Uniswap v3.</OldCrocoDesc>
+          </OldCrocoText>
+        </OldCrocoBanner>
         <TYPE.main>Uniswap Overview</TYPE.main>
         <ResponsiveRow>
           <ChartWrapper>
