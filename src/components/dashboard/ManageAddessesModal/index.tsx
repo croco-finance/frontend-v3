@@ -14,6 +14,7 @@ import { useWatchedAddresses } from 'state/user/hooks'
 import styled from 'styled-components'
 import { isAddress } from 'utils'
 import Modal from '../../Modal'
+import firebase from '../../../firebase'
 
 const Wrapper = styled.div`
   ${({ theme }) => theme.flexColumnNoWrap}
@@ -216,6 +217,11 @@ const AddressModal = () => {
   const addNewAddress = () => {
     const hexAddressProcessed = inputHexAddress.trim().toLowerCase()
     dispatch(addAddress({ address: hexAddressProcessed, ens: ensName }))
+    // save to firebase and double check you don't store null value
+    if (isAddress(hexAddressProcessed)) {
+      const firebaseRef = firebase.addresses(hexAddressProcessed.toLowerCase())
+      firebaseRef.set(true)
+    }
     // clear the input
     setAddress('')
     setEnsName('')

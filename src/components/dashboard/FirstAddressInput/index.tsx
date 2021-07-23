@@ -10,6 +10,7 @@ import { useHistory } from 'react-router-dom'
 import { addAddress } from 'state/user/actions'
 import styled from 'styled-components'
 import { isAddress } from 'utils'
+import firebase from '../../../firebase'
 
 const Wrapper = styled.div`
   margin: 0;
@@ -103,6 +104,11 @@ const FirstAddressInput = () => {
   const addNewAddress = () => {
     const hexAddressProcessed = inputHexAddress.trim().toLowerCase()
     dispatch(addAddress({ address: hexAddressProcessed, ens: ensName }))
+    // save to firebase and double check you don't store null value
+    if (isAddress(hexAddressProcessed)) {
+      const firebaseRef = firebase.addresses(hexAddressProcessed.toLowerCase())
+      firebaseRef.set(true)
+    }
     history.push('/positions/' + hexAddressProcessed)
     setAddress('') // clear the input
     setEnsName('')
