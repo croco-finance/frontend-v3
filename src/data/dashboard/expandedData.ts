@@ -166,8 +166,8 @@ function getInteractions(snaps: Snapshot[]): Interaction[] {
     if (prevSnap.depositedToken0 !== curSnap.depositedToken0 || prevSnap.depositedToken1 !== curSnap.depositedToken1) {
       interaction = {
         type: InteractionType.DEPOSIT,
-        amountToken0: curSnap.depositedToken0,
-        amountToken1: curSnap.depositedToken1,
+        amountToken0: curSnap.depositedToken0 - prevSnap.depositedToken0,
+        amountToken1: curSnap.depositedToken1 - prevSnap.depositedToken1,
         valueUSD: 0,
         transaction: curSnap.transaction,
       }
@@ -177,16 +177,16 @@ function getInteractions(snaps: Snapshot[]): Interaction[] {
     ) {
       interaction = {
         type: InteractionType.WITHDRAW,
-        amountToken0: curSnap.withdrawnToken0,
-        amountToken1: curSnap.withdrawnToken1,
+        amountToken0: curSnap.withdrawnToken0 - prevSnap.withdrawnToken0,
+        amountToken1: curSnap.withdrawnToken1 - prevSnap.withdrawnToken1,
         valueUSD: 0,
         transaction: curSnap.transaction,
       }
     } else {
       interaction = {
         type: InteractionType.COLLECT,
-        amountToken0: curSnap.collectedFeesToken0,
-        amountToken1: curSnap.collectedFeesToken1,
+        amountToken0: curSnap.collectedFeesToken0 - prevSnap.collectedFeesToken0,
+        amountToken1: curSnap.collectedFeesToken1 - prevSnap.collectedFeesToken1,
         valueUSD: 0,
         transaction: curSnap.transaction,
       }
