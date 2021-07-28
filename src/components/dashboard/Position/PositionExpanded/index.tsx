@@ -17,6 +17,7 @@ import { getRelativeImpLoss } from 'utils/simulator'
 import Icon from 'components/Icon'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import Interactions from './Interactions'
 
 dayjs.extend(utc)
 
@@ -316,6 +317,7 @@ const PositionExpanded = ({
           )}
         </DensityChartWrapper>
       </ChartsWrapper>
+      <Interactions interactions={expandedInfo?.interactions} token0Symbol={token0Symbol} token1Symbol={token1Symbol} />
     </Wrapper>
   )
 }
