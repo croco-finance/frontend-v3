@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { PositionInOverview } from 'data/dashboard/overviewData'
-import { Snapshot } from 'data/dashboard/expandedData'
+import { Snapshot, Interaction } from 'data/dashboard/expandedData'
 import { currentTimestamp } from './../../utils/index'
 import { addPositionOwners, updateExtendedData, updatePositionData } from './actions'
 
@@ -11,9 +11,10 @@ export type FeesChartEntry = {
   // TODO feesUSD:number
 }
 
-export interface ExpandedPostionData {
+export interface ExpandedPositionData {
   dailyFees: FeesChartEntry[]
   snapshots: Snapshot[]
+  interactions: Interaction[]
   collectedFeesToken0: number
   collectedFeesToken1: number
 }
@@ -21,7 +22,7 @@ export interface ExpandedPostionData {
 export interface PositionData {
   tokenId: number
   overview: PositionInOverview
-  expanded: ExpandedPostionData | undefined
+  expanded: ExpandedPositionData | undefined
 }
 
 interface PositionsState {

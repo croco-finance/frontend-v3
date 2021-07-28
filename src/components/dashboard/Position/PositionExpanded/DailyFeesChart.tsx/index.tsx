@@ -60,7 +60,7 @@ const StyledPollingDot = styled.div<{ color: string }>`
 const getAvergeFees = (dailyFees: FeesChartEntry[]): { feesToken0: number; feesToken1: number } => {
   const dataPointsCount = dailyFees.length
   let feesToken0Sum = 0
-  let feesToken1Sum = 1
+  let feesToken1Sum = 0
 
   for (let i = 0; i < dailyFees.length; i++) {
     feesToken0Sum += dailyFees[i].feesToken0

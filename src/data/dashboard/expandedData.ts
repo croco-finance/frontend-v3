@@ -32,7 +32,24 @@ export interface Snapshot {
   amountToken0: CurrencyAmount<Token>
   amountToken1: CurrencyAmount<Token>
 
+  priceToken0: number
+  priceToken1: number
+
   // Transaction related to this snapshot
+  transaction: Transaction
+}
+
+export enum InteractionType {
+  DEPOSIT,
+  WITHDRAW,
+  COLLECT,
+}
+
+export interface Interaction {
+  type: InteractionType
+  amountToken0: number
+  amountToken1: number
+  valueUSD: number
   transaction: Transaction
 }
 
@@ -42,6 +59,7 @@ export interface ExpandedPositionInfo {
   collectedFeesToken1: number
   dailyFees: DailyFees
   snapshots: Snapshot[]
+  interactions: Interaction[]
 }
 
 const POSITION_AND_SNAPS = gql`
@@ -99,6 +117,12 @@ function buildQuery(pool: string, minTimestamp: number, relevantTickIds: string[
       liquidity
       sqrtPrice
       tick
+      token0 {
+        derivedETH
+      }
+      token1 {
+          derivedETH
+      }
   }`
   }
   for (const tickId of relevantTickIds) {
@@ -124,6 +148,54 @@ function buildQuery(pool: string, minTimestamp: number, relevantTickIds: string[
   }
   query += '}'
   return query
+}
+
+function getInteractions(snaps: Snapshot[]): Interaction[] {
+  const interactions: Interaction[] = []
+  interactions.push({
+    type: InteractionType.DEPOSIT,
+    amountToken0: snaps[0].depositedToken0,
+    amountToken1: snaps[0].depositedToken1,
+    valueUSD: snaps[0].depositedToken0 * snaps[0].priceToken0 + snaps[0].depositedToken1 * snaps[0].priceToken1,
+    transaction: snaps[0].transaction,
+  })
+  for (let i = 1; i < snaps.length; i++) {
+    const prevSnap = snaps[i - 1]
+    const curSnap = snaps[i]
+    let interaction
+    if (prevSnap.depositedToken0 !== curSnap.depositedToken0 || prevSnap.depositedToken1 !== curSnap.depositedToken1) {
+      interaction = {
+        type: InteractionType.DEPOSIT,
+        amountToken0: curSnap.depositedToken0,
+        amountToken1: curSnap.depositedToken1,
+        valueUSD: 0,
+        transaction: curSnap.transaction,
+      }
+    } else if (
+      prevSnap.withdrawnToken0 !== curSnap.withdrawnToken0 ||
+      prevSnap.withdrawnToken1 !== curSnap.withdrawnToken1
+    ) {
+      interaction = {
+        type: InteractionType.WITHDRAW,
+        amountToken0: curSnap.withdrawnToken0,
+        amountToken1: curSnap.withdrawnToken1,
+        valueUSD: 0,
+        transaction: curSnap.transaction,
+      }
+    } else {
+      interaction = {
+        type: InteractionType.COLLECT,
+        amountToken0: curSnap.collectedFeesToken0,
+        amountToken1: curSnap.collectedFeesToken1,
+        valueUSD: 0,
+        transaction: curSnap.transaction,
+      }
+    }
+    interaction.valueUSD =
+      interaction.amountToken0 * curSnap.priceToken0 + interaction.amountToken1 * curSnap.priceToken1
+    interactions.push(interaction)
+  }
+  return interactions
 }
 
 function dailyFeesToChartFormat(dailyFees: DailyFees, decimals0: number, decimals1: number): FeesChartEntry[] {
@@ -206,6 +278,14 @@ export async function getExpandedPosition(positionInOverview: PositionInOverview
         tickLower: positionInOverview.tickLower,
         tickUpper: positionInOverview.tickUpper,
       })
+
+      const transaction: Transaction = {
+        id: snap.transaction.id,
+        timestamp: Number(snap.timestamp),
+        txCostETH: Number(snap.transaction.gasUsed) * Number(snap.transaction.gasPrice),
+        ethPriceUSD: Number(result.data['b' + snap.blockNumber].ethPriceUSD),
+      }
+
       snapshots.push({
         depositedToken0: Number(snap.depositedToken0),
         depositedToken1: Number(snap.depositedToken1),
@@ -215,12 +295,9 @@ export async function getExpandedPosition(positionInOverview: PositionInOverview
         collectedFeesToken1: Number(snap.collectedFeesToken1),
         amountToken0: snapPosition.amount0,
         amountToken1: snapPosition.amount1,
-        transaction: {
-          id: snap.transaction.id,
-          timestamp: Number(snap.timestamp),
-          txCostETH: Number(snap.transaction.gasUsed) * Number(snap.transaction.gasPrice),
-          ethPriceUSD: Number(result.data['b' + snap.blockNumber].ethPriceUSD),
-        },
+        priceToken0: Number(additionalPoolInfo.token0.derivedETH) * transaction.ethPriceUSD,
+        priceToken1: Number(additionalPoolInfo.token1.derivedETH) * transaction.ethPriceUSD,
+        transaction,
       })
     }
 
@@ -235,6 +312,7 @@ export async function getExpandedPosition(positionInOverview: PositionInOverview
           positionInOverview.pool.token1.decimals
         ),
         snapshots,
+        interactions: getInteractions(snapshots),
       },
       error,
     }
