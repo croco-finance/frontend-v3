@@ -90,8 +90,6 @@ const Interactions = ({ interactions, token0Symbol, token1Symbol }: Interactions
     previousTxId = interaction.transaction.id
   })
 
-  console.log('indexesWithoutTopBorder', indexesWithoutTopBorder)
-
   return (
     <Wrapper>
       <Label>Transactions</Label>
@@ -103,25 +101,30 @@ const Interactions = ({ interactions, token0Symbol, token1Symbol }: Interactions
           <RightHeadlineLabel hideBorder>{token0Symbol}</RightHeadlineLabel>
           <RightHeadlineLabel hideBorder>{token1Symbol}</RightHeadlineLabel>
 
-          {interactions.map((interaction, i) => (
-            <>
-              <Left hideBorder={i in indexesWithoutTopBorder}>
-                {i in indexesWithoutTopBorder ? (
-                  ''
-                ) : (
-                  <ExternalLink
-                    href={getExplorerLink(chainId, interaction.transaction.id, ExplorerDataType.TRANSACTION)}
-                  >
-                    {dayjs(interaction.transaction.timestamp * 1000).format('MMM D, YYYY')} ↗
-                  </ExternalLink>
-                )}
-              </Left>
-              <Left hideBorder={i in indexesWithoutTopBorder}>{getInteractionTypeLabel(interaction.type)}</Left>
-              <Right hideBorder={i in indexesWithoutTopBorder}>{formatDollarAmount(interaction.valueUSD)}</Right>
-              <Right hideBorder={i in indexesWithoutTopBorder}>{formatAmount(interaction.amountToken0)}</Right>
-              <Right hideBorder={i in indexesWithoutTopBorder}>{formatAmount(interaction.amountToken1)}</Right>
-            </>
-          ))}
+          {interactions.map((interaction, i) => {
+            const hideTopBorder = indexesWithoutTopBorder.includes(i)
+            return (
+              <>
+                <Left hideBorder={hideTopBorder}>
+                  {hideTopBorder ? (
+                    ''
+                  ) : (
+                    <ExternalLink
+                      href={getExplorerLink(chainId, interaction.transaction.id, ExplorerDataType.TRANSACTION)}
+                    >
+                      {dayjs(interaction.transaction.timestamp * 1000).format('MMM D, YYYY')} ↗
+                    </ExternalLink>
+                  )}
+                </Left>
+                <Left hideBorder={indexesWithoutTopBorder.includes(i)}>
+                  {getInteractionTypeLabel(interaction.type)}
+                </Left>
+                <Right hideBorder={hideTopBorder}>{formatDollarAmount(interaction.valueUSD)}</Right>
+                <Right hideBorder={hideTopBorder}>{formatAmount(interaction.amountToken0)}</Right>
+                <Right hideBorder={hideTopBorder}>{formatAmount(interaction.amountToken1)}</Right>
+              </>
+            )
+          })}
         </Content>
       ) : (
         <Loader />
