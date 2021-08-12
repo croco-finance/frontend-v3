@@ -386,10 +386,9 @@ interface Props {
   positionIndex: number
   isExpanded: boolean
   handleShowExpanded: () => void
-  vm: any
 }
 
-const PositionOverview = ({ position, isExpanded, handleShowExpanded, vm }: Props) => {
+const PositionOverview = ({ position, isExpanded, handleShowExpanded }: Props) => {
   const theme = useTheme()
   const { pool, tickLower, tickUpper, tokenId } = position
   const { token0, token1, fee } = position.pool

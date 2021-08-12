@@ -160,7 +160,7 @@ function buildQuery(pool: string, minTimestamp: number, relevantTickIds: string[
   for (const tickId of relevantTickIds) {
     const processedId = tickId.replace('#', '_').replace('-', '_')
     query += `
-      t${processedId}: tickDayDatas(where: {tick: "${tickId}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: asc) {
+      t${processedId}: tickDayDatas(where: {tick: "${tickId}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: desc) {
           date
           tick {
               tickIdx

@@ -7,7 +7,7 @@ import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 import { PositionData } from 'state/dashboard/reducer'
 import { getFeeGrowthInside, getPositionFees } from './contractUtils'
-import { parseTick } from './totalOwnerPoolFees'
+import { parseTick } from './dailyFees'
 
 // See https://docs.uniswap.org/reference/core/libraries/FixedPoint128 for details
 const Q128 = BigNumber.from('0x100000000000000000000000000000000')

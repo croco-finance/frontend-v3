@@ -18,10 +18,9 @@ const PositionExpandedWrapper = styled.div`
 interface Props {
   positionIndex: number
   position: PositionData
-  vm: any
 }
 
-const Position = ({ position, positionIndex, vm }: Props) => {
+const Position = ({ position, positionIndex }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
@@ -36,7 +35,6 @@ const Position = ({ position, positionIndex, vm }: Props) => {
             handleShowExpanded={() => {
               setIsExpanded(!isExpanded)
             }}
-            vm={vm}
           />
         }
         collapseBody={
@@ -56,7 +54,6 @@ const Position = ({ position, positionIndex, vm }: Props) => {
                 token1priceUSD={position.overview.token1priceUSD}
                 token0CurrentAmount={Number(position.overview.amount0.toSignificant())}
                 token1CurrentAmount={Number(position.overview.amount1.toSignificant())}
-                vm={vm}
               />
             ) : null}
           </PositionExpandedWrapper>

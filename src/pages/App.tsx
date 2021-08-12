@@ -20,6 +20,8 @@ import { ExternalLink, HideMedium, TYPE } from 'theme'
 import { useSubgraphStatus } from 'state/application/hooks'
 import { DarkGreyCard } from 'components/Card'
 import Resize from 'components/Resize'
+import VM from '@ethereumjs/vm'
+import { deployContractAndGetVm } from '../data/dashboard/contractUtils'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -64,13 +66,24 @@ const BodyWrapper = styled.div`
 const Marginer = styled.div`
   margin-top: 5rem;
 `
+export const VMContext = React.createContext<VM | undefined>(undefined)
 
 export default function App() {
   // pretend load buffer
   const [loading, setLoading] = useState(true)
+  // deploy local vm
+  const [vm, setVM] = useState<VM | undefined>(undefined)
+
   useEffect(() => {
+    async function deployVM() {
+      const vm = await deployContractAndGetVm()
+      setVM(vm)
+    }
+    if (!vm) {
+      deployVM()
+    }
     setTimeout(() => setLoading(false), 1300)
-  }, [])
+  }, [vm])
 
   // subgraph health
   const [subgraphStatus] = useSubgraphStatus()
@@ -106,18 +119,20 @@ export default function App() {
           </HeaderWrapper>
           <BodyWrapper>
             <Popups />
-            <Switch>
-              <Route exact strict path="/" component={Home} />
-              <Route exact strict path="/protocol" component={Protocol} />
-              <Route exact strict path="/pools" component={PoolsOverview} />
-              <Route exact strict path="/tokens" component={TokensOverview} />
-              <Route exact strict path="/tokens/:address" component={RedirectInvalidToken} />
-              <Route exact strict path="/pools/:address" component={PoolPage} />
-              <Route exact strict path="/simulator" component={Simulator} />
-              <Route exact strict path="/simulator/:address" component={Simulator} />
-              <Route exact strict path="/positions" component={Dashboard} />
-              <Route exact strict path="/positions/:address" component={Dashboard} />
-            </Switch>
+            <VMContext.Provider value={vm}>
+              <Switch>
+                <Route exact strict path="/" component={Home} />
+                <Route exact strict path="/protocol" component={Protocol} />
+                <Route exact strict path="/pools" component={PoolsOverview} />
+                <Route exact strict path="/tokens" component={TokensOverview} />
+                <Route exact strict path="/tokens/:address" component={RedirectInvalidToken} />
+                <Route exact strict path="/pools/:address" component={PoolPage} />
+                <Route exact strict path="/simulator" component={Simulator} />
+                <Route exact strict path="/simulator/:address" component={Simulator} />
+                <Route exact strict path="/positions" component={Dashboard} />
+                <Route exact strict path="/positions/:address" component={Dashboard} />
+              </Switch>
+            </VMContext.Provider>
             <Marginer />
           </BodyWrapper>
         </AppWrapper>

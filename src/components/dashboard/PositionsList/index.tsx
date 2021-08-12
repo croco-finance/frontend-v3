@@ -9,14 +9,13 @@ const Wrapper = styled.div`
 
 interface Props {
   positions: PositionData[]
-  vm: any
 }
 
-const PositionsList = ({ positions, vm }: Props) => {
+const PositionsList = ({ positions }: Props) => {
   return (
     <Wrapper>
       {positions.map((position, i) => (
-        <Position key={position.tokenId} positionIndex={i} position={position} vm={vm} />
+        <Position key={position.tokenId} positionIndex={i} position={position} />
       ))}
     </Wrapper>
   )

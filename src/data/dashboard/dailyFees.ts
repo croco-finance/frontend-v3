@@ -3,8 +3,25 @@ import dayjs from 'dayjs'
 import { BigNumber } from 'ethers'
 import gql from 'graphql-tag'
 import { getFeeGrowthInside, getPositionFees } from './contractUtils'
-import { Tick, TokenFees } from './totalOwnerPoolFees'
 
+export interface TokenFees {
+  amount0: BigNumber
+  amount1: BigNumber
+}
+
+export interface Tick {
+  idx: number
+  feeGrowthOutside0X128: BigNumber
+  feeGrowthOutside1X128: BigNumber
+}
+
+export function parseTick(tick: any): Tick {
+  return {
+    idx: Number(tick.tickIdx),
+    feeGrowthOutside0X128: BigNumber.from(tick.feeGrowthOutside0X128),
+    feeGrowthOutside1X128: BigNumber.from(tick.feeGrowthOutside1X128),
+  }
+}
 const POSITION_AND_SNAPS = gql`
   query tickIds($positionId: String) {
     position(id: $positionId) {

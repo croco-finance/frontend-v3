@@ -3,7 +3,7 @@ import { Transaction } from '@ethereumjs/tx'
 import VM from '@ethereumjs/vm'
 import { defaultAbiCoder as AbiCoder, Interface } from '@ethersproject/abi'
 import { BigNumber } from 'ethers'
-import { Tick } from './totalOwnerPoolFees'
+import { Tick } from './dailyFees'
 
 const PRIVATE_KEY = Buffer.from('e331b6d69882b4cb4ea581d88e0b604039a3de5967688d3dcffdd2270c0fd109', 'hex')
 const ACCOUNT_ADDRESS = Address.fromPrivateKey(PRIVATE_KEY)
