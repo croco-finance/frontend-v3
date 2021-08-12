@@ -179,6 +179,7 @@ interface Props {
   token1priceUSD: number
   token0CurrentAmount: number
   token1CurrentAmount: number
+  vm: any
 }
 
 const PositionExpanded = ({
@@ -195,9 +196,10 @@ const PositionExpanded = ({
   token1priceUSD,
   token0CurrentAmount,
   token1CurrentAmount,
+  vm,
 }: Props) => {
   const theme = useTheme()
-  const expandedInfo = useExpandedData(owner, tokenId)
+  const expandedInfo = useExpandedData(owner, tokenId, vm)
   // liquidity distribution data
   const poolData = usePoolDatas([poolAddress])[0]
   const impLossData = expandedInfo?.snapshots

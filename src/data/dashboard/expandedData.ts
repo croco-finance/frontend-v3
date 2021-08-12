@@ -209,7 +209,7 @@ function dailyFeesToChartFormat(dailyFees: DailyFees, decimals0: number, decimal
   return entryArray
 }
 
-export async function getExpandedPosition(positionInOverview: PositionInOverview) {
+export async function getExpandedPosition(positionInOverview: PositionInOverview, vm: any) {
   let error = false
 
   try {
@@ -249,7 +249,7 @@ export async function getExpandedPosition(positionInOverview: PositionInOverview
     })
 
     // 5. compute daily fees from all the data
-    const dailyFees = computeFees(result.data, rawPosition, rawSnaps)
+    const dailyFees = await computeFees(result.data, rawPosition, rawSnaps, vm)
 
     // 6. process snapshots
     const snapshots: Snapshot[] = []

@@ -386,9 +386,10 @@ interface Props {
   positionIndex: number
   isExpanded: boolean
   handleShowExpanded: () => void
+  vm: any
 }
 
-const PositionOverview = ({ position, isExpanded, handleShowExpanded }: Props) => {
+const PositionOverview = ({ position, isExpanded, handleShowExpanded, vm }: Props) => {
   const theme = useTheme()
   const { pool, tickLower, tickUpper, tokenId } = position
   const { token0, token1, fee } = position.pool
@@ -460,9 +461,9 @@ const PositionOverview = ({ position, isExpanded, handleShowExpanded }: Props) =
         <LiquidityCard chainId={1} position={position} ratio={ratio} />
         <FeesCard
           title="Unclaimed Fees"
-          feesUSD={position.uncollectedFeesUSD}
-          feesToken0={position.uncollectedFeesToken0}
-          feesToken1={position.uncollectedFeesToken1}
+          feesUSD={position.uncollectedFeesUSD || 0}
+          feesToken0={position.uncollectedFeesToken0 || 0}
+          feesToken1={position.uncollectedFeesToken1 || 0}
           token0={token0}
           token1={token1}
         />

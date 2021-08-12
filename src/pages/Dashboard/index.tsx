@@ -18,6 +18,7 @@ import { useWatchedAddresses } from 'state/user/hooks'
 import { UserState } from 'state/user/reducer'
 import styled from 'styled-components'
 import { isAddress } from 'utils'
+import { deployContractAndGetVm } from '../../data/dashboard/contractUtils'
 
 const Header = styled(DarkCard)`
   display: flex;
@@ -111,6 +112,7 @@ const Dashboard = ({
   const backgroundColor = useColor(address)
   const toggleAddressesModal = useDashboardAddressesModalToggle()
   const watchedAddresses = useWatchedAddresses()
+  const [vm, setVM] = useState<any>(null)
 
   // based on value of poolSelected we will fiter pools rendered to user
   const [poolSelected, setPoolSelected] = useState<PoolOption>({ value: 'all', label: 'All pools' })
@@ -118,6 +120,19 @@ const Dashboard = ({
   useEffect(() => {
     setPoolSelected({ value: 'all', label: 'All pools' })
   }, [address])
+
+  // set VM
+  useEffect(() => {
+    async function getVM() {
+      const vm = await deployContractAndGetVm()
+      setVM(vm)
+    }
+
+    // get VM if not saved in state
+    if (!vm) {
+      getVM()
+    }
+  }, [])
 
   // get for which adddresses to fetch positions
   let ownersToUse: string[] | undefined
@@ -202,9 +217,9 @@ const Dashboard = ({
           <Loader />
         ) : (
           <>
-            <PositionsList positions={positionsInRange} />
-            <PositionsList positions={positionsOutOfRange} />
-            <PositionsList positions={positionsClosed} />
+            <PositionsList positions={positionsInRange} vm={vm} />
+            <PositionsList positions={positionsOutOfRange} vm={vm} />
+            <PositionsList positions={positionsClosed} vm={vm} />
           </>
         )}
       </Content>

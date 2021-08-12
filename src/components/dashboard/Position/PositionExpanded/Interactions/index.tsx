@@ -104,7 +104,7 @@ const Interactions = ({ interactions, token0Symbol, token1Symbol }: Interactions
           {interactions.map((interaction, i) => {
             const hideTopBorder = indexesWithoutTopBorder.includes(i)
             return (
-              <>
+              <React.Fragment key={i}>
                 <Left hideBorder={hideTopBorder}>
                   {hideTopBorder ? (
                     ''
@@ -122,7 +122,7 @@ const Interactions = ({ interactions, token0Symbol, token1Symbol }: Interactions
                 <Right hideBorder={hideTopBorder}>{formatDollarAmount(interaction.valueUSD)}</Right>
                 <Right hideBorder={hideTopBorder}>{formatAmount(interaction.amountToken0)}</Right>
                 <Right hideBorder={hideTopBorder}>{formatAmount(interaction.amountToken1)}</Right>
-              </>
+              </React.Fragment>
             )
           })}
         </Content>

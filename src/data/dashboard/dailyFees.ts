@@ -2,7 +2,8 @@ import { clientCroco as client } from 'apollo/client'
 import dayjs from 'dayjs'
 import { BigNumber } from 'ethers'
 import gql from 'graphql-tag'
-import { getFeeGrowthInside, getTotalPositionFees, Tick, TokenFees } from './overviewData'
+import { getFeeGrowthInside, getPositionFees } from './contractUtils'
+import { Tick, TokenFees } from './totalOwnerPoolFees'
 
 const POSITION_AND_SNAPS = gql`
   query tickIds($positionId: String) {
@@ -41,32 +42,32 @@ export interface DailyFees {
 
 function buildQuery(pool: string, minTimestamp: number, relevantTickIds: string[]): string {
   let query = `{
-          poolDayDatas(where: {pool: "${pool}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: asc) {
-              date
-              tick
-              feeGrowthGlobal0X128
-              feeGrowthGlobal1X128
-          }`
+            poolDayDatas(where: {pool: "${pool}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: asc) {
+                date
+                tick
+                feeGrowthGlobal0X128
+                feeGrowthGlobal1X128
+            }`
   for (const tickId of relevantTickIds) {
     const processedId = tickId.replace('#', '_').replace('-', '_')
     query += `
-      t${processedId}: tickDayDatas(where: {tick: "${tickId}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: desc) {
-          date
-          tick {
-              tickIdx
-          }
-          feeGrowthOutside0X128
-          feeGrowthOutside1X128
-      }`
+        t${processedId}: tickDayDatas(where: {tick: "${tickId}", date_gt: ${minTimestamp}}, orderBy: date, orderDirection: desc) {
+            date
+            tick {
+                tickIdx
+            }
+            feeGrowthOutside0X128
+            feeGrowthOutside1X128
+        }`
     query += `
-      t${processedId}_first_smaller: tickDayDatas(first: 1, where: {tick: "${tickId}", date_lte: ${minTimestamp}}, orderBy: date, orderDirection: desc) {
-          date
-          tick {
-              tickIdx
-          }
-          feeGrowthOutside0X128
-          feeGrowthOutside1X128
-      }`
+        t${processedId}_first_smaller: tickDayDatas(first: 1, where: {tick: "${tickId}", date_lte: ${minTimestamp}}, orderBy: date, orderDirection: desc) {
+            date
+            tick {
+                tickIdx
+            }
+            feeGrowthOutside0X128
+            feeGrowthOutside1X128
+        }`
   }
   query += '}'
   return query
@@ -80,7 +81,7 @@ function parseTickDayData(tickDayData: any): Tick {
   }
 }
 
-export function computeFees(data: any, position: any, positionSnaps: any): DailyFees {
+export async function computeFees(data: any, position: any, positionSnaps: any, vm: any): Promise<DailyFees> {
   const positionFees: DailyFees = {}
 
   // 1. Get tickDayDatas and merge first smaller with the rest
@@ -115,37 +116,31 @@ export function computeFees(data: any, position: any, positionSnaps: any): Daily
       currentSnapIndex += 1
     }
 
-    const [feeGrowthInside0X128, feeGrowthInside1X128] = getFeeGrowthInside(
+    const [feeGrowthInside0X128, feeGrowthInside1X128] = await getFeeGrowthInside(
+      vm,
       lowerTickDayData,
       upperTickDayData,
       Number(poolDayData.tick),
       BigNumber.from(poolDayData.feeGrowthGlobal0X128),
       BigNumber.from(poolDayData.feeGrowthGlobal1X128)
     )
-    if (
-      feeGrowthInside0X128.sub(feeGrowthInside0LastX128).lt('0') ||
-      feeGrowthInside1X128.sub(feeGrowthInside1LastX128).lt('0')
-    ) {
-      positionFees[poolDayData.date] = {
-        amount0: BigNumber.from('0'),
-        amount1: BigNumber.from('0'),
-      }
-    } else {
-      positionFees[poolDayData.date] = getTotalPositionFees(
-        feeGrowthInside0X128,
-        feeGrowthInside1X128,
-        feeGrowthInside0LastX128,
-        feeGrowthInside1LastX128,
-        BigNumber.from(positionSnaps[currentSnapIndex].liquidity)
-      )
-      feeGrowthInside0LastX128 = feeGrowthInside0X128
-      feeGrowthInside1LastX128 = feeGrowthInside1X128
+
+    const liquidity = BigNumber.from(positionSnaps[currentSnapIndex].liquidity)
+    const fees0Promise = getPositionFees(vm, feeGrowthInside0X128, feeGrowthInside0LastX128, liquidity)
+    const fees1Promise = getPositionFees(vm, feeGrowthInside1X128, feeGrowthInside1LastX128, liquidity)
+
+    feeGrowthInside0LastX128 = feeGrowthInside0X128
+    feeGrowthInside1LastX128 = feeGrowthInside1X128
+
+    positionFees[poolDayData.date] = {
+      amount0: await fees0Promise,
+      amount1: await fees1Promise,
     }
   }
   return positionFees
 }
 
-export async function getDailyPositionFees(positionId: string, numDays: number): Promise<DailyFees> {
+export async function getDailyPositionFees(positionId: string, numDays: number, vm: any): Promise<DailyFees> {
   // 1. get position and snaps
   let result = await client.query({
     query: POSITION_AND_SNAPS,
@@ -180,5 +175,5 @@ export async function getDailyPositionFees(positionId: string, numDays: number):
   })
 
   // 5. compute fees from all the data
-  return computeFees(result.data, position, positionSnapshots)
+  return computeFees(result.data, position, positionSnapshots, vm)
 }

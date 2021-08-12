@@ -4,7 +4,10 @@ import { Pool, Position } from '@uniswap/v3-sdk'
 import { BigNumber } from 'ethers'
 import { formatUnits } from 'ethers/lib/utils'
 import gql from 'graphql-tag'
+import { useEffect, useState } from 'react'
 import { PositionData } from 'state/dashboard/reducer'
+import { getFeeGrowthInside, getPositionFees } from './contractUtils'
+import { parseTick } from './totalOwnerPoolFees'
 
 // See https://docs.uniswap.org/reference/core/libraries/FixedPoint128 for details
 const Q128 = BigNumber.from('0x100000000000000000000000000000000')
@@ -18,50 +21,6 @@ export interface Tick {
   idx: number
   feeGrowthOutside0X128: BigNumber
   feeGrowthOutside1X128: BigNumber
-}
-
-export function parseTick(tick: any): Tick {
-  return {
-    idx: Number(tick.tickIdx),
-    feeGrowthOutside0X128: BigNumber.from(tick.feeGrowthOutside0X128),
-    feeGrowthOutside1X128: BigNumber.from(tick.feeGrowthOutside1X128),
-  }
-}
-
-// reimplementation of Tick.getFeeGrowthInside
-export function getFeeGrowthInside(
-  tickLower: Tick,
-  tickUpper: Tick,
-  tickCurrentId: number,
-  feeGrowthGlobal0X128: BigNumber,
-  feeGrowthGlobal1X128: BigNumber
-): [BigNumber, BigNumber] {
-  // calculate fee growth below
-  let feeGrowthBelow0X128: BigNumber
-  let feeGrowthBelow1X128: BigNumber
-  if (tickCurrentId >= tickLower.idx) {
-    feeGrowthBelow0X128 = tickLower.feeGrowthOutside0X128
-    feeGrowthBelow1X128 = tickLower.feeGrowthOutside1X128
-  } else {
-    feeGrowthBelow0X128 = feeGrowthGlobal0X128.sub(tickLower.feeGrowthOutside0X128)
-    feeGrowthBelow1X128 = feeGrowthGlobal1X128.sub(tickLower.feeGrowthOutside1X128)
-  }
-
-  // calculate fee growth above
-  let feeGrowthAbove0X128: BigNumber
-  let feeGrowthAbove1X128: BigNumber
-  if (tickCurrentId < tickUpper.idx) {
-    feeGrowthAbove0X128 = tickUpper.feeGrowthOutside0X128
-    feeGrowthAbove1X128 = tickUpper.feeGrowthOutside1X128
-  } else {
-    feeGrowthAbove0X128 = feeGrowthGlobal0X128.sub(tickUpper.feeGrowthOutside0X128)
-    feeGrowthAbove1X128 = feeGrowthGlobal1X128.sub(tickUpper.feeGrowthOutside1X128)
-  }
-
-  const feeGrowthInside0X128 = feeGrowthGlobal0X128.sub(feeGrowthBelow0X128).sub(feeGrowthAbove0X128)
-  const feeGrowthInside1X128 = feeGrowthGlobal1X128.sub(feeGrowthBelow1X128).sub(feeGrowthAbove1X128)
-
-  return [feeGrowthInside0X128, feeGrowthInside1X128]
 }
 
 export function getTotalPositionFees(
@@ -87,9 +46,9 @@ export class PositionInOverview extends Position {
   readonly liquidityUSD: number
 
   // Sum of all uncollected fees
-  readonly uncollectedFeesToken0: number
-  readonly uncollectedFeesToken1: number
-  readonly uncollectedFeesUSD: number
+  uncollectedFeesToken0: number | undefined
+  uncollectedFeesToken1: number | undefined
+  uncollectedFeesUSD: number | undefined
 
   constructor(positionData: any, ethPrice: number) {
     const poolData = positionData.pool
@@ -127,26 +86,38 @@ export class PositionInOverview extends Position {
     this.liquidityUSD =
       Number(this.amount0.toSignificant()) * this.token0priceUSD +
       Number(this.amount1.toSignificant()) * this.token1priceUSD
+  }
 
+  public async setFees(positionData: any, vm: any) {
+    const poolData = positionData.pool
     const tickLower = parseTick(positionData.tickLower)
     const tickUpper = parseTick(positionData.tickUpper)
 
-    const [feeGrowthInside0X128, feeGrowthInside1X128] = getFeeGrowthInside(
+    const [feeGrowthInside0X128, feeGrowthInside1X128] = await getFeeGrowthInside(
+      vm,
       tickLower,
       tickUpper,
       this.pool.tickCurrent,
       BigNumber.from(poolData.feeGrowthGlobal0X128),
       BigNumber.from(poolData.feeGrowthGlobal1X128)
     )
-    const fees = getTotalPositionFees(
+
+    const liquidity = BigNumber.from(positionData.liquidity)
+    const fees0Promise = getPositionFees(
+      vm,
       feeGrowthInside0X128,
-      feeGrowthInside1X128,
       BigNumber.from(positionData.feeGrowthInside0LastX128),
-      BigNumber.from(positionData.feeGrowthInside1LastX128),
-      BigNumber.from(positionData.liquidity)
+      liquidity
     )
-    this.uncollectedFeesToken0 = Number(formatUnits(fees.amount0, this.pool.token0.decimals))
-    this.uncollectedFeesToken1 = Number(formatUnits(fees.amount1, this.pool.token1.decimals))
+    const fees1Promise = getPositionFees(
+      vm,
+      feeGrowthInside1X128,
+      BigNumber.from(positionData.feeGrowthInside1LastX128),
+      liquidity
+    )
+
+    this.uncollectedFeesToken0 = Number(formatUnits(await fees0Promise, this.pool.token0.decimals))
+    this.uncollectedFeesToken1 = Number(formatUnits(await fees1Promise, this.pool.token1.decimals))
     this.uncollectedFeesUSD =
       this.uncollectedFeesToken0 * this.token0priceUSD + this.uncollectedFeesToken1 * this.token1priceUSD
   }
@@ -215,23 +186,86 @@ interface PositionsResponse {
   positions: any[]
 }
 
+function useAsyncSetFeesHook(positionData: PositionsResponse | undefined, vm: any) {
+  const [dataWithFees, setDataWithFees] = useState<any>(undefined)
+  const [loadingFees, setLoadingFees] = useState(false)
+  const [errorFees, setErrorFees] = useState(false)
+
+  useEffect(() => {
+    async function fetchFees() {
+      if (positionData) {
+        try {
+          setLoadingFees(true)
+          setErrorFees(false)
+          const ethPrice = Number(positionData.bundle.ethPriceUSD)
+          const positionsFormatted: { [key: string]: PositionData[] } = {}
+
+          for (const position of positionData.positions) {
+            if (!positionsFormatted[position.owner]) {
+              positionsFormatted[position.owner] = []
+            }
+
+            const overview = new PositionInOverview(position, ethPrice)
+            await overview.setFees(position, vm)
+
+            positionsFormatted[position.owner].push({
+              tokenId: position.id,
+              overview,
+              expanded: undefined,
+            })
+          }
+          setDataWithFees(positionsFormatted)
+          setLoadingFees(false)
+        } catch (error) {
+          setLoadingFees(false)
+          setErrorFees(true)
+        }
+      }
+    }
+
+    if (!vm || !positionData) {
+      setDataWithFees(undefined)
+      setLoadingFees(true)
+    }
+
+    if (vm && positionData) {
+      fetchFees()
+    }
+  }, [positionData, vm])
+
+  return { dataWithFees, loadingFees, errorFees }
+}
 /**
  * Fetch top addresses by volume
  */
 export function usePositionDatas(
-  owners: string[]
+  owners: string[],
+  vm: any
 ): {
   loading: boolean
   error: boolean
   data: { [owner: string]: PositionData[] } | undefined
 } {
+  // console.log('usePositionDatas')
+  // console.log('owners', owners)
+  // console.log('vm', vm)
+
   // get blocks from historic timestamps
   const { loading, error, data } = useQuery<PositionsResponse>(POSITIONS_BULK(owners), {
     fetchPolicy: 'network-only',
   })
 
-  // return early if not all data yet
-  if (loading || error) {
+  const { dataWithFees, loadingFees, errorFees } = useAsyncSetFeesHook(data, vm)
+
+  // console.log('loading', loading)
+  // console.log('error', error)
+  // console.log('data', data)
+  // console.log('loadingFees', loadingFees)
+  // console.log('dataWithFees', dataWithFees)
+
+  // return early if not all data yet or vm is not accessible
+
+  if (!vm || error || errorFees) {
     return {
       loading,
       error: true,
@@ -239,31 +273,32 @@ export function usePositionDatas(
     }
   }
 
-  const positionsFormatted: { [key: string]: PositionData[] } = {}
-
-  if (data) {
-    const ethPrice = Number(data.bundle.ethPriceUSD)
-
-    for (const positionData of data.positions) {
-      if (!positionsFormatted[positionData.owner]) positionsFormatted[positionData.owner] = []
-      positionsFormatted[positionData.owner].push({
-        tokenId: positionData.id,
-        overview: new PositionInOverview(positionData, ethPrice),
-        expanded: undefined,
-      })
+  if (loading || loadingFees || !data || !dataWithFees) {
+    return {
+      loading: true,
+      error: false,
+      data: undefined,
     }
   }
 
-  // if there is no data for a given address, save empty arr so that we know we dodn't find any positions
-  owners.forEach((owner) => {
-    if (!Object.keys(positionsFormatted).includes(owner)) {
-      positionsFormatted[owner] = []
+  if (dataWithFees) {
+    // if there is no data for a given address, save empty arr so that we know we dodn't find any positions
+    owners.forEach((owner) => {
+      if (!Object.keys(dataWithFees).includes(owner)) {
+        dataWithFees[owner] = []
+      }
+    })
+
+    return {
+      loading: false,
+      error: false,
+      data: dataWithFees,
     }
-  })
+  }
 
   return {
     loading,
-    error: false,
-    data: positionsFormatted,
+    error: true,
+    data: undefined,
   }
 }
