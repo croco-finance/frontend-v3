@@ -29,7 +29,7 @@ export const client = new ApolloClient({
 })
 
 export const clientCroco = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/benesjan/uniswap-v3-subgraph',
+  uri: 'https://api.thegraph.com/subgraphs/name/benesjan/uniswap-v3-test',
   cache: new InMemoryCache({
     typePolicies: {
       Token: {
