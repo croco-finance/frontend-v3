@@ -7,7 +7,7 @@ import { RowBetween, RowFixed } from 'components/Row'
 import { MouseoverTooltip } from 'components/Tooltip'
 import { Snapshot } from 'data/dashboard/expandedData'
 import useTheme from 'hooks/useTheme'
-import React from 'react'
+import React, { useContext } from 'react'
 import { useExpandedData } from 'state/dashboard/hooks'
 import { usePoolDatas } from 'state/pools/hooks'
 import styled from 'styled-components'
@@ -18,6 +18,7 @@ import Icon from 'components/Icon'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import Interactions from './Interactions'
+import { VMContext } from 'pages/App'
 
 dayjs.extend(utc)
 
@@ -197,7 +198,8 @@ const PositionExpanded = ({
   token1CurrentAmount,
 }: Props) => {
   const theme = useTheme()
-  const expandedInfo = useExpandedData(owner, tokenId)
+  const vm = useContext(VMContext)
+  const expandedInfo = useExpandedData(owner, tokenId, vm)
   // liquidity distribution data
   const poolData = usePoolDatas([poolAddress])[0]
   const impLossData = expandedInfo?.snapshots

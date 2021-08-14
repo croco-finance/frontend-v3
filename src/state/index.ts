@@ -32,11 +32,11 @@ const store = configureStore({
       immutableCheck: false,
       serializableCheck: {
         // Ignore these action types
-        ignoredActions: ['positions/updatePositionData'],
+        ignoredActions: ['positions/updatePositionData', 'positions/addExtendedData'],
         // Ignore these field paths in all actions
         ignoredActionPaths: ['meta.arg', 'payload.timestamp'],
         // Ignore these paths in the state
-        ignoredPaths: ['positions'],
+        ignoredPaths: ['positions', 'positions/addExtendedData'],
       },
     }),
     save({ states: PERSISTED_KEYS }),

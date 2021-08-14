@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState, useEffect } from 'react'
+import { getExpandedPosition } from 'data/dashboard/expandedData'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addPositionOwners, updatePositionData, updateExtendedData } from 'state/dashboard/actions'
+import { addPositionOwners, updateExtendedData, updatePositionData } from 'state/dashboard/actions'
 import { PositionData } from 'state/dashboard/reducer'
 import { notEmpty } from 'utils'
 import { AppDispatch, AppState } from './../index'
-import { getExpandedPosition } from 'data/dashboard/expandedData'
 
 export function useAllPositionData(): {
   [owner: string]: { data: PositionData[] | undefined; lastUpdated: number | undefined }
@@ -73,7 +73,7 @@ export function usePositionDatas(
  * @param tokenId
  * @returns
  */
-export function useExpandedData(owner: string, tokenId: number) {
+export function useExpandedData(owner: string, tokenId: number, vm: any) {
   const dispatch = useDispatch<AppDispatch>()
   const positions = useSelector((state: AppState) => state.positions.byOwner[owner].data)
   // find position with given token id
@@ -85,7 +85,7 @@ export function useExpandedData(owner: string, tokenId: number) {
   useEffect(() => {
     async function fetch() {
       if (position) {
-        const { data, error } = await getExpandedPosition(position.overview)
+        const { data, error } = await getExpandedPosition(position.overview, vm)
         if (!error && data) {
           dispatch(updateExtendedData({ owner, tokenId, data }))
         }

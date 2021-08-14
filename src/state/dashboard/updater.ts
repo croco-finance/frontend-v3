@@ -1,10 +1,11 @@
-import { useAllPositionData, useUpdatePositionData, useAddPositionOwners } from './hooks'
-import { useEffect, useMemo } from 'react'
-import { useTopTokenAddresses } from '../../data/tokens/topTokens'
 import { usePositionDatas } from 'data/dashboard/overviewData'
+import { useEffect, useMemo, useState } from 'react'
 import { useWatchedAddresses } from 'state/user/hooks'
+import { deployContractAndGetVm } from '../../data/dashboard/contractUtils'
+import { useTopTokenAddresses } from '../../data/tokens/topTokens'
+import { useAddPositionOwners, useAllPositionData, useUpdatePositionData } from './hooks'
 
-export default function Updater(): null {
+export default function Updater() {
   // updaters
   const updatePositionData = useUpdatePositionData()
   const addPositionOwners = useAddPositionOwners()
@@ -13,6 +14,7 @@ export default function Updater(): null {
   const watchedAddresses = useWatchedAddresses()
   const allPositionData = useAllPositionData()
   const { loading, error, addresses } = useTopTokenAddresses()
+  const [vm, setVM] = useState<any>(null)
 
   // add top pools on first load
   useEffect(() => {
@@ -20,6 +22,19 @@ export default function Updater(): null {
       addPositionOwners(Object.keys(watchedAddresses))
     }
   }, [allPositionData, addresses, error, loading, watchedAddresses, addPositionOwners])
+
+  // set VM
+  useEffect(() => {
+    async function getVM() {
+      const vm = await deployContractAndGetVm()
+      setVM(vm)
+    }
+
+    // get VM if not saved in state
+    if (!vm) {
+      getVM()
+    }
+  }, [])
 
   // detect for which addresses we havent loaded token data yet
   const unfetchedOwners = useMemo(() => {
@@ -35,7 +50,8 @@ export default function Updater(): null {
 
   // update unloaded pool entries with fetched data
   const { error: positionDataError, loading: positionDataLoading, data: positionDatas } = usePositionDatas(
-    unfetchedOwners
+    unfetchedOwners,
+    vm
   )
   useEffect(() => {
     if (positionDatas && !positionDataError && !positionDataLoading) {
