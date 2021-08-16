@@ -176,9 +176,13 @@ export async function computeFees(data: any, position: any, positionSnaps: any, 
       numAdditions1 = numAdditions1 + 1
     }
 
-    positionFees[poolDayData.date] = {
-      amount0: fees0,
-      amount1: fees1,
+    // This if statement ensures that the first day of fees is ignored
+    // --> first day is noisy plenty of the times
+    if (numAdditions0 !== 1) {
+      positionFees[poolDayData.date] = {
+        amount0: fees0,
+        amount1: fees1,
+      }
     }
   }
   return positionFees
