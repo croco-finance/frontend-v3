@@ -25,6 +25,14 @@ function makeid(length: number) {
   return result
 }
 
+export interface TokenSimulator {
+  name: string
+  symbol: string
+  address: string
+  decimals: number
+  derivedETH: number
+}
+
 export interface Position {
   id: string
   investmentUsd: number
@@ -45,6 +53,8 @@ export interface SimulatorState {
   volume24Usd: number | null
   feeTier: number | null
   currentTokenPricesUsd: number[]
+  tokenBase: TokenSimulator | undefined
+  tokenQuote: TokenSimulator | undefined
   // simulation data
   simulatedPriceCoefficients: number[]
   defaultSliderPriceCoefficients: number[]
@@ -71,6 +81,8 @@ const initialState: SimulatorState = {
   volume24Usd: 0,
   feeTier: 0,
   currentTokenPricesUsd: [],
+  tokenBase: undefined,
+  tokenQuote: undefined,
   // simulation data
   simulatedPriceCoefficients: [1, 1],
   defaultSliderPriceCoefficients: [1, 1],
@@ -95,6 +107,8 @@ export default createReducer(initialState, (builder) =>
         volume24Usd,
         feeTier,
         positions,
+        tokenBase,
+        tokenQuote,
       } = action.payload
       state.poolId = poolId
       state.tokenSymbols = tokenSymbols
@@ -107,6 +121,9 @@ export default createReducer(initialState, (builder) =>
       state.positions = positions
       state.simulatedPriceCoefficients = [1, 1]
       state.defaultSliderPriceCoefficients = [1, 1]
+      state.tokenBase = tokenBase
+      state.tokenQuote = tokenQuote
+      state.priceRatioOrder = 'default'
     })
     .addCase(resetSimulationCoefficients, (state, _) => {
       const tokenCount = state.simulatedPriceCoefficients.length

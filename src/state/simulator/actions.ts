@@ -12,6 +12,8 @@ type SetNewDataType = Pick<
   | 'feeTier'
   | 'volume24Usd'
   | 'positions'
+  | 'tokenBase'
+  | 'tokenQuote'
 >
 
 export const setNewSimulationPoolData = createAction<SetNewDataType>('simulator/setNewSimulationPoolData')

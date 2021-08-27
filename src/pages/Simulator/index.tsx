@@ -246,6 +246,8 @@ const Simulator = ({
               feeTier: poolData.feeTier,
               volume24Usd: poolData.volumeUSD,
               positions: [], // clear all positions
+              tokenBase: token0,
+              tokenQuote: token1,
             })
           )
           dispatch(addPosition())
@@ -261,6 +263,8 @@ const Simulator = ({
               feeTier: poolData.feeTier,
               volume24Usd: poolData.volumeUSD,
               positions: [], // clear all positions
+              tokenBase: token0,
+              tokenQuote: token1,
             })
           )
           // set fetch error
