@@ -17,6 +17,10 @@ export interface ExpandedPositionData {
   interactions: Interaction[]
   collectedFeesToken0: number
   collectedFeesToken1: number
+  roiUSD: number | undefined
+  roiETH: number | undefined
+  roiHODL: number | undefined
+  apr: number | undefined
 }
 
 export interface PositionData {

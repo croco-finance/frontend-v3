@@ -76,6 +76,20 @@ const FirstRowCard = styled(LightCard)`
   margin: 4px 0;
   `};
 `
+
+const FirstRowCardNarrow = styled(FirstRowCard)`
+  width: 25%;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  width: 100%;
+  `};
+`
+
+const FirstRowCardWide = styled(FirstRowCard)`
+  width: 51%;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  width: 100%;
+  `};
+`
 // responsive text
 // disable the warning because we don't use the end prop, we just want to filter it out
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -103,6 +117,10 @@ const RelIl = styled.div`
   border-left: 1px solid ${({ theme }) => theme.text4};
   padding-left: 8px;
   margin-left: 8px;
+`
+
+const Dark = styled.div`
+  color: ${({ theme }) => theme.text3};
 `
 
 interface ImpermanentLossInfo {
@@ -180,6 +198,7 @@ interface Props {
   token1priceUSD: number
   token0CurrentAmount: number
   token1CurrentAmount: number
+  liquidityUSD: number
 }
 
 const PositionExpanded = ({
@@ -196,6 +215,7 @@ const PositionExpanded = ({
   token1priceUSD,
   token0CurrentAmount,
   token1CurrentAmount,
+  liquidityUSD,
 }: Props) => {
   const theme = useTheme()
   const vm = useContext(VMContext)
@@ -212,10 +232,15 @@ const PositionExpanded = ({
       )
     : undefined
 
+  // check if the last interaction with WITHDRAW/DEPOSIT tag is also the first interaction.
+  // If so, we can hide some things in the UI so it's more clean
+  const firstSnapTimestamp = expandedInfo ? expandedInfo.snapshots[0].transaction.timestamp * 1000 : 0
+  const lastInteractionIsFirstSnapshot = impLossData?.impLossSinceTimestamp === firstSnapTimestamp
+
   return (
     <Wrapper>
       <CardsWrapper>
-        <FirstRowCard>
+        <FirstRowCardNarrow>
           <AutoColumn gap="md">
             {typeof expandedInfo?.collectedFeesToken0 === 'number' &&
             typeof expandedInfo?.collectedFeesToken1 === 'number' ? (
@@ -240,23 +265,109 @@ const PositionExpanded = ({
               <Loader />
             )}
           </AutoColumn>
-        </FirstRowCard>
-        <FirstRowCard>
+        </FirstRowCardNarrow>
+        <FirstRowCardNarrow>
           <AutoColumn gap="md">
-            {impLossData ? (
+            {liquidityUSD === 0 ? (
               <>
                 <RowBetween>
-                  <MouseoverTooltip
-                    text={`Impermanent loss since ${dayjs(impLossData.impLossSinceTimestamp).format(
-                      'MMM D, YYYY'
-                    )} - date of your last ${impLossData.lastSnapAction === 'DEPOSIT' ? 'deposit' : 'withdrawal'} 
-                    (This is how much you've lost compared to just holding the underlying tokens).`}
-                  >
-                    <Label>
-                      Imp. loss since {dayjs(impLossData.impLossSinceTimestamp).format('MMM D, YYYY')}:
-                      <Icon icon="QUESTION_ACTIVE" size={18} color={theme.text3} style={{ marginLeft: '2px' }} />
-                    </Label>
-                  </MouseoverTooltip>
+                  <Label>ROI and APR</Label>
+                </RowBetween>
+                <RowBetween>-</RowBetween>
+              </>
+            ) : (typeof expandedInfo?.roiETH === 'number' ||
+                typeof expandedInfo?.roiUSD === 'number' ||
+                typeof expandedInfo?.apr === 'number') &&
+              impLossData &&
+              impLossData.impLossSinceTimestamp ? (
+              <>
+                <RowBetween>
+                  {lastInteractionIsFirstSnapshot ? (
+                    <Label>ROI and APR</Label>
+                  ) : (
+                    <MouseoverTooltip
+                      text={`ROI and APR estimate since ${dayjs(impLossData.impLossSinceTimestamp).format(
+                        'MMM D, YYYY'
+                      )} - date of your last ${impLossData.lastSnapAction === 'DEPOSIT' ? 'deposit' : 'withdrawal'} 
+                   .`}
+                    >
+                      <Label>
+                        ROI and APR since {dayjs(impLossData.impLossSinceTimestamp).format('MMM D')}
+                        <Icon icon="QUESTION_ACTIVE" size={18} color={theme.text3} style={{ marginLeft: '2px' }} />
+                      </Label>
+                    </MouseoverTooltip>
+                  )}
+                </RowBetween>
+                <RowBetween>
+                  <RowFixed>
+                    <TYPE.main>ROI USD</TYPE.main>
+                  </RowFixed>
+                  <TYPE.main>{expandedInfo?.roiUSD ? formatPercentageValue(expandedInfo?.roiUSD) : '-'}</TYPE.main>
+                </RowBetween>
+                <RowBetween>
+                  <RowFixed>
+                    <TYPE.main>ROI ETH</TYPE.main>
+                  </RowFixed>
+                  <TYPE.main>{expandedInfo?.roiETH ? formatPercentageValue(expandedInfo?.roiETH) : '-'}</TYPE.main>
+                </RowBetween>
+                <RowBetween>
+                  <RowFixed>
+                    {lastInteractionIsFirstSnapshot ? (
+                      <Dark>APR USD Est.</Dark>
+                    ) : (
+                      <MouseoverTooltip
+                        text={`Expected APR based on our ROI since ${dayjs(impLossData.impLossSinceTimestamp).format(
+                          'MMM D, YYYY'
+                        )} - date of your last ${impLossData.lastSnapAction === 'DEPOSIT' ? 'deposit' : 'withdrawal'} 
+                 .`}
+                      >
+                        <Dark style={{ display: 'flex', alignItems: 'center' }}>
+                          APR USD Est.
+                          <Icon icon="QUESTION_ACTIVE" size={18} color={theme.text3} style={{ marginLeft: '2px' }} />
+                        </Dark>
+                      </MouseoverTooltip>
+                    )}
+                  </RowFixed>
+                  <Dark>{expandedInfo?.apr ? formatPercentageValue(expandedInfo?.apr) : '-'}</Dark>
+                </RowBetween>
+              </>
+            ) : (
+              <Loader />
+            )}
+          </AutoColumn>
+        </FirstRowCardNarrow>
+        <FirstRowCardWide>
+          <AutoColumn gap="md">
+            {liquidityUSD === 0 ? (
+              <>
+                <RowBetween>
+                  <Label>Impermanent loss</Label>
+                </RowBetween>
+                <RowBetween>-</RowBetween>
+              </>
+            ) : impLossData ? (
+              <>
+                <RowBetween>
+                  {lastInteractionIsFirstSnapshot ? (
+                    <MouseoverTooltip
+                      text={`Impermanent loss -  
+                   This is how much you've lost compared to just holding the underlying tokens.`}
+                    >
+                      <Label>Impermanent loss</Label>
+                    </MouseoverTooltip>
+                  ) : (
+                    <MouseoverTooltip
+                      text={`Impermanent loss since ${dayjs(impLossData.impLossSinceTimestamp).format(
+                        'MMM D, YYYY'
+                      )} - date of your last ${impLossData.lastSnapAction === 'DEPOSIT' ? 'deposit' : 'withdrawal'} 
+ (This is how much you've lost compared to just holding the underlying tokens).`}
+                    >
+                      <Label>
+                        Imp. loss since {dayjs(impLossData.impLossSinceTimestamp).format('MMM D')}
+                        <Icon icon="QUESTION_ACTIVE" size={18} color={theme.text3} style={{ marginLeft: '2px' }} />:
+                      </Label>
+                    </MouseoverTooltip>
+                  )}
 
                   {impLossData.impLossUSD > 0 ? (
                     <Il style={{ color: theme.red1 }}>
@@ -285,12 +396,18 @@ const PositionExpanded = ({
                     {impLossData.differenceToken0 ? toTwoNonZeroDecimals(impLossData.differenceToken1) : '-'}
                   </TYPE.main>
                 </RowBetween>
+                <RowBetween>
+                  <RowFixed>
+                    <Dark>{"ROI USD if you HODL'd"}</Dark>
+                  </RowFixed>
+                  <Dark>{formatPercentageValue(expandedInfo?.roiHODL || 0)}</Dark>
+                </RowBetween>
               </>
             ) : (
               <Loader />
             )}
           </AutoColumn>
-        </FirstRowCard>
+        </FirstRowCardWide>
       </CardsWrapper>
       <ChartsWrapper>
         <DailyFeesWrapper>

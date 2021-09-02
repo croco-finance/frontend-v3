@@ -54,6 +54,7 @@ const Position = ({ position, positionIndex }: Props) => {
                 token1priceUSD={position.overview.token1priceUSD}
                 token0CurrentAmount={Number(position.overview.amount0.toSignificant())}
                 token1CurrentAmount={Number(position.overview.amount1.toSignificant())}
+                liquidityUSD={position.overview.liquidityUSD}
               />
             ) : null}
           </PositionExpandedWrapper>
