@@ -1,6 +1,6 @@
 import { ButtonOutlined } from 'components/Button'
 import VerticalCryptoAmounts from 'components/VerticalCryptoAmounts'
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { removePosition } from 'state/simulator/actions'
 import { useAllSimulatorData } from 'state/simulator/hooks'
@@ -14,6 +14,13 @@ import {
   getSimulatedStatsForRange,
 } from 'utils/simulator'
 import GridRow from './GridRow'
+import { estimate24hUsdFees } from 'data/simulator/feeEstimation'
+import Loader from 'components/Loader'
+import { priceToClosestTick } from '@uniswap/v3-sdk'
+import { Price, Token } from '@uniswap/sdk-core'
+import { MouseoverTooltip } from 'components/Tooltip'
+import Icon from 'components/Icon'
+import useTheme from 'hooks/useTheme'
 
 const Wrapper = styled.div`
   display: flex;
@@ -74,6 +81,7 @@ const AddRow = styled.div`
 
 const AddTitle = styled.div`
   display: flex;
+  align-items: center;
   flex-grow: 1;
   color: ${({ theme }) => theme.text2};
   font-weight: ${({ theme }) => theme.fontWeight.medium};
@@ -121,6 +129,28 @@ const FiatDifference = styled.div<{ sign: '+' | '-' | '' }>`
   }}
 `
 
+const gcd = (a: number, b: number): any => {
+  if (!b) {
+    return a
+  }
+
+  return gcd(b, a % b)
+}
+
+const getNumeratorAndDenominatorOfFraction = (fraction: number) => {
+  const len = fraction.toString().length - 2
+
+  let denominator = Math.pow(10, len)
+  let numerator = fraction * denominator
+
+  const divisor = gcd(numerator, denominator)
+
+  numerator /= divisor
+  denominator /= divisor
+
+  return { numerator, denominator }
+}
+
 interface Props {
   positionIndex: number
   investmentUsd: Position['investmentUsd']
@@ -137,7 +167,78 @@ export default function PositionOverview({
   infiniteRangeSelected,
 }: Props) {
   const dispatch = useDispatch()
-  const { simulatedPriceCoefficients, tokenSymbols, currentTokenPricesUsd, priceRatioOrder } = useAllSimulatorData()
+  const {
+    simulatedPriceCoefficients,
+    tokenSymbols,
+    currentTokenPricesUsd,
+    priceRatioOrder,
+    poolId,
+    tokenBase,
+    tokenQuote,
+  } = useAllSimulatorData()
+  const [feeEstimate, setFeeEstimate] = useState<number | null>(0)
+  const lastPriceUpdate = useRef<number>(Date.now())
+
+  const theme = useTheme()
+  // useEffect to set fees
+  useEffect(() => {
+    async function getFeeEstimate() {
+      setFeeEstimate(null)
+
+      if (tokenBase && tokenQuote) {
+        const token0 = new Token(1, tokenBase.address, tokenBase.decimals, tokenBase.symbol, tokenBase.name)
+        const token1 = new Token(1, tokenQuote.address, tokenQuote.decimals, tokenQuote.symbol, tokenQuote.name)
+
+        const { numerator: numeratorMin, denominator: denominatorMin } = getNumeratorAndDenominatorOfFraction(
+          priceRatioOrder === 'default' ? 1 / priceMin : priceMin
+        )
+        const { numerator: numeratorMax, denominator: denominatorMax } = getNumeratorAndDenominatorOfFraction(
+          priceRatioOrder === 'default' ? 1 / priceMax : priceMax
+        )
+
+        let priceLower
+        let priceUpper
+        const decimalsDifference = tokenBase.decimals - tokenQuote.decimals
+
+        if (decimalsDifference < 0) {
+          priceLower = new Price(token0, token1, numeratorMin, denominatorMin * 10 ** -decimalsDifference)
+          priceUpper = new Price(token0, token1, numeratorMax, denominatorMax * 10 ** -decimalsDifference)
+        } else {
+          priceLower = new Price(token0, token1, numeratorMin * 10 ** decimalsDifference, denominatorMin)
+          priceUpper = new Price(token0, token1, numeratorMax * 10 ** decimalsDifference, denominatorMax)
+        }
+
+        let tickLower = priceToClosestTick(priceLower) || undefined
+        let tickUpper = priceToClosestTick(priceUpper) || undefined
+
+        // switch tick order of lower is bigger than upper
+        if (tickLower && tickUpper) {
+          if (tickLower > tickUpper) {
+            const tmp = tickUpper
+            tickUpper = tickLower
+            tickLower = tmp
+          }
+
+          const feesUsd = await estimate24hUsdFees(poolId, investmentUsd, tickLower, tickUpper, 7)
+          setFeeEstimate(feesUsd)
+        }
+      }
+    }
+
+    // save time of last priceMin / priceMax change
+    lastPriceUpdate.current = Date.now()
+
+    // try to fetch fees only when there is some time between parameters changes
+    if (investmentUsd > 0) {
+      setTimeout(() => {
+        if (Date.now() - lastPriceUpdate.current > 250) {
+          getFeeEstimate()
+        }
+      }, 300)
+    } else {
+      setFeeEstimate(0)
+    }
+  }, [priceMin, priceMax, investmentUsd, poolId, tokenBase, tokenQuote, priceRatioOrder])
 
   // get simulated token price
   const simulatedTokenPricesUsd = multiplyArraysElementWise(currentTokenPricesUsd, simulatedPriceCoefficients)
@@ -240,6 +341,18 @@ export default function PositionOverview({
               {formatDollarAmount(ilAbsolute)}
             </IlAbsolute>
           </IlValuesWrapper>
+        </AddRow>
+        <AddRow>
+          <AddTitle>
+            <MouseoverTooltip text={`Daily average of last week's fee rewards in selected price range`}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                Daily fees estimate:
+                <Icon icon="QUESTION_ACTIVE" size={18} color={theme.text3} style={{ marginLeft: '2px' }} />
+              </div>
+            </MouseoverTooltip>
+          </AddTitle>
+
+          <div>{feeEstimate === 0 ? '0' : feeEstimate ? formatDollarAmount(feeEstimate) : <Loader />}</div>
         </AddRow>
       </AdditionalInfoWrapper>
       <RemovePositionWrapper>

@@ -25,27 +25,44 @@ import { useAddTokenKeys, useAllTokenData } from 'state/tokens/hooks'
 import styled from 'styled-components'
 import { multiplyArraysElementWise } from 'utils/math'
 import { getDataForSimulatedDensityChart } from 'utils/simulator'
+import { DarkCard } from 'components/Card'
+
+const Header = styled(DarkCard)`
+  display: flex;
+  margin-bottom: 44px;
+  align-items: flex-end;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  flex-direction: column;
+  `};
+`
+const InputLabel = styled.div`
+  color: ${({ theme }) => theme.text2};
+  font-weight: ${({ theme }) => theme.fontWeight.medium};
+  padding-left: 10px;
+  margin-bottom: 10px;
+`
+
+const PoolSelectWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  width: 100%;
+  margin-right: 0;
+  `};
+`
 
 const ContentWrapper = styled.div`
   padding: 10px 0;
 `
 
 const SectionHeadline = styled(ContentWrapper)`
-  padding: 20px;
-  font-size: ${({ theme }) => theme.fontSize.h3};
-  font-weight: ${({ theme }) => theme.fontWeight.demiBold};
-  color: ${({ theme }) => theme.text2};
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  padding: 16px 20px;
   font-size: ${({ theme }) => theme.fontSize.normal};
-  `};
-`
-
-const PoolSelectTitle = styled.div`
-  margin-right: 10px;
-  width: 140px;
-  font-size: ${({ theme }) => theme.fontSize.h3};
   font-weight: ${({ theme }) => theme.fontWeight.demiBold};
   color: ${({ theme }) => theme.text2};
+  background-color: ${({ theme }) => theme.black};
+  border-radius: 10px 10px 0 0;
   ${({ theme }) => theme.mediaWidth.upToMedium`
   font-size: ${({ theme }) => theme.fontSize.normal};
   `};
@@ -55,11 +72,20 @@ const ChosenPoolWrapper = styled.div`
   display: flex;
   aign-items: center;
   padding-left: 20px;
-  border-left: 1px solid ${({ theme }) => theme.text4};
-  height: 36px;
+  border-left: 1px solid ${({ theme }) => theme.text5};
+  height: 44px;
   align-items: center;
   font-weight: ${({ theme }) => theme.fontWeight.medium};
   min-width: 160px;
+  width: 100%;
+  max-width: 430px;
+  margin-left: 20px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  border: none;
+  margin-left: 0;
+  padding-left: 10px;
+  max-width: 100%;
+  `};
 `
 const ChosenTokenSymbols = styled.div`
   margin: 0 10px;
@@ -80,6 +106,7 @@ const PositionsTitle = styled.div`
   font-size: ${({ theme }) => theme.fontSize.h3};
   font-weight: ${({ theme }) => theme.fontWeight.demiBold};
   color: ${({ theme }) => theme.text2};
+  padding-left: 16px;
   ${({ theme }) => theme.mediaWidth.upToMedium`
   font-size: ${({ theme }) => theme.fontSize.normal};
   `};
@@ -89,21 +116,7 @@ const PositionWrapper = styled.div`
   margin-bottom: 20px;
 `
 
-const PoolSelectHeader = styled(ContentWrapper)`
-  align-items: center;
-  display: flex;
-  padding-bottom: 20px;
-`
-
-const Content = styled.div`
-  border-top: 1px solid ${({ theme }) => theme.text4};
-`
-
-const PoolSelectWrapper = styled.div`
-  width: 100%;
-  max-width: 430px;
-  margin-right: 20px;
-`
+const Content = styled.div``
 
 const PositionsSelectorWrapper = styled(ContentWrapper)``
 
@@ -111,9 +124,11 @@ const AddPositionButtonWrapper = styled.div`
   display: flex;
   flex-grow: 1;
   justify-content: flex-end;
-  margin-top: 10px;
   width: 200px;
-  margin: 0 20px 0 auto;
+  margin: 0px 20px 20px auto;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  margin-right: 10px;
+ `};
 `
 
 const AddPositionButton = styled(ButtonSecondary)`
@@ -132,7 +147,8 @@ const SimulationBoxSectionWrapper = styled.div`
   margin-right: 10px;
   ${({ theme }) => theme.mediaWidth.upToMedium`
   width: 100%;
-  margin: 0;
+  margin-right: 0;
+  margin-bottom: 20px;
 `};
 `
 
@@ -148,15 +164,16 @@ const LiquidityChartSectionWrapper = styled.div`
 const LiquidityChartWrapper = styled.div`
   padding: 10px;
   background-color: ${({ theme }) => theme.bg0};
-  border-radius: 10px;
+  border-radius: 0 0 10px 10px;
 `
 
 const Error = styled.div`
   width: 100%;
-  color: ${({ theme }) => theme.red1};
-  padding: 20px 0;
+  color: ${({ theme }) => theme.warning};
+  padding: 16px;
   font-size: ${({ theme }) => theme.fontSize.h3};
-  font-weight: ${({ theme }) => theme.fontWeight.demiBold};
+  font-weight: ${({ theme }) => theme.fontWeight.medium};
+  align-items: center;
 `
 
 const Simulator = ({
@@ -229,6 +246,8 @@ const Simulator = ({
               feeTier: poolData.feeTier,
               volume24Usd: poolData.volumeUSD,
               positions: [], // clear all positions
+              tokenBase: token0,
+              tokenQuote: token1,
             })
           )
           dispatch(addPosition())
@@ -244,6 +263,8 @@ const Simulator = ({
               feeTier: poolData.feeTier,
               volume24Usd: poolData.volumeUSD,
               positions: [], // clear all positions
+              tokenBase: token0,
+              tokenQuote: token1,
             })
           )
           // set fetch error
@@ -267,9 +288,9 @@ const Simulator = ({
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={backgroundColor} />
-      <PoolSelectHeader>
-        <PoolSelectTitle>Choose pool</PoolSelectTitle>
+      <Header>
         <PoolSelectWrapper>
+          <InputLabel>Choose pool</InputLabel>
           <PoolSelect />
         </PoolSelectWrapper>
         {showChosenPool && feeTier ? (
@@ -277,7 +298,7 @@ const Simulator = ({
             <DoubleCurrencyLogo
               address0={priceRatioOrder === 'default' ? tokenAddresses[0] : tokenAddresses[1]}
               address1={priceRatioOrder === 'default' ? tokenAddresses[1] : tokenAddresses[0]}
-              size={22}
+              size={20}
             />
             <ChosenTokenSymbols>
               {priceRatioOrder === 'default'
@@ -287,9 +308,13 @@ const Simulator = ({
             {feeTier / 10000}%
           </ChosenPoolWrapper>
         ) : null}
-      </PoolSelectHeader>
+      </Header>
       {loading && <Loader />}
-      {error && <Error>Sorry, we can&apos;t load prices for tokens in this pool.</Error>}
+      {error && (
+        <Error>
+          <Loader /> We are trying to load prices for tokens in this pool. If not loading, try it again in a while.
+        </Error>
+      )}
       {showContent ? (
         <Content>
           <PositionsHeadline>

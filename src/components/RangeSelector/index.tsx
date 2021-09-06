@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => {
       marginTop: -8,
       marginLeft: -8,
       backgroundColor: props.blue1,
-      '&:focus, &:hover, &$active': {
+      '&:focus, &:hover, &active': {
         boxShadow: 'inherit',
       },
     }),

@@ -9,7 +9,7 @@ import CurrencyLogo from 'components/CurrencyLogo'
 const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.bg0};
   padding: 24px;
-  border-radius: 10px;
+  border-radius: 0 0 10px 10px;
   height: fit-content;
   ${({ theme }) => theme.mediaWidth.upToSmall`
   padding: 18px;

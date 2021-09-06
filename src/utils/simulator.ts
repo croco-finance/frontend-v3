@@ -137,14 +137,18 @@ export function getSimulatedStatsForRange(
   }
 }
 
-export function getNearestTick(targetPrice: number, roundOption: 'bottom' | 'nearest' | 'top' = 'nearest') {
+/**
+ * Returns the closest tick that is nearest a given targetPrice
+ * @param targetPrice priceToken0/priceToken1
+ */
+export const getNearestTick = (targetPrice: number) => {
   // there is a tick at every price 𝑝 that is an integer power of 1.0001
   // the equation: 1.0001^tickInteger = targetPrice;
-  // the solution (first get float value and then round it to the nearest integer):
+
+  // 1. First get float value and then round it to the nearest integer"
   const tickFloat = Math.log(targetPrice) / Math.log(1.0001)
-  // return integer tick
-  if (roundOption === 'bottom') return Math.floor(tickFloat)
-  if (roundOption === 'top') return Math.ceil(tickFloat)
+
+  // 2. Convert float to integer (tick has to be integer)
   return Math.round(tickFloat)
 }
 
