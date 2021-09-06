@@ -112,6 +112,13 @@ export async function computeFees(data: any, position: any, positionSnaps: any, 
   let feeGrowthInside0LastX128 = BigNumber.from(positionSnaps[0].feeGrowthInside0LastX128)
   let feeGrowthInside1LastX128 = BigNumber.from(positionSnaps[0].feeGrowthInside1LastX128)
   let currentSnapIndex = 0
+
+  // Filtration vars
+  let sum0 = BigNumber.from(0)
+  let sum1 = BigNumber.from(0)
+  let numAdditions0 = 0
+  let numAdditions1 = 0
+
   for (const poolDayData of data.poolDayDatas) {
     // 3. Get the first tickDayData whose date is smaller or equal to current poolDayData
     const lowerTickDayDataRaw = lowerTickDayDatas.find(
@@ -149,9 +156,33 @@ export async function computeFees(data: any, position: any, positionSnaps: any, 
     feeGrowthInside0LastX128 = feeGrowthInside0X128
     feeGrowthInside1LastX128 = feeGrowthInside1X128
 
-    positionFees[poolDayData.date] = {
-      amount0: await fees0Promise,
-      amount1: await fees1Promise,
+    let fees0 = await fees0Promise
+    let fees1 = await fees1Promise
+
+    // Filtration
+    if (numAdditions0 > 0 && fees0.gt(sum0.div(numAdditions0).mul('1000'))) {
+      // If current fees are more than thousand times bigger than the average set them to average
+      // --> purpose of this is to filter out erroneous values
+      fees0 = sum0.div(numAdditions0)
+    } else {
+      sum0 = sum0.add(fees0)
+      numAdditions0 = numAdditions0 + 1
+    }
+
+    if (numAdditions1 > 0 && fees1.gt(sum1.div(numAdditions1).mul('1000'))) {
+      fees1 = sum1.div(numAdditions1)
+    } else {
+      sum1 = sum1.add(fees1)
+      numAdditions1 = numAdditions1 + 1
+    }
+
+    // This if statement ensures that the first day of fees is ignored
+    // --> first day is noisy plenty of the times
+    if (numAdditions0 !== 1) {
+      positionFees[poolDayData.date] = {
+        amount0: fees0,
+        amount1: fees1,
+      }
     }
   }
   return positionFees

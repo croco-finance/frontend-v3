@@ -44,6 +44,7 @@ export class PositionInOverview extends Position {
   readonly token0priceUSD: number
   readonly token1priceUSD: number
   readonly liquidityUSD: number
+  readonly ethPriceUSD: number
 
   // Sum of all uncollected fees
   uncollectedFeesToken0: number | undefined
@@ -86,6 +87,7 @@ export class PositionInOverview extends Position {
     this.liquidityUSD =
       Number(this.amount0.toSignificant()) * this.token0priceUSD +
       Number(this.amount1.toSignificant()) * this.token1priceUSD
+    this.ethPriceUSD = ethPrice
   }
 
   public async setFees(positionData: any, vm: any) {
