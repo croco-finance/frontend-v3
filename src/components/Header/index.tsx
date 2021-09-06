@@ -282,7 +282,10 @@ export default function Header(props: RouteComponentProps) {
           />
         ) : (
           <NavItems>
-            <StyledNavLink id={`pool-nav-link`} to={'/'} isActive={(match, { pathname }) => pathname === '/'}>
+            <StyledNavLink id={`stake-nav-link`} to={'/positions'}>
+              My Positions
+            </StyledNavLink>
+            <StyledNavLink id={`pool-nav-link`} to={'/overview'}>
               Overview
             </StyledNavLink>
             {/* <StyledNavLink id={`swap-nav-link`} to={'/protocol'}>
@@ -293,9 +296,6 @@ export default function Header(props: RouteComponentProps) {
             </StyledNavLink>
             <StyledNavLink id={`stake-nav-link`} to={'/tokens'}>
               Tokens
-            </StyledNavLink>
-            <StyledNavLink id={`stake-nav-link`} to={'/positions'}>
-              Positions
             </StyledNavLink>
             <StyledNavLink
               id={`stake-nav-link`}
@@ -319,44 +319,43 @@ export default function Header(props: RouteComponentProps) {
     <MobileMenuWrapper>
       <NavItems>
         <StyledNavLink
-          id={`pool-nav-link`}
-          to={'/'}
-          isActive={(match, { pathname }) => pathname === '/'}
-          onClick={() => {
-            setMobileMenuOpened(false)
-          }}
-        >
-          Overview
-        </StyledNavLink>
-        {/* <StyledNavLink id={`swap-nav-link`} to={'/protocol'}>
-            Protocol
-          </StyledNavLink> */}
-        <StyledNavLink
-          id={`stake-nav-link`}
-          to={'/pools'}
-          onClick={() => {
-            setMobileMenuOpened(false)
-          }}
-        >
-          Pools
-        </StyledNavLink>
-        <StyledNavLink
-          id={`stake-nav-link`}
-          to={'/tokens'}
-          onClick={() => {
-            setMobileMenuOpened(false)
-          }}
-        >
-          Tokens
-        </StyledNavLink>
-        <StyledNavLink
           id={`stake-nav-link`}
           to={'/positions'}
           onClick={() => {
             setMobileMenuOpened(false)
           }}
         >
-          Positions
+          My Positions
+          <StyledNavLink
+            id={`pool-nav-link`}
+            to={'/overview'}
+            onClick={() => {
+              setMobileMenuOpened(false)
+            }}
+          >
+            Overview
+          </StyledNavLink>
+          {/* <StyledNavLink id={`swap-nav-link`} to={'/protocol'}>
+            Protocol
+          </StyledNavLink> */}
+          <StyledNavLink
+            id={`stake-nav-link`}
+            to={'/pools'}
+            onClick={() => {
+              setMobileMenuOpened(false)
+            }}
+          >
+            Pools
+          </StyledNavLink>
+          <StyledNavLink
+            id={`stake-nav-link`}
+            to={'/tokens'}
+            onClick={() => {
+              setMobileMenuOpened(false)
+            }}
+          >
+            Tokens
+          </StyledNavLink>
         </StyledNavLink>
         <StyledNavLink
           id={`stake-nav-link`}
