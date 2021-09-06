@@ -13,6 +13,7 @@ import TokensOverview from './Token/TokensOverview'
 import TopBar from 'components/Header/TopBar'
 import Simulator from './Simulator'
 import Dashboard from './Dashboard'
+import LandingPage from './LandingPage'
 import { RedirectInvalidToken } from './Token/redirects'
 import { LocalLoader } from 'components/Loader'
 import PoolPage from './Pool/PoolPage'
@@ -121,7 +122,8 @@ export default function App() {
             <Popups />
             <VMContext.Provider value={vm}>
               <Switch>
-                <Route exact strict path="/" component={Home} />
+                <Route exact strict path="/" component={LandingPage} />
+                <Route exact strict path="/overview" component={Home} />
                 <Route exact strict path="/protocol" component={Protocol} />
                 <Route exact strict path="/pools" component={PoolsOverview} />
                 <Route exact strict path="/tokens" component={TokensOverview} />

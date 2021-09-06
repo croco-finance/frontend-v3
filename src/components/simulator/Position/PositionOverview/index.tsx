@@ -321,11 +321,6 @@ export default function PositionOverview({
         />
       </GridWrapper>
       <AdditionalInfoWrapper>
-        <AddRow>
-          {/* TODO add tooltip that it's compared to Uniswap v2 */}
-          <AddTitle>Capital efficiency coefficient</AddTitle>
-          <div>{capitalEfficiencyCoefficient.toFixed(2)}</div>
-        </AddRow>
         {/* <AddRow>
           <AddTitle>Simulated price</AddTitle>
           <div>{roundToNDecimals(simulatedTokenPricesUsd[0] / simulatedTokenPricesUsd[1], 5)}</div>
@@ -353,6 +348,11 @@ export default function PositionOverview({
           </AddTitle>
 
           <div>{feeEstimate === 0 ? '0' : feeEstimate ? formatDollarAmount(feeEstimate) : <Loader />}</div>
+        </AddRow>
+        <AddRow>
+          {/* TODO add tooltip that it's compared to Uniswap v2 */}
+          <AddTitle style={{ color: theme.text3 }}>Capital efficiency coefficient</AddTitle>
+          <div style={{ color: theme.text3 }}>{capitalEfficiencyCoefficient.toFixed(2)}</div>
         </AddRow>
       </AdditionalInfoWrapper>
       <RemovePositionWrapper>
