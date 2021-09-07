@@ -302,13 +302,21 @@ const PositionExpanded = ({
                   <RowFixed>
                     <TYPE.main>ROI USD</TYPE.main>
                   </RowFixed>
-                  <TYPE.main>{expandedInfo?.roiUSD ? formatPercentageValue(expandedInfo?.roiUSD) : '-'}</TYPE.main>
+                  <TYPE.main>
+                    {expandedInfo?.roiUSD && expandedInfo?.roiUSD !== Infinity
+                      ? formatPercentageValue(expandedInfo?.roiUSD)
+                      : '-'}
+                  </TYPE.main>
                 </RowBetween>
                 <RowBetween>
                   <RowFixed>
                     <TYPE.main>ROI ETH</TYPE.main>
                   </RowFixed>
-                  <TYPE.main>{expandedInfo?.roiETH ? formatPercentageValue(expandedInfo?.roiETH) : '-'}</TYPE.main>
+                  <TYPE.main>
+                    {expandedInfo?.roiETH && expandedInfo?.roiETH !== Infinity
+                      ? formatPercentageValue(expandedInfo?.roiETH)
+                      : '-'}
+                  </TYPE.main>
                 </RowBetween>
                 <RowBetween>
                   <RowFixed>
@@ -328,7 +336,11 @@ const PositionExpanded = ({
                       </MouseoverTooltip>
                     )}
                   </RowFixed>
-                  <Dark>{expandedInfo?.apr ? formatPercentageValue(expandedInfo?.apr) : '-'}</Dark>
+                  <Dark>
+                    {expandedInfo?.apr && expandedInfo?.apr !== Infinity
+                      ? formatPercentageValue(expandedInfo?.apr)
+                      : '-'}
+                  </Dark>
                 </RowBetween>
               </>
             ) : (
@@ -400,7 +412,11 @@ const PositionExpanded = ({
                   <RowFixed>
                     <Dark>{"ROI USD if you HODL'd"}</Dark>
                   </RowFixed>
-                  <Dark>{formatPercentageValue(expandedInfo?.roiHODL || 0)}</Dark>
+                  <Dark>
+                    {expandedInfo?.roiHODL && expandedInfo?.roiHODL !== Infinity
+                      ? formatPercentageValue(expandedInfo?.roiHODL)
+                      : '-'}
+                  </Dark>
                 </RowBetween>
               </>
             ) : (
