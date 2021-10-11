@@ -1,10 +1,12 @@
 import { ButtonPrimary } from 'components/Button'
 import Loader from 'components/Loader'
+import Paywall from 'components/PayWall'
 import ethersProvider from 'connectors/ethersProvider'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { useHistory } from 'react-router-dom'
+import { useIsLocked } from 'state/application/hooks'
 import { addAddress } from 'state/user/actions'
 import styled from 'styled-components'
 import { isAddress } from 'utils'
@@ -146,6 +148,7 @@ const UniLink = styled.a`
 const LandingPage = (props: RouteComponentProps<any>) => {
   const dispatch = useDispatch()
   const history = useHistory()
+  const appIsLocked = useIsLocked()
 
   const [inputAddress, setInputAddress] = useState('')
   const [inputHexAddress, setInputHexAddress] = useState('')
@@ -221,26 +224,32 @@ const LandingPage = (props: RouteComponentProps<any>) => {
               </UniLink>{' '}
               liquidity providers
             </SubBannerHeadline>
-            <AddressInputWrapper>
-              <AddressInput
-                type="text"
-                spellCheck={false}
-                placeholder="Enter ENS domain or valid Ethereum address"
-                value={inputAddress}
-                onChange={(event) => {
-                  handleAddressChange(event.target.value.trim())
-                  setInputAddress(event.target.value.trim())
-                }}
-              />
-              <GoButton
-                disabled={!isValidAddress}
-                onClick={(e) => {
-                  handleButtonOnClick()
-                }}
-              >
-                {loadingEnsDomain ? <Loader size="14px" /> : "Let's Go!"}
-              </GoButton>
-            </AddressInputWrapper>
+
+            {appIsLocked ? (
+              <Paywall />
+            ) : (
+              <AddressInputWrapper>
+                <AddressInput
+                  type="text"
+                  spellCheck={false}
+                  placeholder="Enter ENS domain or valid Ethereum address"
+                  value={inputAddress}
+                  onChange={(event) => {
+                    handleAddressChange(event.target.value.trim())
+                    setInputAddress(event.target.value.trim())
+                  }}
+                />
+                <GoButton
+                  disabled={!isValidAddress}
+                  onClick={(e) => {
+                    handleButtonOnClick()
+                  }}
+                >
+                  {loadingEnsDomain ? <Loader size="14px" /> : "Let's Go!"}
+                </GoButton>
+              </AddressInputWrapper>
+            )}
+
             {/* </Fade> */}
           </AnimatedWrapper>
 

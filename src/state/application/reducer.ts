@@ -8,6 +8,7 @@ import {
   ApplicationModal,
   setOpenModal,
   updateWindowSize,
+  setIsLocked,
 } from './actions'
 
 import { MEDIA_WIDTHS } from 'theme'
@@ -62,6 +63,7 @@ export interface ApplicationState {
     screenWidth: number | null
     screenHeight: number | null
   }
+  readonly isLocked: true | false // depending on if the user has Croco NFT token
 }
 
 const initialState: ApplicationState = {
@@ -77,6 +79,7 @@ const initialState: ApplicationState = {
     screenWidth: null,
     screenHeight: null,
   },
+  isLocked: true,
 }
 
 export default createReducer(initialState, (builder) =>
@@ -121,5 +124,8 @@ export default createReducer(initialState, (builder) =>
         screenWidth,
         screenHeight,
       }
+    })
+    .addCase(setIsLocked, (state, { payload: { isLocked } }) => {
+      state.isLocked = isLocked
     })
 )

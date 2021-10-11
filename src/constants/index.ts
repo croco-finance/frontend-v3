@@ -204,8 +204,6 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   },
 }
 
-export const NetworkContextName = 'NETWORK'
-
 // used for rewards deadlines
 export const BIG_INT_SECONDS_IN_WEEK = JSBI.BigInt(60 * 60 * 24 * 7)
 

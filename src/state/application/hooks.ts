@@ -40,6 +40,10 @@ export function useDashboardAddressesModalToggle(): () => void {
   return useToggleModal(ApplicationModal.DASHBOARD_ADDRESSES)
 }
 
+export function useUnlockProtocolModalToggle(): () => void {
+  return useToggleModal(ApplicationModal.UNLOCK_PROTOCOL)
+}
+
 export function useToggleSettingsMenu(): () => void {
   return useToggleModal(ApplicationModal.SETTINGS)
 }
@@ -97,6 +101,10 @@ export const useLayoutSize = () => {
   const layoutSize = useSelector((state: AppState) => state.application.screen.screenSize)
   const isMobileLayout = !['LARGE', 'LARGE', 'NORMAL'].includes(layoutSize)
   return { isMobileLayout, layoutSize }
+}
+
+export const useIsLocked = () => {
+  return useSelector((state: AppState) => state.application.isLocked)
 }
 
 export const useActions = <M extends ActionCreatorsMapObject<any>>(actions: M) => {

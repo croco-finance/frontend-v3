@@ -15,6 +15,7 @@ export enum ApplicationModal {
   SETTINGS,
   MENU,
   DASHBOARD_ADDRESSES,
+  UNLOCK_PROTOCOL,
 }
 
 export type ResizeAction = {
@@ -34,3 +35,4 @@ export const updateSubgraphStatus = createAction<{ available: boolean | null; sy
 export const updateWindowSize = createAction<{ screenWidth: number; screenHeight: number }>(
   'application/updateWindowSize'
 )
+export const setIsLocked = createAction<{ isLocked: boolean }>('application/setIsLocked')

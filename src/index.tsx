@@ -17,6 +17,11 @@ import ApplicationUpdater from './state/application/updater'
 import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
 import { ApolloProvider } from '@apollo/client/react'
 import { client } from 'apollo/client'
+import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
+import getLibrary from './utils/getLibrary'
+import { NetworkContextName } from './constants/misc'
+
+const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
 const GOOGLE_ANALYTICS_ID: string | undefined = process.env.REACT_APP_GOOGLE_ANALYTICS_ID
 if (typeof GOOGLE_ANALYTICS_ID === 'string') {
@@ -57,13 +62,17 @@ ReactDOM.render(
     <FixedGlobalStyle />
     <ApolloProvider client={client}>
       <Provider store={store}>
-        <Updaters />
-        <ThemeProvider>
-          <ThemedGlobalStyle />
-          <HashRouter>
-            <App />
-          </HashRouter>
-        </ThemeProvider>
+        <Web3ReactProvider getLibrary={getLibrary}>
+          <Web3ProviderNetwork getLibrary={getLibrary}>
+            <Updaters />
+            <ThemeProvider>
+              <ThemedGlobalStyle />
+              <HashRouter>
+                <App />
+              </HashRouter>
+            </ThemeProvider>
+          </Web3ProviderNetwork>
+        </Web3ReactProvider>
       </Provider>
     </ApolloProvider>
   </StrictMode>,
