@@ -2,12 +2,11 @@ import { useWeb3React } from '@web3-react/core'
 import { ButtonPrimary } from 'components/Button'
 import { DarkCard } from 'components/Card'
 import WalletModal from 'components/WalletModal'
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { ApplicationModal } from 'state/application/actions'
 import { useModalOpen, useUnlockProtocolModalToggle, useWalletModalToggle } from 'state/application/hooks'
 import styled from 'styled-components'
-import { NetworkContextName } from '../../constants/misc'
 import { AppState } from '../../state/index'
 
 const Wrapper = styled(DarkCard)`
@@ -83,16 +82,65 @@ const NotHaveTokenDesc = styled.div`
   margin: 20px 0 30px 0;
   font-weight: ${({ theme }) => theme.fontWeight.regular};
 `
+
+type UnlockState = 'LOCKED' | 'UNLOCKED' | 'PENDING'
+
 const Paywall = () => {
-  const dispatch = useDispatch()
-  const { active, account, connector, error } = useWeb3React()
-  const contextNetwork = useWeb3React(NetworkContextName)
+  const { active, account } = useWeb3React()
 
   const [paywallState, setPaywallState] = useState<'NOT_CONNECTED' | 'CONNECTED_NO_TOKEN' | 'CONNECTED_SUCCESS'>()
   const appIsLocked = useSelector((state: AppState) => state.application.isLocked)
   const addressesModalOpen = useModalOpen(ApplicationModal.UNLOCK_PROTOCOL)
   const toggleUnlockModal = useUnlockProtocolModalToggle()
   const toggleWalletModal = useWalletModalToggle()
+  const [unlock, setUnclock] = useState<UnlockState>('PENDING')
+
+  const unlockToken = () => {
+    // eslint-disable-next-line no-unused-expressions
+    const newWindow: any = window as any
+    if (newWindow.unlockProtocol) {
+      newWindow.unlockProtocol.loadCheckoutModal(/* optional configuration */)
+    }
+  }
+
+  const unlockHandler = (e: any) => {
+    setUnclock(e.detail)
+  }
+
+  useEffect(() => {
+    window.addEventListener('unlockProtocol', unlockHandler)
+    window.addEventListener('unlockProtocol.status', (e: any) => {
+      const state = e.detail
+      // the state is a string whose value can either be 'unlocked' or 'locked'...
+      // If state is 'unlocked': implement code here which will be triggered when
+      // the current visitor has a valid lock key
+      // If state is 'locked': implement code here which will be
+      // triggered when the current visitor does not have a valid lock key
+    })
+
+    // window.addEventListener('unlockProtocol.status', (event: any) => {
+    //     // We hide all .unlock-content elements
+    //     if (document && document.querySelector) {
+    //         document.querySelector('.unlock-content').style.display = 'none';
+    //         // We show only the relevant element
+    //         document
+    //             .querySelectorAll(`.unlock-content.${event.detail.state}`)
+    //             .forEach(element => {
+    //                 element.style.display = 'block';
+    //             });
+    //     }
+    // });
+
+    window.addEventListener('unlockProtocol.authenticated', (event: any) => {
+      // event.detail.addresss includes the address of the current user, when known
+    })
+
+    window.addEventListener('unlockProtocol.transactionSent', (event: any) => {
+      // event.detail.hash includes the hash of the transaction sent
+    })
+
+    return () => window.removeEventListener('unlockProtocol', unlockHandler)
+  }, [])
 
   if (!account && !active) {
     return (
@@ -100,7 +148,6 @@ const Paywall = () => {
         <H1>Croco is now available only to Croco Token holders.</H1>
         <Button onClick={toggleWalletModal}>Connect Wallet</Button>
         <DescSmall>Connect your wallet to check if you have Croco Token.</DescSmall>
-        {/* <Web3Status /> */}
         <WalletModal ENSName={undefined} pendingTransactions={[]} confirmedTransactions={[]} />
       </Wrapper>
     )
@@ -119,7 +166,7 @@ const Paywall = () => {
           </Desc>
         </NotHaveTokenDesc>
 
-        <Button onClick={toggleWalletModal}>Get Croco Token</Button>
+        <Button onClick={unlockToken}>Get Croco Token</Button>
         <DescSmall>The membership costs 0.01 ETH per month and you get access to all Croco features.</DescSmall>
         <WalletModal ENSName={undefined} pendingTransactions={[]} confirmedTransactions={[]} />
       </Wrapper>

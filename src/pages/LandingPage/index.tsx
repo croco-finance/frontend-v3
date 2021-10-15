@@ -2,7 +2,7 @@ import { ButtonPrimary } from 'components/Button'
 import Loader from 'components/Loader'
 import Paywall from 'components/PayWall'
 import ethersProvider from 'connectors/ethersProvider'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { useHistory } from 'react-router-dom'
@@ -224,7 +224,6 @@ const LandingPage = (props: RouteComponentProps<any>) => {
               </UniLink>{' '}
               liquidity providers
             </SubBannerHeadline>
-
             {appIsLocked ? (
               <Paywall />
             ) : (
